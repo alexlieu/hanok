@@ -1,26 +1,43 @@
 package com.alex_lieu.hanok.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Data
+@NoArgsConstructor
 public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long customerOrderId;
+    private long id;
 
     @ManyToOne
-    @JoinColumn(name = "person_id")
-    private Person person;
+    @JoinColumn(name = "customer_id")
+    private Person customer;
 
-    private LocalDateTime orderDate;
-    private double totalPrice;
-    private String orderStatus;
-    private String paymentMethod;
-    private double orderAmount;
+    private LocalDateTime orderDateTime;
+    private LocalDateTime pickupDateTime;
+    private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "customerOrder")
-    private Set<OrderItem> orderItem;
+    private String specialInstructions;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
+    public BigDecimal calculateTotal() {
+        return orderItems.stream().map(item ->
+                        item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public enum OrderStatus { PENDING, CONFIRMED, PREPARING, READY, COMPLETED, CANCELLED }
 }
