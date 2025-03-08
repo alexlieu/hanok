@@ -4,16 +4,16 @@ import com.alex_lieu.hanok.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.awt.print.Pageable;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByCategory(Product.Category category, Pageable pageable);
-    List<Product> findByCategoryAndAvailableTrue(Product.Category category, Pageable pageable);
-    List<Product> findByNameContaining(String name, Pageable pageable);
-    List<Product> findByAvailableTrue(Pageable pageable);
-    List<Product> findByNameContainingAndAvailableTrue(String name, Pageable pageable);
-    List<Product> findByNameContainingAndAvailableTrueAndCategory(String name, Product.Category category, Pageable pageable);
-    List<Product> findByNameContainingAndCategory(String name, Product.Category category, Pageable pageable);
+    Page<Product> findByCategory(Product.Category category, Pageable pageable);
+    Page<Product> findByCategoryAndAvailableTrue(Product.Category category, Pageable pageable);
+    Page<Product> findByNameContaining(String name, Pageable pageable);
+    Page<Product> findByAvailableTrue(Pageable pageable);
+    Page<Product> findByNameContainingAndAvailableTrue(String name, Pageable pageable);
+    Page<Product> findByNameContainingAndAvailableTrueAndCategory(String name, Product.Category category, Pageable pageable);
+    Page<Product> findByNameContainingAndCategory(String name, Product.Category category, Pageable pageable);
 }
