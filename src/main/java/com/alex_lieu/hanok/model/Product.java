@@ -29,7 +29,8 @@ public class Product {
 
     private String imageUrl;
 
-    private Boolean available = true;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean available;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariation> variations;

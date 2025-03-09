@@ -23,6 +23,8 @@ public class CustomerOrder {
 
     private LocalDateTime orderDateTime;
     private LocalDateTime pickupDateTime;
+
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     private String specialInstructions;
