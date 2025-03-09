@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    Page<Payment> findByOrder(CustomerOrder customerOrder, Pageable pageable);
+    Page<Payment> findByOrderId(Long id, Pageable pageable);
     Page<Payment> findByPaymentMethod(Payment.PaymentMethod paymentMethod, Pageable pageable);
     Page<Payment> findByPaymentStatus(Payment.PaymentStatus paymentStatus, Pageable pageable);
     Payment findByTransactionReference(String transactionReference);

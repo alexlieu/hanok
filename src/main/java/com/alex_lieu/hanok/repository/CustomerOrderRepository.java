@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Long> {
-    Page<CustomerOrder> findByCustomer(Person customer, Pageable pageable);
+    Page<CustomerOrder> findByCustomerId(Long id, Pageable pageable);
     Page<CustomerOrder> findByOrderStatus(CustomerOrder.OrderStatus orderStatus, Pageable pageable);
     Page<CustomerOrder> findByPickupDateTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
 }
