@@ -32,9 +32,6 @@ public class Product {
 
     private String imageUrl;
 
-    @Column(columnDefinition = "boolean default true")
-    private Boolean available;
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ProductVariation> variations;

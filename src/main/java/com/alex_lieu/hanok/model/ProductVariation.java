@@ -26,6 +26,9 @@ public class ProductVariation {
 
     private BigDecimal price;
 
+    @Column(columnDefinition = "boolean default true")
+    private Boolean available;
+
     @Enumerated(EnumType.STRING)
     private Flavour flavour;
 
