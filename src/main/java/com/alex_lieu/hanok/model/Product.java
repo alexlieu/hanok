@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,14 +25,14 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    private BigDecimal price;
+    private BigDecimal basePrice;
 
     private String imageUrl;
 
     private Boolean available = true;
 
-    @OneToMany(mappedBy = "product")
-    private Set<OrderItem> orderItems;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariation> variations;
 
     @Getter
     public enum Category {
@@ -50,4 +51,16 @@ public class Product {
         }
     }
 
+    /**
+     * Adds a ProductVariation object with default values to a Product with no variation options.
+     */
+    public void createDefaultProduct() {
+        if (this.variations.isEmpty()) {
+            ProductVariation defaultVar = new ProductVariation();
+            defaultVar.setSize(ProductVariation.Size.REGULAR);
+            defaultVar.setFlavour(ProductVariation.Flavour.PLAIN);
+            defaultVar.setPrice(this.basePrice);
+            this.variations.add(defaultVar);
+        }
+    }
 }

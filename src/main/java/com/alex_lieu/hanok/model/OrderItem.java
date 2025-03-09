@@ -14,17 +14,23 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private CustomerOrder order;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variation_id")
+    private ProductVariation variation;
 
     private Integer quantity;
 
+    @Column(precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
     private String notes;
+
+    public BigDecimal getSubTotal() {
+        return unitPrice.multiply(new BigDecimal(quantity));
+    }
+
 }

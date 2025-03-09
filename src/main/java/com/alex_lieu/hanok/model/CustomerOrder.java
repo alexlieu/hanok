@@ -17,7 +17,7 @@ public class CustomerOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Person customer;
 
@@ -33,11 +33,10 @@ public class CustomerOrder {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    public BigDecimal calculateTotal() {
-        return orderItems.stream().map(item ->
-                        item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal getTotal() {
+        return orderItems.stream().map(OrderItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public enum OrderStatus { PENDING, CONFIRMED, PREPARING, READY, COMPLETED, CANCELLED }
+
 }

@@ -25,7 +25,6 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
     @OneToMany(mappedBy = "customer")
     private List<CustomerOrder> orders;
 
