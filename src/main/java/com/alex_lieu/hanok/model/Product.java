@@ -34,7 +34,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private List<ProductVariation> variations;
+    private List<ProductVariant> variations;
 
     @Getter
     public enum Category {
@@ -58,9 +58,9 @@ public class Product {
      */
     public void createDefaultProduct() {
         if (this.variations.isEmpty()) {
-            ProductVariation defaultVar = new ProductVariation();
-            defaultVar.setSize(ProductVariation.Size.REGULAR);
-            defaultVar.setFlavour(ProductVariation.Flavour.PLAIN);
+            ProductVariant defaultVar = new ProductVariant();
+            defaultVar.setSize(ProductVariant.Size.REGULAR);
+            defaultVar.setFlavour(ProductVariant.Flavour.PLAIN);
             defaultVar.setPrice(this.basePrice);
             this.variations.add(defaultVar);
         }

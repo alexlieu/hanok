@@ -25,9 +25,9 @@ public class OrderItem {
     private CustomerOrder order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variation_id")
+    @JoinColumn(name = "variant_id")
     @ToString.Exclude
-    private ProductVariation variation;
+    private ProductVariant variant;
 
     private Integer quantity;
 
