@@ -30,6 +30,22 @@ public class CustomerOrder {
     private LocalDateTime orderDateTime;
     private LocalDateTime pickupDateTime;
 
+    private LocalDateTime updatedAt;
+
+    // Called before the entity is persisted (inserted into the database)
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.orderDateTime = now;
+        this.updatedAt = now;
+    }
+
+    // Called before the entity is updated
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
