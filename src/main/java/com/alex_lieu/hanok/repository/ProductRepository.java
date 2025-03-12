@@ -1,4 +1,5 @@
 package com.alex_lieu.hanok.repository;
+import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.model.Product;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "AND (:maxPrice IS NULL OR v.price <= :maxPrice) " +
             "AND (:available IS NULL OR v.available = :available)")
     Page<Product> searchProducts(
-            @Param("category") Product.Category category,
+            @Param("category") Category category,
             @Param("name") String name,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,

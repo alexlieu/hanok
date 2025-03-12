@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.model;
 
+import com.alex_lieu.hanok.enums.Category;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,23 +38,6 @@ public class Product {
     @JsonManagedReference // Serializes this side normally.
     @ToString.Exclude
     private List<ProductVariant> variations;
-
-    @Getter
-    public enum Category {
-        RICE_CAKE("Rice Cakes"),
-        YAKGWA("Yakgwa"),
-        CASTELLA("Castellas"),
-        MADELEINE("Madeleines"),
-        BROWNIE("Brownies"),
-        CAKE("Cakes"),
-        SERVICE("Services");
-
-        private final String displayName;
-
-        Category(String displayName) {
-            this.displayName = displayName;
-        }
-    }
 
     /**
      * Adds a ProductVariation object with default values to a Product with no variation options.
