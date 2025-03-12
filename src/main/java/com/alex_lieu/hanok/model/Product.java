@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -33,6 +34,7 @@ public class Product {
     private String imageUrl;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Serializes this side normally.
     @ToString.Exclude
     private List<ProductVariant> variations;
 

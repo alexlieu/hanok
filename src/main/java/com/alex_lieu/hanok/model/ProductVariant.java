@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -22,12 +23,13 @@ public class ProductVariant {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonBackReference // Omits this side from serialization.
     private Product product;
 
     private BigDecimal price;
 
     @Column(columnDefinition = "boolean default true")
-    private Boolean available;
+    private boolean available;
 
     @Enumerated(EnumType.STRING)
     private Flavour flavour;
