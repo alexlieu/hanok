@@ -3,10 +3,16 @@ package com.alex_lieu.hanok.model;
 import com.alex_lieu.hanok.enums.Category;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.stereotype.Indexed;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,38 +23,69 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(name = "unique_column_constraints", columnNames = {"name", "description"})
+        },
+        indexes = {
+                @Index(name = "idx_category_active", columnList = "category, active"),
+                @Index(name = "idx_name_active", columnList = "name, active"),
+                @Index(name = "idx_name_category", columnList = "name, category")
+        }
+)
 public class Product {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
 
+    @NotNull(message = "{product.name.notblank}")
+    @Size(min = 3, max = 50, message = "{product.name.size}")
     private String name;
 
     @Column(length = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "{product.category.notblank}")
     private Category category;
 
+    @NotNull(message = "{product.basePrice.notblank}")
+    @Min(value = 0, message = "{product.basePrice.min}")
     private BigDecimal basePrice;
 
+    @Column(unique = true, nullable = true)
     private String imageUrl;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean active;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // Serializes this side normally.
     @ToString.Exclude
-    private List<ProductVariant> variations;
+    private List<ProductVariant> variations = new ArrayList<>();
+
+
+    public void addVariant(ProductVariant productVariant) {
+        variations.add(productVariant);
+        productVariant.setProduct(this);
+    }
 
     /**
      * Adds a ProductVariation object with default values to a Product with no variation options.
      */
     public void createDefaultProduct() {
-        if (this.variations.isEmpty()) {
-            ProductVariant defaultVar = new ProductVariant();
-            defaultVar.setSize(ProductVariant.Size.REGULAR);
-            defaultVar.setFlavour(ProductVariant.Flavour.PLAIN);
-            defaultVar.setPrice(this.basePrice);
-            this.variations.add(defaultVar);
+        ProductVariant defaultVar = new ProductVariant();
+        defaultVar.setSize(ProductVariant.Size.REGULAR);
+        defaultVar.setFlavour(ProductVariant.Flavour.PLAIN);
+        defaultVar.setPrice(this.basePrice);
+        defaultVar.setActive(true);
+        this.addVariant(defaultVar);
+    }
+
+    public void attachVariants(List<ProductVariant> variants) {
+        this.variations.addAll(variants);
+        for (ProductVariant variant : variants) {
+            variant.setProduct(this);
         }
     }
 
