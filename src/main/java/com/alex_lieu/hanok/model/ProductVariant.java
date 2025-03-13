@@ -16,6 +16,12 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@Table(
+        indexes = {
+                @Index(name = "idx_product_variant_price", columnList = "price"),
+                @Index(name = "idx_product_variant_available", columnList = "available")
+        }
+)
 public class ProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +42,9 @@ public class ProductVariant {
 
     @Enumerated(EnumType.STRING)
     private Size size;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean active;
 
     public enum Size { REGULAR, LARGE }
 
