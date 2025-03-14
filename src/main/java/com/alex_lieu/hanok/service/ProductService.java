@@ -51,14 +51,17 @@ public class ProductService {
     }
 
     /**
-     * Expects ProductVariants to be in Product's variations list - use Product.attachVariant method.
+     * Creates a Product entry in the db along with all its variants
+     * Expects ProductVariants to be in Product's variations list - use Product.attachVariant method
+     * If a variant is assigned to a Product, that will be overridden to use this.Product
+     * Do not need to assign active to true, this is done automatically
      * @param product
      * @return Saved Product
      */
     @Transactional
     public Product createProduct(Product product) {
         try {
-            if ( !product.getActive() ) throw new IllegalArgumentException("Cannot save product without active flag");
+            if (!product.getActive()) throw new IllegalArgumentException("Cannot save product without active flag set as false");
             List<ProductVariant> variants = product.getVariations();
             if (variants.isEmpty()) {
                 product.createDefaultProduct();

@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-import org.springframework.stereotype.Indexed;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,9 +22,6 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(
-        uniqueConstraints = {
-                @UniqueConstraint(name = "unique_column_constraints", columnNames = {"name", "description"})
-        },
         indexes = {
                 @Index(name = "idx_category_active", columnList = "category, active"),
                 @Index(name = "idx_name_active", columnList = "name, active"),
@@ -38,12 +33,13 @@ public class Product {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
 
+    @Column(unique=true)
     @NotNull(message = "{product.name.notblank}")
     @Size(min = 3, max = 50, message = "{product.name.size}")
     private String name;
 
     @Column(length = 1000)
-    private String description;
+    private String description = "";
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "{product.category.notblank}")
@@ -57,13 +53,12 @@ public class Product {
     private String imageUrl;
 
     @Column(columnDefinition = "boolean default true")
-    private Boolean active;
+    private Boolean active = true;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // Serializes this side normally.
     @ToString.Exclude
     private List<ProductVariant> variations = new ArrayList<>();
-
 
     public void addVariant(ProductVariant productVariant) {
         variations.add(productVariant);

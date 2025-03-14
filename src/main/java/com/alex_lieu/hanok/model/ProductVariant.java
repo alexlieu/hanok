@@ -2,6 +2,8 @@ package com.alex_lieu.hanok.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -17,6 +19,9 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(
+        uniqueConstraints = {
+                @UniqueConstraint(name = "unique_variant_product_constraints", columnNames = {"product_id","flavour","size"})
+        },
         indexes = {
                 @Index(name = "idx_product_variant_price", columnList = "price"),
                 @Index(name = "idx_product_variant_available", columnList = "available")
@@ -32,19 +37,23 @@ public class ProductVariant {
     @JsonBackReference // Omits this side from serialization.
     private Product product;
 
+    @NotNull(message = "{variant.price.notblank}")
+    @Min(value = 0, message = "{variant.price.min}")
     private BigDecimal price;
 
     @Column(columnDefinition = "boolean default true")
     private boolean available;
 
+    @NotNull(message = "{variant.flavour.notblank}")
     @Enumerated(EnumType.STRING)
     private Flavour flavour;
 
+    @NotNull(message = "{variant.size.notblank}")
     @Enumerated(EnumType.STRING)
     private Size size;
 
     @Column(columnDefinition = "boolean default true")
-    private Boolean active;
+    private Boolean active = true;
 
     public enum Size { REGULAR, LARGE }
 
