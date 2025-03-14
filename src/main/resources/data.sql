@@ -14,6 +14,10 @@ INSERT INTO product (name, category, base_price, description) VALUES
     ('Brownie Set', 'BROWNIE', 16, 'Includes: 2 pieces of vegan chocolate, 2 pieces of cheese & rice, 2 pieces of matcha.'),
     ('Injeolmi', 'RICE_CAKE', 16, 'Perfectly soft, chewy and nutty rice cakes coated in delicately sweet bean powder.');
 
+
+INSERT INTO product (name, category, base_price, description, active) VALUES
+    ('I am not here', 'BROWNIE', 2, 'I am not here...', false);
+
 -- Populate ProductVariant table
 INSERT INTO product_variant (product_id, price, size, flavour) VALUES
     (4, 7, 'REGULAR', 'PLAIN'),
@@ -22,7 +26,8 @@ INSERT INTO product_variant (product_id, price, size, flavour) VALUES
     (4, 10.5, 'LARGE', 'MUGWORT'),
     (1, 16, 'REGULAR', 'PLAIN'),
     (2, 16, 'REGULAR', 'PLAIN'),
-    (3, 16, 'REGULAR', 'PLAIN');
+    (3, 16, 'REGULAR', 'PLAIN'),
+    (5, 16, 'REGULAR', 'PLAIN');
 
 -- Populate CustomerOrder table
 INSERT INTO customer_order (customer_id, order_status, order_date_time, pickup_date_time) VALUES
