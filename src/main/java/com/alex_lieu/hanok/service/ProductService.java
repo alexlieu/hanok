@@ -1,5 +1,7 @@
 package com.alex_lieu.hanok.service;
 
+import com.alex_lieu.hanok.dto.ProductUpdateDto;
+import com.alex_lieu.hanok.dto.VariantUpdateDto;
 import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.model.Product;
 import com.alex_lieu.hanok.model.ProductVariant;
@@ -7,13 +9,12 @@ import com.alex_lieu.hanok.repository.ProductRepository;
 import com.alex_lieu.hanok.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +34,8 @@ public class ProductService {
 
     public Product getProductById(long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ProductExceptions.ProductNotFoundException(id));
-        return product.getActive() ? product : throwProductNotFoundException(id);
+//        return product.getActive() ? product : throwProductNotFoundException(id);
+        return product;
     }
 
     private Product throwProductNotFoundException(Long id) {
@@ -76,30 +78,67 @@ public class ProductService {
         }
     }
 
-    // edit product will take an id and a product object
-    // you will confirm existence of product with id and change the values using the product pbject
-
     @Transactional
-    public ProductVariant addVariantToProduct(Long productId, ProductVariant variant) {
-        Product product = getProductById(productId);
-        variant.setProduct(product);
-        try {
-            return productVariantRepository.save(variant);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Error while adding variant to product: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public void deleteProductWithVariants(long id) {
+    public Product updateProduct(long id, ProductUpdateDto updateDto) {
         Product product = getProductById(id);
-        List<ProductVariant> variants = product.getVariations();
-        productVariantRepository.deleteAll(variants);
-        productRepository.delete(product);
+
+        if (updateDto.name() != null) product.setName(updateDto.name());
+        if (updateDto.description() != null) product.setDescription(updateDto.description());
+        if (updateDto.category() != null) product.setCategory(updateDto.category());
+        if (updateDto.basePrice() != null) product.setBasePrice(updateDto.basePrice());
+        if (updateDto.imageUrl() != null) product.setImageUrl(updateDto.imageUrl());
+        if (updateDto.variants() != null) updateVariants(product, updateDto.variants());
+
+        return productRepository.save(product);
     }
 
     @Transactional
-    public void deleteVariant(long id) {}
+    public void updateVariants(Product product, List<VariantUpdateDto> variantUpdateDtos) {
+        // Create a map of existing variants using a composite key of size and flavour
+        Map<VariantKey, ProductVariant> existingVariants = product.getVariations().stream()
+                .collect(Collectors.toMap(
+                        v -> new VariantKey(v.getSize(), v.getFlavour()),
+                        Function.identity(),
+                        (v1, v2) -> v1 // In case of duplicates, keep the first one (merge function)
+                ));
+
+        List<ProductVariant> updatedVariants = new ArrayList<>();
+
+        for (VariantUpdateDto variantUpdateDto : variantUpdateDtos) {
+            VariantKey key = new VariantKey(variantUpdateDto.size(), variantUpdateDto.flavour());
+            ProductVariant variant = existingVariants.get(key);
+
+            if (variant != null) {
+                // Variant already exists, no need to update
+                variant.setPrice(variantUpdateDto.price());
+                updatedVariants.add(variant);
+                existingVariants.remove(key);
+            } else {
+                // Create new variant
+                ProductVariant newVariant = ProductVariant.builder().product(product)
+                        .price(variantUpdateDto.price()).flavour(variantUpdateDto.flavour())
+                        .size(variantUpdateDto.size()).build();
+                updatedVariants.add(newVariant);
+            }
+        }
+
+        // Remove variants not present in the update
+        product.getVariations().clear();
+        product.getVariations().addAll(updatedVariants);
+    }
+
+    private record VariantKey(ProductVariant.Size size, ProductVariant.Flavour flavour) {}
+
+    // Setting the active state for product variants could be done in the update product method instead
+    // If all variants are inactive do we want to make the parent product inactive?
+    @Transactional
+    public Product updateProductStatus(long id) {
+        Product product = getProductById(id);
+        boolean newStatus = !product.getActive();
+        for (ProductVariant variant : product.getVariations()) variant.setActive(newStatus);
+        product.setActive(newStatus);
+        return productRepository.save(product);
+    }
 
     public List<ProductVariant> getVariantsForProduct(long productId) {
         try {

@@ -2,6 +2,7 @@ package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.ProductListDto;
 import com.alex_lieu.hanok.dto.ProductListMapper;
+import com.alex_lieu.hanok.dto.ProductUpdateDto;
 import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.model.Product;
 import com.alex_lieu.hanok.service.ProductService;
@@ -64,7 +65,7 @@ public class ProductController {
             return ResponseEntity.ok(productListDtos);
     }
 
-    @GetMapping({"{id}"})
+    @GetMapping({"/{id}"})
     public ResponseEntity<Product> getProduct(@PathVariable long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
@@ -72,6 +73,16 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         return ResponseEntity.ok(productService.createProduct(product));
+    }
+
+    @PatchMapping({"/{id}"})
+    public ResponseEntity<Product> updateProduct(@PathVariable long id, @RequestBody ProductUpdateDto productUpdateDto) {
+        return ResponseEntity.ok(productService.updateProduct(id, productUpdateDto));
+    }
+
+    @PatchMapping( {"/{id}/toggle-active"} )
+    public ResponseEntity<Product> softDeleteProduct(@PathVariable long id) {
+        return ResponseEntity.ok(productService.updateProductStatus(id));
     }
 
     private Comparator<ProductListDto> searchProductComparator(String sortBy, String sortDir) {

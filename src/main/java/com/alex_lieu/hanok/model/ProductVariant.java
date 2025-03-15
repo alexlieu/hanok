@@ -57,7 +57,7 @@ public class ProductVariant {
 
     public enum Size { REGULAR, LARGE }
 
-    public enum Flavour { PLAIN, MUGWORT }
+    public enum Flavour { PLAIN, MUGWORT, MATCHA, CHOCOLATE }
 
     @Override
     public final boolean equals(Object o) {
