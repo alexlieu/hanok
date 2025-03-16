@@ -174,17 +174,6 @@ public class ProductService {
                 .build();
     }
 
-    // Setting the active state for product variants could be done in the update product method instead
-    // If all variants are inactive do we want to make the parent product inactive?
-    @Transactional
-    public Product updateProductStatus(long id) {
-        Product product = getProductById(id);
-        boolean newStatus = !product.getActive();
-        for (ProductVariant variant : product.getVariations()) variant.setActive(newStatus);
-        product.setActive(newStatus);
-        return productRepository.save(product);
-    }
-
     public List<ProductVariant> getVariantsForProduct(long productId) {
         try {
             return productVariantRepository.findByProductId(productId);

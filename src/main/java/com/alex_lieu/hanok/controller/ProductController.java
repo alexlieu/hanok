@@ -80,11 +80,6 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, productUpdateDto));
     }
 
-    @PatchMapping( {"/{id}/toggle-active"} )
-    public ResponseEntity<Product> softDeleteProduct(@PathVariable long id) {
-        return ResponseEntity.ok(productService.updateProductStatus(id));
-    }
-
     private Comparator<ProductListDto> searchProductComparator(String sortBy, String sortDir) {
         Comparator<ProductListDto> comparator = switch (sortBy.toLowerCase()) {
             case "name" -> Comparator.comparing(ProductListDto::name);
