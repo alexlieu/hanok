@@ -12,11 +12,12 @@ INSERT INTO product (name, category, base_price, description) VALUES
     ('Cream Cheese Rice Brownies', 'BROWNIE', 16, 'Chewy and sweet brownies made with rice and cream cheese sauce on top.'),
     ('Rice Castella', 'CASTELLA', 16, 'Soft and delicate Japanese sponge cake made with rice and bean paste'),
     ('Brownie Set', 'BROWNIE', 16, 'Includes: 2 pieces of vegan chocolate, 2 pieces of cheese & rice, 2 pieces of matcha.'),
-    ('Injeolmi', 'RICE_CAKE', 16, 'Perfectly soft, chewy and nutty rice cakes coated in delicately sweet bean powder.');
+    ('Injeolmi', 'RICE_CAKE', 16, 'Perfectly soft, chewy and nutty rice cakes coated in delicately sweet bean powder.'),
+    ('Strawberry Cake', 'CAKE', 36, 'Delightfully sweet Korean-style strawberry cake, featuring layers of vanilla sponge, fresh strawberries, and fresh cream.');
 
 
 INSERT INTO product (name, category, base_price, description, active) VALUES
-    ('I am not here', 'BROWNIE', 2, 'I am not here...', false);
+    ('Product with no active flag', 'BROWNIE', 16, 'Inactive :(', false);
 
 -- Populate ProductVariant table
 INSERT INTO product_variant (product_id, price, size, flavour) VALUES
@@ -27,7 +28,12 @@ INSERT INTO product_variant (product_id, price, size, flavour) VALUES
     (1, 16, 'REGULAR', 'PLAIN'),
     (2, 16, 'REGULAR', 'PLAIN'),
     (3, 16, 'REGULAR', 'PLAIN'),
-    (5, 16, 'REGULAR', 'PLAIN');
+    (5, 36, 'REGULAR', 'PLAIN'),
+    (5, 40, 'LARGE', 'PLAIN');
+
+INSERT INTO product_variant (product_id, price, size, flavour, active, available) VALUES
+    (6, 16, 'LARGE', 'MATCHA', false, true),
+    (6, 16, 'REGULAR', 'PLAIN', false, false);
 
 -- Populate CustomerOrder table
 INSERT INTO customer_order (customer_id, order_status, order_date_time, pickup_date_time) VALUES

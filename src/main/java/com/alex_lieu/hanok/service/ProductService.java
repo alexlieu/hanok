@@ -7,8 +7,11 @@ import com.alex_lieu.hanok.model.Product;
 import com.alex_lieu.hanok.model.ProductVariant;
 import com.alex_lieu.hanok.repository.ProductRepository;
 import com.alex_lieu.hanok.repository.ProductVariantRepository;
+import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,8 +58,7 @@ public class ProductService {
     /**
      * Creates a Product entry in the db along with all its variants
      * Expects ProductVariants to be in Product's variations list - use Product.attachVariant method
-     * If a variant is assigned to a Product, that will be overridden to use this.Product
-     * Do not need to assign active to true, this is done automatically
+     * To update variants you need to parse all fields and all variants e.g. if you don't list a variant in your update, it will be deleted
      * @param product
      * @return Saved Product
      */
@@ -88,11 +90,30 @@ public class ProductService {
         if (updateDto.basePrice() != null) product.setBasePrice(updateDto.basePrice());
         if (updateDto.imageUrl() != null) product.setImageUrl(updateDto.imageUrl());
         if (updateDto.variants() != null) updateVariants(product, updateDto.variants());
+        if (updateDto.active() != null) product.setActive(updateDto.active());
 
-        return productRepository.save(product);
+        if (product.getActive()) {
+            boolean hasActiveVariant = product.getVariations().stream().anyMatch(ProductVariant::getActive);
+            if (!hasActiveVariant) {
+                throw new IllegalStateException("Product cannot be active without at least one active variant.");
+            }
+        }
+
+        try {
+            return productRepository.save(product);
+        } catch (DataIntegrityViolationException ex) {
+           throw new IllegalStateException("Database integrity violation: " + ex.getMessage(), ex);
+        } catch (ConstraintViolationException ex) {
+            throw new IllegalStateException("Constraint violation occured: " + ex.getMessage(), ex);
+        } catch (PersistenceException ex) {
+            Throwable cause = ex.getCause();
+            if (cause != null && cause.getMessage().contains("unique")) {
+                throw new IllegalStateException("Duplicate entry detected", ex);
+            }
+            throw new IllegalStateException("An unexpected persistence error occurred", ex);
+        }
     }
 
-    @Transactional
     public void updateVariants(Product product, List<VariantUpdateDto> variantUpdateDtos) {
         // Create a map of existing variants using a composite key of size and flavour
         Map<VariantKey, ProductVariant> existingVariants = product.getVariations().stream()
@@ -102,32 +123,56 @@ public class ProductService {
                         (v1, v2) -> v1 // In case of duplicates, keep the first one (merge function)
                 ));
 
-        List<ProductVariant> updatedVariants = new ArrayList<>();
+        Set<VariantKey> processedVariants = new HashSet<>();
 
         for (VariantUpdateDto variantUpdateDto : variantUpdateDtos) {
+            if (variantUpdateDto.size() == null || variantUpdateDto.flavour() == null) {
+                throw new IllegalArgumentException
+                        ("Product Variants cannot be updated or created with null values for flavour and size.");
+            };
             VariantKey key = new VariantKey(variantUpdateDto.size(), variantUpdateDto.flavour());
             ProductVariant variant = existingVariants.get(key);
 
             if (variant != null) {
-                // Variant already exists, no need to update
-                variant.setPrice(variantUpdateDto.price());
-                updatedVariants.add(variant);
-                existingVariants.remove(key);
+                // Update existing variant
+                updateVariantFromDto(variant, variantUpdateDto);
             } else {
                 // Create new variant
-                ProductVariant newVariant = ProductVariant.builder().product(product)
-                        .price(variantUpdateDto.price()).flavour(variantUpdateDto.flavour())
-                        .size(variantUpdateDto.size()).build();
-                updatedVariants.add(newVariant);
+                ProductVariant newVariant = createVariantFromDto(product, variantUpdateDto);
+                product.getVariations().add(newVariant);
             }
+            processedVariants.add(key);
         }
 
-        // Remove variants not present in the update
-        product.getVariations().clear();
-        product.getVariations().addAll(updatedVariants);
+        // Soft delete variants that are not present in the update.
+        for (ProductVariant variant : product.getVariations()) {
+            VariantKey key = new VariantKey(variant.getSize(), variant.getFlavour());
+            if (!processedVariants.contains(key)) {
+                variant.setActive(false);
+            }
+        }
     }
 
     private record VariantKey(ProductVariant.Size size, ProductVariant.Flavour flavour) {}
+
+    private void updateVariantFromDto(ProductVariant variant, VariantUpdateDto dto) {
+        // Use current Product Variant value if no value is given for a field
+        if (dto.price() != null) variant.setPrice(dto.price());
+        if (dto.active() != null) variant.setActive(dto.active());
+        if (dto.available() != null) variant.setAvailable(dto.available());
+    }
+
+    private ProductVariant createVariantFromDto(Product product, VariantUpdateDto dto) {
+        if (dto.price() == null) throw new IllegalArgumentException("Price is required when creating a new product variant.");
+        return ProductVariant.builder()
+                .product(product)
+                .price(dto.price())
+                .flavour(dto.flavour())
+                .size(dto.size())
+                .active(dto.active() != null ? dto.active() : true)
+                .available(dto.available() != null ? dto.available() : true)
+                .build();
+    }
 
     // Setting the active state for product variants could be done in the update product method instead
     // If all variants are inactive do we want to make the parent product inactive?

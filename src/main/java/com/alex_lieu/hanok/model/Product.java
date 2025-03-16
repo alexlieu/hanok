@@ -57,6 +57,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // Serializes this side normally.
+    @NotNull(message = "{product.variant.notblank}")
     @ToString.Exclude
     private List<ProductVariant> variations = new ArrayList<>();
 
