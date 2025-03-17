@@ -41,9 +41,13 @@ INSERT INTO customer_order (customer_id, order_status, order_date_time, pickup_d
     (1, 'PREPARING', '2025-03-09T10:00:00', '2025-03-10T14:00:00'),
     (2, 'COMPLETED', '2025-03-07T11:00:00', '2025-03-07T15:00:00');
 
+INSERT INTO customer_order (customer_id, order_status, pickup_date_time) VALUES
+    (1, 'PENDING', '2025-03-18T14:00:00');
+
 -- Populate OrderItem table
 INSERT INTO order_item (order_id, variant_id, quantity) VALUES
     (1, 1, 1),
     (1, 4, 1),
     (2, 5, 1),
-    (3, 6, 2);
+    (3, 6, 2),
+    (4, 4, 1);

@@ -4,11 +4,10 @@ import com.alex_lieu.hanok.model.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
-    Page<OrderItem> findByOrderId(Long id, Pageable pageable);
-    Page<OrderItem> findByVariantId(Long id, Pageable pageable);
+    List<OrderItem> findByOrderId(Long id);
+    List<OrderItem> findByVariantId(Long id);
 }

@@ -3,8 +3,8 @@ package com.alex_lieu.hanok.dto;
 import com.alex_lieu.hanok.model.Person;
 
 public class PersonMapper {
-    public static PersonDto toPersonDto(Person person) {
-        return new PersonDto(
+    public static CustomerDto toPersonDto(Person person) {
+        return new CustomerDto(
                 person.getId(),
                 person.getFirstName(),
                 person.getLastName(),

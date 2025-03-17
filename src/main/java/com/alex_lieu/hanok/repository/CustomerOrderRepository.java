@@ -4,10 +4,9 @@ import com.alex_lieu.hanok.model.CustomerOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 @Repository
 public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Long> {
-    Page<CustomerOrder> findOrderItemsByCustomerId(long id, Pageable pageable);
+    List<CustomerOrder> findOrderItemsByCustomerId(long id);
 }
