@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * DTO for {@link OrderItem}
  */
-public record OrderItemDto(
+public record OrderItemViewDto(
         long id,
         @Size(min=3, max=3) @NotEmpty List<String> itemName,
         @Positive(message = "{orderitem.quantity.positive}") Integer quantity,
