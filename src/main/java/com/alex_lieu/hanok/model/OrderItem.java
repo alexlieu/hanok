@@ -2,6 +2,7 @@ package com.alex_lieu.hanok.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -31,6 +32,7 @@ public class OrderItem {
     @ToString.Exclude
     private ProductVariant variant;
 
+    @Positive(message = "{orderitem.quantity.positive}")
     private Integer quantity;
 
     @Column(precision = 10, scale = 2)
@@ -38,7 +40,7 @@ public class OrderItem {
 
     private String notes;
 
-    public BigDecimal getSubTotal() {
+    public BigDecimal getSubtotal() {
         return unitPrice.multiply(new BigDecimal(quantity));
     }
 

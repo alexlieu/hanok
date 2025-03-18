@@ -2,6 +2,7 @@ package com.alex_lieu.hanok.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -28,7 +29,11 @@ public class CustomerOrder {
     @ToString.Exclude
     private Person customer;
 
+    //This tag doesn't work for some reason.
+    //@FutureOrPresent(message = "{order.order.future}")
     private LocalDateTime orderDateTime;
+
+    @Future(message = "{order.pickup.future}")
     private LocalDateTime pickupDateTime;
 
     private LocalDateTime updatedAt;
@@ -61,7 +66,7 @@ public class CustomerOrder {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     public BigDecimal getTotal() {
-        return orderItems.stream().map(OrderItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return orderItems.stream().map(OrderItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public enum OrderStatus { PENDING, CONFIRMED, PREPARING, READY, COMPLETED, CANCELLED }
