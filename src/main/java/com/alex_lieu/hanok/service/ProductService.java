@@ -46,7 +46,7 @@ public class ProductService {
     }
 
 
-    public ProductVariant getProductVariantById(long id) {
+    public ProductVariant getActiveProductVariantById(long id) {
         ProductVariant variant = productVariantRepository.findById(id).orElseThrow(() -> new ProductExceptions.ProductNotFoundException(id));
         return variant.getActive() ? variant : throwProductVariantNotFoundException(id);
     }
