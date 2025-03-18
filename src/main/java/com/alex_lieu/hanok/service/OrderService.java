@@ -1,8 +1,6 @@
 package com.alex_lieu.hanok.service;
 
-import com.alex_lieu.hanok.dto.OrderDto;
-import com.alex_lieu.hanok.dto.OrderItemDto;
-import com.alex_lieu.hanok.dto.PersonMapper;
+import com.alex_lieu.hanok.dto.*;
 import com.alex_lieu.hanok.model.CustomerOrder;
 import com.alex_lieu.hanok.model.OrderItem;
 import com.alex_lieu.hanok.model.Person;
@@ -15,6 +13,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,11 +21,20 @@ import java.util.List;
 public class OrderService {
     private final CustomerOrderRepository customerOrderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final PersonService personService;
+    private final ProductService productService;
 
     @Autowired
-    public OrderService(CustomerOrderRepository customerOrderRepository, OrderItemRepository orderItemRepository) {
+    public OrderService(
+            CustomerOrderRepository customerOrderRepository,
+            OrderItemRepository orderItemRepository,
+            PersonService personService,
+            ProductService productService
+    ) {
         this.customerOrderRepository = customerOrderRepository;
         this.orderItemRepository = orderItemRepository;
+        this.personService = personService;
+        this.productService = productService;
     }
 
     /**
@@ -46,33 +54,51 @@ public class OrderService {
         return customerOrderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + id));
     }
 
-    public List<OrderDto> getOrders() {
+    public List<OrderViewDto> getOrders() {
         return customerOrderRepository.findAll().stream().map(
                 order -> createOrderDto(order, order.getCustomer())
         ).toList();
     }
 
-    public OrderDto createOrderDto(CustomerOrder customerOrder, Person person) {
-        return new OrderDto(
+    public OrderViewDto createOrderDto(CustomerOrder customerOrder, Person person) {
+        return new OrderViewDto(
                 customerOrder.getId(),
+                customerOrder.getOrderDateTime(),
                 customerOrder.getPickupDateTime(),
                 customerOrder.getOrderStatus(),
+                customerOrder.getTotal(),
                 customerOrder.getSpecialInstructions(),
                 customerOrder.getOrderItems().stream().map(this::createOrderItemDto).toList(),
                 PersonMapper.toPersonDto(person)
         );
     }
 
-    public OrderItemDto createOrderItemDto(OrderItem orderItem) {
+    public OrderItemViewDto createOrderItemDto(OrderItem orderItem) {
         ProductVariant variant = orderItem.getVariant();
-        List<String> itemName = Arrays.asList(variant.getProduct().getName(), variant.getFlavour().name(), variant.getSize().name());
-        return new OrderItemDto(
+        return new OrderItemViewDto(
                 orderItem.getId(),
-                itemName,
+                Arrays.asList(
+                        variant.getProduct().getName(),
+                        variant.getFlavour().name().toLowerCase(),
+                        variant.getSize().name().toLowerCase()
+                ),
                 orderItem.getQuantity(),
+                orderItem.getSubtotal(),
                 orderItem.getNotes()
         );
     }
+     public List<OrderViewDto> filterAll(
+             Long customerId,
+             CustomerOrder.OrderStatus orderStatus,
+             LocalDateTime orderDateTimeStart,
+             LocalDateTime orderDateTimeEnd,
+             LocalDateTime pickupDateTimeStart,
+             LocalDateTime pickupDateTimeEnd
+     ) {
+        return customerOrderRepository.filterAll(
+                customerId, orderStatus, orderDateTimeStart, orderDateTimeEnd, pickupDateTimeStart, pickupDateTimeEnd)
+                .stream().map(order -> createOrderDto(order, order.getCustomer())).toList();
+     }
 
     public List<CustomerOrder> getOrderItemsForOrder(long id) {
         CustomerOrder customerOrder = getOrderById(id);
@@ -80,18 +106,30 @@ public class OrderService {
     }
 
     @Transactional
-    public void placeOrder(CustomerOrder order, List<OrderItem> orderItem) {
-        try {
-            order.setOrderStatus(CustomerOrder.OrderStatus.PENDING);
-            CustomerOrder customerOrder = customerOrderRepository.save(order);
-            for (OrderItem item : orderItem) {
-                item.setOrder(customerOrder);
-                orderItemRepository.save(item);
-            }
+    public OrderViewDto placeOrder(OrderCreateDto createOrderDto) {
+        Person customer = personService.findById(createOrderDto.customerId());
+        CustomerOrder order = CustomerOrder.builder()
+                .customer(customer)
+                .specialInstructions(createOrderDto.specialInstructions())
+                .orderStatus(CustomerOrder.OrderStatus.PENDING)
+                .build();
+        order.setOrderItems(createOrderDto.createOrderItemDtoList().stream().map(o -> {
+            ProductVariant variant = productService.getActiveProductVariantById(o.productVariantId());
+            return OrderItem.builder()
+                    .order(order)
+                    .variant(variant)
+                    .quantity((o.quantity() == null) ? 1 : o.quantity())
+                    .unitPrice(variant.getPrice())
+                    .notes(o.notes())
+                    .build();
+        }).toList());
+        try{
+            CustomerOrder savedOrder = customerOrderRepository.save(order);
+            return createOrderDto(savedOrder, order.getCustomer());
         } catch (DataAccessException e) {
-            throw new OrderExceptions.OrderProcessingException("Error saving order or order items", e);
+            throw new RuntimeException("Error occurred while placing order: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new OrderExceptions.UnexpectedOrderException("Unexpected error during order placement", e);
+            throw new OrderExceptions.OrderProcessingException("Error occurred while placing order: " + e.getMessage(), e);
         }
     }
 

@@ -85,7 +85,7 @@ public class ProductController {
             case "name" -> Comparator.comparing(ProductListDto::name);
             case "cat" -> Comparator.comparing(ProductListDto::category);
             case "price" -> Comparator.comparing(ProductListDto::price);
-            default -> throw new IllegalArgumentException("Invalid sortBy parameter: " + sortBy);
+            default -> throw new IllegalArgumentException("Invalid sortBy parameter: " + sortBy.toLowerCase());
         };
 
         if (sortDir.equalsIgnoreCase("desc")) {
