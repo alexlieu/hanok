@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.model;
+package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.enums.Category;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

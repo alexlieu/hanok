@@ -1,6 +1,6 @@
 package com.alex_lieu.hanok.dto;
 
-import com.alex_lieu.hanok.model.ProductVariant;
+import com.alex_lieu.hanok.entity.ProductVariant;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

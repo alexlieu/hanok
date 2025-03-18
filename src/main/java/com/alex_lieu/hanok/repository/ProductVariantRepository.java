@@ -1,6 +1,6 @@
 package com.alex_lieu.hanok.repository;
 
-import com.alex_lieu.hanok.model.ProductVariant;
+import com.alex_lieu.hanok.entity.ProductVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

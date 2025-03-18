@@ -2,7 +2,7 @@ package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.OrderCreateDto;
 import com.alex_lieu.hanok.dto.OrderViewDto;
-import com.alex_lieu.hanok.model.CustomerOrder;
+import com.alex_lieu.hanok.entity.CustomerOrder;
 import com.alex_lieu.hanok.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;

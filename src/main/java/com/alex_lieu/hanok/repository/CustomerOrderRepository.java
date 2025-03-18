@@ -1,5 +1,5 @@
 package com.alex_lieu.hanok.repository;
-import com.alex_lieu.hanok.model.CustomerOrder;
+import com.alex_lieu.hanok.entity.CustomerOrder;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

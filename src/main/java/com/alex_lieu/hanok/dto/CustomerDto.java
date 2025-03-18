@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * DTO for {@link com.alex_lieu.hanok.model.Person}
+ * DTO for {@link com.alex_lieu.hanok.entity.Person}
  */
 public record CustomerDto(
         long id,

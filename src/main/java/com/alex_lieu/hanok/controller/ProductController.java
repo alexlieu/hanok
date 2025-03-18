@@ -4,7 +4,7 @@ import com.alex_lieu.hanok.dto.ProductListDto;
 import com.alex_lieu.hanok.dto.ProductListMapper;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
 import com.alex_lieu.hanok.enums.Category;
-import com.alex_lieu.hanok.model.Product;
+import com.alex_lieu.hanok.entity.Product;
 import com.alex_lieu.hanok.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

@@ -1,10 +1,8 @@
 package com.alex_lieu.hanok.service;
 
-import com.alex_lieu.hanok.model.Person;
+import com.alex_lieu.hanok.entity.Person;
 import com.alex_lieu.hanok.repository.PersonRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class PersonService {

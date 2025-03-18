@@ -1,10 +1,11 @@
-package com.alex_lieu.hanok.model;
+package com.alex_lieu.hanok.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Builder
@@ -14,27 +15,32 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-public class Person {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    private CustomerOrder order;
 
-    @Column(unique = true)
-    private String email;
-    private String passwordHash;
+    private BigDecimal amount;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private PaymentMethod paymentMethod;
 
-    @OneToMany(mappedBy = "customer")
-    @ToString.Exclude
-    private List<CustomerOrder> orders;
+    private PaymentStatus paymentStatus;
 
-    public enum Role { CUSTOMER, STAFF, ADMIN }
+    private LocalDateTime paymentDateTime;
+
+    private String transactionReference;
+
+    public enum PaymentMethod {
+        CREDIT_CARD, DEBIT_CARD, CASH, MOBILE_PAYMENT
+    }
+
+    public enum PaymentStatus {
+        PENDING, COMPLETED, FAILED, REFUNDED
+    }
 
     @Override
     public final boolean equals(Object o) {

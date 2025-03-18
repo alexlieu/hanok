@@ -1,7 +1,7 @@
 package com.alex_lieu.hanok.dto;
 
-import com.alex_lieu.hanok.model.Product;
-import com.alex_lieu.hanok.model.ProductVariant;
+import com.alex_lieu.hanok.entity.Product;
+import com.alex_lieu.hanok.entity.ProductVariant;
 
 import java.math.BigDecimal;
 

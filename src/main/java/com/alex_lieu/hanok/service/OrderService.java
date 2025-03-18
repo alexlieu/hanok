@@ -1,10 +1,10 @@
 package com.alex_lieu.hanok.service;
 
 import com.alex_lieu.hanok.dto.*;
-import com.alex_lieu.hanok.model.CustomerOrder;
-import com.alex_lieu.hanok.model.OrderItem;
-import com.alex_lieu.hanok.model.Person;
-import com.alex_lieu.hanok.model.ProductVariant;
+import com.alex_lieu.hanok.entity.CustomerOrder;
+import com.alex_lieu.hanok.entity.OrderItem;
+import com.alex_lieu.hanok.entity.Person;
+import com.alex_lieu.hanok.entity.ProductVariant;
 import com.alex_lieu.hanok.repository.CustomerOrderRepository;
 import com.alex_lieu.hanok.repository.OrderItemRepository;
 import jakarta.persistence.EntityNotFoundException;

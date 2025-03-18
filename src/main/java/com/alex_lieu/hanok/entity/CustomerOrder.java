@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.model;
+package com.alex_lieu.hanok.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
