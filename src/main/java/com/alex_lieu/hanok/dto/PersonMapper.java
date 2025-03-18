@@ -8,8 +8,8 @@ public class PersonMapper {
                 person.getId(),
                 person.getFirstName(),
                 person.getLastName(),
-                person.getEmail(),
-                person.getPhoneNumber()
+                person.getPhoneNumber(),
+                person.getEmail()
         );
     }
 }
