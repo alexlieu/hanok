@@ -8,10 +8,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record VariantUpdateDto(
-        long id,
-        @Positive BigDecimal price,
-        @NotNull ProductVariant.Flavour flavour,
-        @NotNull ProductVariant.Size size,
+        @Positive(message = "{variant.price.positive}") BigDecimal price,
+        @NotNull(message = "{variant.flavour.notblank}") ProductVariant.Flavour flavour,
+        @NotNull(message = "{variant.size.notblank}") ProductVariant.Size size,
         Boolean active,
         Boolean available
 ) implements Serializable {}
