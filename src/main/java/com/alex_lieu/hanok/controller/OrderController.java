@@ -1,6 +1,7 @@
 package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.OrderCreateDto;
+import com.alex_lieu.hanok.dto.OrderUpdateDto;
 import com.alex_lieu.hanok.dto.OrderViewDto;
 import com.alex_lieu.hanok.entity.CustomerOrder;
 import com.alex_lieu.hanok.service.OrderService;
@@ -61,6 +62,11 @@ public class OrderController {
     @PostMapping
     private ResponseEntity<OrderViewDto> placeOrder(@RequestBody OrderCreateDto order) {
         return ResponseEntity.ok(orderService.placeOrder(order));
+    }
+
+    @PatchMapping("/{id}")
+    private ResponseEntity<OrderViewDto> updateOrder(@PathVariable long id, @RequestBody OrderUpdateDto updateDto) {
+        return ResponseEntity.ok(orderService.updateOrder(id, updateDto));
     }
 
 }

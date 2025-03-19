@@ -8,14 +8,18 @@ import com.alex_lieu.hanok.entity.ProductVariant;
 import com.alex_lieu.hanok.repository.CustomerOrderRepository;
 import com.alex_lieu.hanok.repository.OrderItemRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -131,6 +135,68 @@ public class OrderService {
         } catch (Exception e) {
             throw new OrderExceptions.OrderProcessingException("Error occurred while placing order: " + e.getMessage(), e);
         }
+    }
+
+    @Transactional
+    public OrderViewDto updateOrder(long id, OrderUpdateDto updateDto) {
+        CustomerOrder order = getOrderById(id);
+
+        Optional<LocalDateTime> updatedPickupDateTime = Optional.ofNullable(updateDto.pickupDateTime());
+        updatedPickupDateTime.ifPresent(p -> {
+            if (!p.isAfter(order.getOrderDateTime())) throw new IllegalArgumentException("Pickup date: " + p + " cannot be before the Order date: " + order.getOrderDateTime());
+            order.setPickupDateTime(p);
+        });
+        if(updateDto.orderStatus() != null) order.setOrderStatus(updateDto.orderStatus());
+        if(updateDto.specialInstructions() != null) order.setSpecialInstructions(updateDto.specialInstructions());
+        if(updateDto.items() != null) updateItems(order, updateDto.items());
+       try {
+           CustomerOrder savedOrder =  customerOrderRepository.save(order);
+           return createOrderDto(savedOrder, savedOrder.getCustomer());
+       } catch (DataIntegrityViolationException ex) {
+           throw new IllegalStateException("Database integrity violation: " + ex.getMessage(), ex);
+       } catch (ConstraintViolationException ex) {
+           throw new IllegalStateException("Constraint violation occured: " + ex.getMessage(), ex);
+       } catch (PersistenceException ex) {
+           Throwable cause = ex.getCause();
+           if (cause != null && cause.getMessage().contains("unique")) {
+               throw new IllegalStateException("Duplicate entry detected", ex);
+           }
+           throw new IllegalStateException("An unexpected persistence error occurred", ex);
+       }
+    }
+
+    private void updateItems(CustomerOrder order, List<OrderItemUpdateDto> updateDtos) {
+        Map<Long, OrderItem> existingItems = order.getOrderItems().stream()
+                .collect(Collectors.toMap(o -> o.getVariant().getId(), Function.identity()));
+
+        for (OrderItemUpdateDto updateDto : updateDtos) {
+            ProductVariant variant = productService.getActiveProductVariantById(updateDto.variantId());
+            Optional<OrderItem> existingItem = Optional.ofNullable(existingItems.get(variant.getId()));
+            existingItem.ifPresentOrElse(
+                    i -> updateOrderItemFromDto(i, updateDto),
+                    () -> order.getOrderItems().add(createOrderItemFromDto(order, variant, updateDto))
+            );
+        }
+    }
+
+    private OrderItem createOrderItemFromDto(CustomerOrder order, ProductVariant variant, OrderItemUpdateDto dto) {
+        return OrderItem.builder()
+                .order(order)
+                .variant(variant)
+                .unitPrice(variant.getPrice())
+                .quantity((dto.quantity() == null) ? 1 : dto.quantity())
+                .notes(nullIfEmptyOrBlankSpace(dto.notes()))
+                .build();
+    }
+
+    private void updateOrderItemFromDto(OrderItem item, OrderItemUpdateDto dto) {
+        if(dto.quantity() != null) item.setQuantity(dto.quantity());
+        if(dto.notes() != null) item.setNotes(dto.notes().trim());
+        item.setNotes(nullIfEmptyOrBlankSpace(dto.notes()));
+    }
+
+    public String nullIfEmptyOrBlankSpace(String str) {
+        return (str == null || str.isBlank()) ? null : str.trim();
     }
 
 }
