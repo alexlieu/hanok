@@ -1,14 +1,16 @@
-import React from 'react';
-import './App.css';
+import Products from './components/Products'
 
-import Products from './Products';
+import './App.css'
 
 function App() {
+
   return (
     <>
-      <Products />
+      <main>
+        <Products />
+      </main>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

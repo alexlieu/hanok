@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import ErrorType from "./type/ErrorType";
-import { ProductView } from "./type/ProductView";
+import ErrorType from "../types/ErrorType";
+import { ProductView } from "../types/ProductListView";
 
 const Products: React.FC = () => {
     const [fetching, setIsFetching] = useState(false);
