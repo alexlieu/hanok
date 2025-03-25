@@ -4,12 +4,15 @@ import { ProductView } from "../types/ProductListView";
 import ProductsFilter from "./ProductsFilter";
 
 const uniqueCategoryFilter = (productsArray: ProductView[]) => {
-    const filteredArray = productsArray.filter((value, index, self) => 
-        index === self.findIndex((t) => (
-            t.category === value.category
-        ))
-    )
-    return filteredArray.map(p => p.category)
+    const uniqueCategories = [...new Set(productsArray.map(p => p.category))];
+    const categoryCounts = productsArray.reduce((acc, product) => {
+        acc[product.category] = (acc[product.category] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+    return uniqueCategories.map(category => ({
+        category,
+        count: categoryCounts[category]
+    }));
 }
 
 const Products: React.FC = () => {

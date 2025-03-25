@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 interface FilterProps {
-    options: string[];
+    options: {category: string, count: number}[];
     onChange: (selectionOption: string | null) => void;
 }
 
@@ -19,14 +19,14 @@ const ProductsFilter: React.FC< FilterProps > = ({ options, onChange }) => {
         <>
             <ul>
                 <li>
-                    {options.map(( cat, index ) => (
-                        <label key={`${cat}-${index}`}>
+                    {options.map(( { category, count } , index ) => (
+                        <label key={`${category}-${index}`}>
                             <input 
                                 type="checkbox"
-                                checked={selectedOption === cat}
-                                onChange={() => handleFilterChange(cat)}
+                                checked={selectedOption === category}
+                                onChange={() => handleFilterChange(category)}
                             />
-                            <span>{cat}</span>
+                            <span>{`${category} (${count})`}</span>
                         </label>
                     ))}
                 </li>
