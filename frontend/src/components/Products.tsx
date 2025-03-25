@@ -15,47 +15,67 @@ const uniqueCategoryFilter = (productsArray: ProductView[]) => {
     }));
 }
 
+const formatPrice = (value: number) => {
+   return (value % 1 != 0) ? `£${value}` : `£${value}.00`;
+}
+
 const Products: React.FC = () => {
     const [fetching, setIsFetching] = useState(false);
-    const [products, setProducts] = useState<ProductView[]>([])
-    const [error, setError] = useState<ErrorType>(null)
+    const [products, setProducts] = useState<ProductView[]>([]);
+    const [categories, setCategories] = useState<{category: string, count: number}[]>([]);
+    const [error, setError] = useState<ErrorType>(null);
 
     useEffect(() => {
-        async function fetchProducts() {
-            try {
-                setIsFetching(true)
-                const response = await fetch("http://localhost:8080/api/products")
-                const resData = await response.json()
-                if (!response.ok) throw new Error()
-                setProducts(resData)
-            } catch (error) {
-                if (error instanceof Error) setError(error)
-                else setError(new Error('An unknown error occured')) 
-            }
-            setIsFetching(false)
-        }
-        fetchProducts()
+        fetchAllProducts();
     }, [])
 
-    const handleFilterSelection = (selectionOption: string | null) => {
-        console.log(`Selected option: `, selectionOption)
+    const handleFilterSelection = (selectedCategory: string | null) => {
+        if (selectedCategory) fetchFilteredProducts(selectedCategory);
+        else fetchAllProducts();
+    }
+
+    const fetchFilteredProducts = async (selectedCategory: string) => {
+        try {
+            setIsFetching(true);
+            const query = new URLSearchParams({cat : selectedCategory});
+            const response = await fetch(`http://localhost:8080/api/products?${query}`);
+            const resData = await response.json();
+            setProducts(resData);
+        } catch (error) {
+            if (error instanceof Error) setError(error);
+            else setError(new Error('An unknown error occurred'));
+        }
+        setIsFetching(false);
+    }
+
+    const fetchAllProducts = async () => {
+        try {
+            setIsFetching(true);
+            const response = await fetch('http://localhost:8080/api/products');
+            if (!response.ok) throw new Error('Failed to fetch products');
+            const data = await response.json();
+            setProducts(data);
+            setCategories(uniqueCategoryFilter(data));
+        } catch (error) {
+            if (error instanceof Error) setError(error);
+            else setError(new Error('An unknown error occurred'));
+        }
+        setIsFetching(false);
     }
 
     return (
         <>
             <ProductsFilter
-                options = {uniqueCategoryFilter(products)}
+                options = {categories}
                 onChange = {handleFilterSelection}
             />
-            {fetching && <p>Fetching products...</p>}
             {( !fetching && products.length === 0 ) && <p>Issue fetching products</p>}
             {products.length > 0 && (
                 <ul className="grid grid-cols-3 gap-4">
                     {products.map((product) => (
-                        <li key={`${product.name}-${product.id}`}>
+                        <li key={`${product.name}-${product.id}`} className="flex justify-evenly">
                             <h3>{product.name}</h3>
-                            <h3>{product.price}</h3>
-                            <p>{product.category.toLowerCase()}</p>
+                            <h3>{formatPrice(product.price)}</h3>
                         </li>
                     ))}
                 </ul>
