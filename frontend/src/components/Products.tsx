@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import ErrorType from "../types/ErrorType";
 import { ProductView } from "../types/ProductListView";
+import ProductsFilter from "./ProductsFilter";
+
+const uniqueCategoryFilter = (productsArray: ProductView[]) => {
+    const filteredArray = productsArray.filter((value, index, self) => 
+        index === self.findIndex((t) => (
+            t.category === value.category
+        ))
+    )
+    return filteredArray.map(p => p.category)
+}
 
 const Products: React.FC = () => {
     const [fetching, setIsFetching] = useState(false);
@@ -24,14 +34,22 @@ const Products: React.FC = () => {
         fetchProducts()
     }, [])
 
+    const handleFilterSelection = (selectionOption: string | null) => {
+        console.log(`Selected option: `, selectionOption)
+    }
+
     return (
         <>
+            <ProductsFilter
+                options = {uniqueCategoryFilter(products)}
+                onChange = {handleFilterSelection}
+            />
             {fetching && <p>Fetching products...</p>}
             {( !fetching && products.length === 0 ) && <p>Issue fetching products</p>}
             {products.length > 0 && (
-                <ul>
+                <ul className="grid grid-cols-3 gap-4">
                     {products.map((product) => (
-                        <li>
+                        <li key={`${product.name}-${product.id}`}>
                             <h3>{product.name}</h3>
                             <h3>{product.price}</h3>
                             <p>{product.category.toLowerCase()}</p>
