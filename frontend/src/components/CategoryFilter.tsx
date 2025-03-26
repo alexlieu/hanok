@@ -5,7 +5,7 @@ interface FilterProps {
     onChange: (selectionOption: string | null) => void;
 }
 
-const ProductsFilter: React.FC< FilterProps > = ({ options, onChange }) => {
+const CategoryFilter: React.FC< FilterProps > = ({ options, onChange }) => {
 
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     
@@ -35,4 +35,4 @@ const ProductsFilter: React.FC< FilterProps > = ({ options, onChange }) => {
     )
 }
 
-export default ProductsFilter
+export default CategoryFilter
