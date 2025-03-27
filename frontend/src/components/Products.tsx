@@ -21,8 +21,9 @@ export const formatPrice = (value: number) => {
 }
 
 interface FilterOptions {
-    category?: string;
-    priceRange?: {min: string, max: string | null};
+    cat?: string;
+    min?: number;
+    max?: number | null;
     available?: boolean;
     sortBy?: string;
     sortDir?: string;
@@ -37,45 +38,67 @@ const Products: React.FC = () => {
 
     useEffect(() => {
         fetchAllProducts();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (Object.keys(filterOptions).length > 0) {
+            fetchFilteredProducts();
+            console.log(filterOptions);
+        } else {
+            fetchAllProducts();
+            console.log('No Filter Options Selected.');
+        }
+    }, [filterOptions]);
 
     const handleCategoryFilter = (selectedCategory: string | null) => {
-        if (selectedCategory) fetchFilteredProducts(selectedCategory);
-        else fetchAllProducts();
+        selectedCategory ? setFilterOptions(prevState => (
+            {...prevState, cat: selectedCategory}
+        )) : setFilterOptions(prevState => { 
+            const {cat, ...rest} = prevState;
+            return rest;
+        });
     }
 
     const handlePriceFilter = (selectedPriceRange: {min: string, max: string | null} | null) => {
         const min = selectedPriceRange?.min;
         const max = selectedPriceRange?.max;
-        const maxFormat = max ? `-£${max}` : '+';
-        const message = selectedPriceRange ? `£${min}${maxFormat}` : null; 
-        console.log("Selected: "+message);
+        // const maxFormat = max ? `-£${max}` : '+';
+        // const message = selectedPriceRange ? `£${min}${maxFormat}` : null; 
+        // console.log("Selected: "+message);
         min ? setFilterOptions(prevState => ( 
-                { ...prevState, priceRange: {min: selectedPriceRange!.min, max: selectedPriceRange!.max} } 
-            ))
-            : setFilterOptions(prevState => {
-                const {priceRange, ...rest} = prevState;
-                return rest;
-            });
+                { ...prevState, min: Number(selectedPriceRange!.min), max: (max ? Number(selectedPriceRange!.max) : null) } 
+        )) : setFilterOptions(prevState => {
+            const {min, max, ...rest} = prevState;
+            return rest;
+        });
     }
 
-    const fetchFilteredProducts = async (selectedCategory: string) => {
+    const fetchFilteredProducts = async () => {
         try {
             setIsFetching(true);
-            const query = new URLSearchParams({cat : selectedCategory});
+            setError(null);
+            const query = new URLSearchParams();
+            Object.entries(filterOptions).forEach(([key, value]) => {
+                if (!value !== undefined && !value !== null) {
+                    if (!(key === 'max' && value === null)) query.append(key, String(value));
+                };
+            })
+            console.log(query.toString());
             const response = await fetch(`http://localhost:8080/api/products?${query}`);
             const resData = await response.json();
             setProducts(resData);
         } catch (error) {
             if (error instanceof Error) setError(error);
             else setError(new Error('An unknown error occurred'));
+        } finally {
+            setIsFetching(false);
         }
-        setIsFetching(false);
     }
 
     const fetchAllProducts = async () => {
         try {
             setIsFetching(true);
+            setError(null);
             const response = await fetch('http://localhost:8080/api/products');
             if (!response.ok) throw new Error('Failed to fetch products');
             const data = await response.json();
@@ -84,8 +107,9 @@ const Products: React.FC = () => {
         } catch (error) {
             if (error instanceof Error) setError(error);
             else setError(new Error('An unknown error occurred'));
+        } finally {
+            setIsFetching(false);
         }
-        setIsFetching(false);
     }
 
     return (
@@ -97,8 +121,8 @@ const Products: React.FC = () => {
             <PriceFilter 
                 onChange={handlePriceFilter}
             />
-            <p>{filterOptions.priceRange?.min + '-' + filterOptions.priceRange?.max}</p>
-            {( !fetching && products.length === 0 ) && <p>Issue fetching products</p>}
+            {!fetching && error && <p>Error: {error.message}</p>}
+            {!fetching && !error && products.length === 0 && <p>No products match your filter criteria</p>}
             {products.length > 0 && (
                 <ul className="grid grid-cols-3 gap-4">
                     {products.map((product) => (
