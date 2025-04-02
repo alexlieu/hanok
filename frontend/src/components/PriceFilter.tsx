@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { formatPrice } from "./Products";
 
 interface FilterProps {
     onChange: (selectionOption: {min: string, max: string | null} | null) => void;

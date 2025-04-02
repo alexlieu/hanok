@@ -3,6 +3,7 @@ import ErrorType from "../types/ErrorType";
 import { ProductView } from "../types/ProductListView";
 import CategoryFilter from "./CategoryFilter";
 import PriceFilter from "./PriceFilter";
+import SortSelect from "./SortSelect";
 
 const getUniqueCategories = (productsArray: ProductView[]) => {
     const uniqueCategories = [...new Set(productsArray.map(p => p.category))];
@@ -73,6 +74,12 @@ const Products: React.FC = () => {
         });
     }
 
+    const handleSortProducts = (selectedSort: string) => {
+        setFilterOptions(prevState => (
+            {...prevState, sortBy: selectedSort}
+        ));
+    }
+
     const fetchFilteredProducts = async () => {
         try {
             setIsFetching(true);
@@ -120,6 +127,9 @@ const Products: React.FC = () => {
             />
             <PriceFilter 
                 onChange={handlePriceFilter}
+            />
+            <SortSelect
+                onChange={handleSortProducts}
             />
             {!fetching && error && <p>Error: {error.message}</p>}
             {!fetching && !error && products.length === 0 && <p>No products match your filter criteria</p>}
