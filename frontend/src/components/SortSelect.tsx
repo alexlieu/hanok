@@ -1,4 +1,8 @@
 import { useState } from "react";
+import FlowerSVGComponent from "./FlowerSVGComponent";
+import Flower2SVGComponent from "./Flower2SVGComponent";
+import Flower3SVGComponent from "./Flower3SVGComponent";
+import Flower4SVGComponent from "./Flower4SVGComponent";
 
 interface SortProps {
     onChange: (selectionOption: string) => void;
@@ -27,6 +31,10 @@ const SortSelect: React.FC<SortProps> = ({onChange}) => {
                     <option value={params.val}>{params.display}</option>
                 ))}
             </select>
+            <FlowerSVGComponent />
+            <Flower2SVGComponent />
+            <Flower3SVGComponent />
+            <Flower4SVGComponent />
         </div>
     )
 }
