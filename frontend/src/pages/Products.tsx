@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import ErrorType from "../types/ErrorType";
 import { ProductView } from "../types/ProductListView";
-import CategoryFilter from "./CategoryFilter";
-import PriceFilter from "./PriceFilter";
-import SortSelect from "./SortSelect";
+import CategoryFilter from "../components/CategoryFilter";
+import PriceFilter from "../components/PriceFilter";
+import SortSelect from "../components/SortSelect";
 
 const getUniqueCategories = (productsArray: ProductView[]) => {
     const uniqueCategories = [...new Set(productsArray.map(p => p.category))];
@@ -30,7 +30,7 @@ interface FilterOptions {
     sortDir?: string;
 }
 
-const Products: React.FC = () => {
+const ProductsPage: React.FC = () => {
     const [fetching, setIsFetching] = useState(false);
     const [products, setProducts] = useState<ProductView[]>([]);
     const [categories, setCategories] = useState<{category: string, count: number}[]>([]);
@@ -147,4 +147,4 @@ const Products: React.FC = () => {
     );
 }
 
-export default Products;
+export default ProductsPage;
