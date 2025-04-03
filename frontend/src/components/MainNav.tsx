@@ -7,7 +7,7 @@ const MainNav: React.FC = () => {
                 <ul>
                     <li>
                         <NavLink
-                            to={"/"}
+                            to=''
                             className={({isActive}) => 
                                 isActive ? `underline` : undefined
                             }
@@ -18,7 +18,7 @@ const MainNav: React.FC = () => {
                     </li>
                     <li>
                         <NavLink
-                            to={"/products"}
+                            to='Products'
                             className={({isActive}) => 
                                 isActive ? `underline` : undefined
                             }
