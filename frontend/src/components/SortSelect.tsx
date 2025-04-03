@@ -1,7 +1,4 @@
 import { useState } from "react";
-import FlowerSVGComponent from "./FlowerSVGComponent";
-import Flower2SVGComponent from "./Flower2SVGComponent";
-import Flower3SVGComponent from "./Flower3SVGComponent";
 import Flower4SVGComponent from "./Flower4SVGComponent";
 
 interface SortProps {
@@ -9,7 +6,7 @@ interface SortProps {
 }
 
 const sortParams = [
-    {val: 'name', display: 'Alphabetical'},
+    {val: 'name', display: 'A-Z'},
     {val: 'cat', display: 'Category'},
     {val: 'price', display: 'Price'},
 ];
@@ -25,16 +22,17 @@ const SortSelect: React.FC<SortProps> = ({onChange}) => {
     }
 
     return (
-        <div className="flex">
-            <select value={sortParam} onChange={handleSortChange} className="appearance-none">
+        <div className="grid relative w-fit">
+            <select 
+                value={sortParam} 
+                onChange={handleSortChange} 
+                className={`appearance-none pr-8 cursor-pointer focus:outline-none col-start-1 row-start-1 w-fit text-center`}>
+
                 {sortParams.map(params => (
-                    <option value={params.val}>{params.display}</option>
+                    <option key={params.val} value={params.val}>{params.display}</option>
                 ))}
             </select>
-            <FlowerSVGComponent />
-            <Flower2SVGComponent />
-            <Flower3SVGComponent />
-            <Flower4SVGComponent />
+            <Flower4SVGComponent className={`pointer-events-none col-start-1 row-start-1 absolute right-1 fill-current w-6 h-6`} />
         </div>
     )
 }

@@ -16,22 +16,6 @@ const Flower4SVGComponent: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
     ));
     return (
         <svg width={200} height={200} viewBox="-100 -100 200 200" {...props}>
-            <filter id="hand-drawn-effect">
-                <feTurbulence 
-                type="fractalNoise" 
-                baseFrequency="0.05" 
-                numOctaves="2" 
-                result="noise"
-                />
-                
-                <feDisplacementMap 
-                in="SourceGraphic" 
-                in2="noise" 
-                scale="5" 
-                xChannelSelector="R" 
-                yChannelSelector="G"
-                />
-            </filter>
             <defs>
                 <path
                     id="vetical-guide"
@@ -40,7 +24,7 @@ const Flower4SVGComponent: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
                         L -100,100"
                     fill="none"
                     stroke="black"
-                    stroke-width="1"
+                    strokeWidth="1"
                 />
                 <path
                     id="horizontal-guide"
@@ -49,7 +33,7 @@ const Flower4SVGComponent: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
                         L 100,-100"
                     fill="none"
                     stroke="black"
-                    stroke-width="1"
+                    strokeWidth="1"
                 />
                 <path
                     id="x-axis"
@@ -57,9 +41,9 @@ const Flower4SVGComponent: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
                         M -100,0
                         L 100,0"
                     fill="none"
-                    fill-opacity={0.5}
+                    fillOpacity={0.5}
                     stroke="black"
-                    stroke-width="2"
+                    strokeWidth="2"
                 />
                 <path
                     id="y-axis"
@@ -67,9 +51,9 @@ const Flower4SVGComponent: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
                         M 0,-100
                         L 0,100"
                     fill="none"
-                    fill-opacity={0.5}
+                    fillOpacity={0.5}
                     stroke="black"
-                    stroke-width="2"
+                    strokeWidth="2"
                 />
                 <path 
                     id="outer-petals"
@@ -80,20 +64,21 @@ const Flower4SVGComponent: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
                 />
                 <path
                     id="inner"
-                    d="M -4 -5 C -3 -13 -4 -16 -4 -22 C -4 -28 0.272 -27.452 0.689 -22.352 C 1.521 -16.317 1.209 -13.091 3 -4 C 10 -7 15 -12 17 -13 C 22 -17 25 -13 20 -9 C 18 -7 11 -2 5.302 1.464 C 9 7 12 11 14 15 C 19 22 14 24 9 18 C 6 14 3 10 -1 4 C -6 11 -8 14 -12 18 C -17 24 -21 19 -17 15 C -12 10 -9 5 -6 0 C -14 -6 -19 -8 -21 -10 C -24 -12 -24 -17 -18 -14 C -13 -11 -10 -9 -4 -5 z M -2.152 -34.681 C 7.053 -35.184 7.053 -48.225 -3.501 -49.174 C -12.255 -49.58 -11.916 -34.507 -2.391 -34.681 Z M 27.848 -20.373 C 33.903 -13.587 44.694 -21.447 38.741 -29.389 C 32.971 -36.368 22.446 -27.442 27.755 -20.496 Z M 19.444 26.873 C 12.518 35.494 23.682 42.272 29.264 37.089 C 35.445 29.114 27.869 19.943 19.529 26.778 Z M -32.003 24.602 C -38.169 32.455 -25.869 40.678 -20.448 33.706 C -16.24 27.113 -26.783 19.1 -31.703 24.161 Z M -30.947 -18.664 C -28.186 -23.212 -29.299 -26.799 -34.612 -29.835 C -39.714 -32.039 -44.259 -26.612 -43.362 -21.933 C -42.237 -16.395 -34.926 -13.467 -31.037 -18.526 Z" 
+                    // d="M -4 -5 C -3 -13 -4 -16 -4 -22 C -4 -28 0.272 -27.452 0.689 -22.352 C 1.521 -16.317 1.209 -13.091 3 -4 C 10 -7 15 -12 17 -13 C 22 -17 25 -13 20 -9 C 18 -7 11 -2 5.302 1.464 C 9 7 12 11 14 15 C 19 22 14 24 9 18 C 6 14 3 10 -1 4 C -6 11 -8 14 -12 18 C -17 24 -21 19 -17 15 C -12 10 -9 5 -6 0 C -14 -6 -19 -8 -21 -10 C -24 -12 -24 -17 -18 -14 C -13 -11 -10 -9 -4 -5 z M -2.152 -34.681 C 7.053 -35.184 7.053 -48.225 -3.501 -49.174 C -12.255 -49.58 -11.916 -34.507 -2.391 -34.681 Z M 27.848 -20.373 C 33.903 -13.587 44.694 -21.447 38.741 -29.389 C 32.971 -36.368 22.446 -27.442 27.755 -20.496 Z M 19.444 26.873 C 12.518 35.494 23.682 42.272 29.264 37.089 C 35.445 29.114 27.869 19.943 19.529 26.778 Z M -32.003 24.602 C -38.169 32.455 -25.869 40.678 -20.448 33.706 C -16.24 27.113 -26.783 19.1 -31.703 24.161 Z M -30.947 -18.664 C -28.186 -23.212 -29.299 -26.799 -34.612 -29.835 C -39.714 -32.039 -44.259 -26.612 -43.362 -21.933 C -42.237 -16.395 -34.926 -13.467 -31.037 -18.526 Z" 
+                    d="M -18.378 20.679 C -7.9747 6.7423 5.441 -8.696 19.104 -24.413 C 33.133 -12.438 32.197 6.834 22.093 16.751 C 12.177 28.164 -4.663 31.345 -18.182 20.679 C -29.003 11.681 -35.161 -1.96 -25.058 -18.051 C -17.573 -29.652 -0.172 -38.633 19.16 -24.369 z"
                     fill="#FCB964"
-                    transform="scale(1)"
+                    transform="scale(1) translate(0,-5)"
                 />
             </defs>
             {/* <use href="#x-axis" />
             <use href="#y-axis" />
             {grid_y}
             {grid_x}
-            <circle r={90} fill="none" stroke="green" stroke-width={2} /> */}
+            <circle r={90} fill="none" stroke="green" strokeWidth={2} /> */}
             <g id="flower" transform="scale(1)">
-                <use href="#outer-petals" filter="url(#hand-drawn-effect)" />
-                <use href="#outer-petals" transform="scale(.92) rotate(5)" fill="#fb72b6" opacity={0.7} filter="url(#hand-drawn-effect)" />
-                <use href="#inner" filter="url(#hand-drawn-effect)" />
+                <use href="#outer-petals" />
+                <use href="#outer-petals" transform="scale(.92) rotate(0)" fill="#f7147e" opacity={0.9}  />
+                <use href="#inner" />
             </g>
         </svg> 
     );
