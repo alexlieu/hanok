@@ -18,12 +18,19 @@ const MainNav: React.FC = () => {
                     </li>
                     <li>
                         <NavLink
-                            to='Products'
+                            to='products'
                             className={({isActive}) => 
                                 isActive ? `underline` : undefined
                             }
                         >
                         Products
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to='test'
+                        >
+                            Test
                         </NavLink>
                     </li>
                 </ul>
