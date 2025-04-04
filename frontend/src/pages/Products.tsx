@@ -24,7 +24,12 @@ export const formatPrice = (value: number) => {
 
 export const loader = async (): Promise<ProductView[]> => {
     const response = await fetch('http://localhost:8080/api/products');
-    if (!response.ok) throw new Error('Something went wrong');
+    if (!response.ok){
+        throw new Response(JSON.stringify({message: 'Could not fetch products.'}), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+         }); 
+    }
     const data = await response.json();
     return data;
 }
