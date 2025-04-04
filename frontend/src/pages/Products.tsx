@@ -4,6 +4,7 @@ import { ProductView } from "../types/ProductListView";
 import CategoryFilter from "../components/CategoryFilter";
 import PriceFilter from "../components/PriceFilter";
 import SortSelect from "../components/SortSelect";
+import { useLoaderData } from "react-router-dom";
 
 const getUniqueCategories = (productsArray: ProductView[]) => {
     const uniqueCategories = [...new Set(productsArray.map(p => p.category))];
@@ -21,6 +22,13 @@ export const formatPrice = (value: number) => {
    return (value % 1 != 0) ? `£${value}` : `£${value}.00`;
 }
 
+export const loader = async (): Promise<ProductView[]> => {
+    const response = await fetch('http://localhost:8080/api/products');
+    if (!response.ok) throw new Error('Something went wrong');
+    const data = await response.json();
+    return data;
+}
+
 interface FilterOptions {
     cat?: string;
     min?: number;
@@ -31,15 +39,12 @@ interface FilterOptions {
 }
 
 const ProductsPage: React.FC = () => {
+    const preloadProducts = useLoaderData<ProductView[]>();
     const [fetching, setIsFetching] = useState(false);
-    const [products, setProducts] = useState<ProductView[]>([]);
-    const [categories, setCategories] = useState<{category: string, count: number}[]>([]);
+    const [products, setProducts] = useState<ProductView[]>(preloadProducts);
+    const [categories, setCategories] = useState<{category: string, count: number}[]>(getUniqueCategories(preloadProducts));
     const [error, setError] = useState<ErrorType>(null);
     const [filterOptions, setFilterOptions] = useState<FilterOptions>({});
-
-    useEffect(() => {
-        fetchAllProducts();
-    }, []);
 
     useEffect(() => {
         if (Object.keys(filterOptions).length > 0) {
