@@ -1,4 +1,4 @@
-import { useLoaderData, LoaderFunctionArgs } from "react-router-dom";
+import { useLoaderData, LoaderFunctionArgs, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { productInfo, variant } from "../types/ProductDetailView";
 import { formatPrice } from "./Products";
@@ -50,7 +50,7 @@ const ProductPage: React.FC = () => {
 
     return (
         <>
-            <p>{info.category}</p>
+            <Link to={`..?cat=${info.category}`}>{info.category}</Link>
             <h1 className={`text-3xl font-semibold`}>{(info.name).toLowerCase()}</h1>
             <p className={`text-[1.2em]`}>{info.description}</p>
             <div>

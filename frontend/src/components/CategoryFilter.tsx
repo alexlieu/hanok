@@ -1,13 +1,14 @@
-import { useState } from "react"
+import { useState } from "react";
 
 interface FilterProps {
     options: {category: string, count: number}[];
+    searchParam: string | null;
     onChange: (selectionOption: string | null) => void;
 }
 
-const CategoryFilter: React.FC< FilterProps > = ({ options, onChange }) => {
+const CategoryFilter: React.FC< FilterProps > = ({ options, searchParam, onChange }) => {
 
-    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [selectedOption, setSelectedOption] = useState<string | null>(searchParam);
     
     const handleFilterChange = (optionId: string) => {
         const newSelection = selectedOption === optionId ? null : optionId;

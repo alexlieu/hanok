@@ -2,6 +2,7 @@ import { useState } from "react";
 import Flower4SVGComponent from "./Flower4SVGComponent";
 
 interface SortProps {
+    searchParams: string | null;
     onChange: (selectionOption: string) => void;
 }
 
@@ -11,9 +12,10 @@ const sortParams = [
     {val: 'price', display: 'Price'},
 ];
 
-const SortSelect: React.FC<SortProps> = ({onChange}) => {
+const SortSelect: React.FC<SortProps> = ({searchParams, onChange}) => {
 
-    const [sortParam, setSortParam] = useState<string>('feat');
+    const startVal = searchParams ?? 'name';
+    const [sortParam, setSortParam] = useState<string>(startVal);
 
     const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selection = event.target.value;
