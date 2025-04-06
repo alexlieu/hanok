@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ProductsPage, { loader as productsLoader } from './pages/Products';
+import ProductPage, { loader as productLoader } from './pages/Product';
 import './App.css';
 import RootLayout from './pages/Root';
 import HomePage from './pages/Home';
@@ -12,7 +13,13 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {index: true, element: < HomePage />},
-      {path: 'products', element: < ProductsPage />, loader: productsLoader, },
+      {
+        path: 'products', 
+        children: [
+          {index: true, element: < ProductsPage />, loader: productsLoader,},
+          {path: ':id', element: < ProductPage />, loader: productLoader},
+        ]
+      },
     ],
   },
 ]);

@@ -4,7 +4,7 @@ import { ProductView } from "../types/ProductListView";
 import CategoryFilter from "../components/CategoryFilter";
 import PriceFilter from "../components/PriceFilter";
 import SortSelect from "../components/SortSelect";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, Link } from "react-router-dom";
 
 const getUniqueCategories = (productsArray: ProductView[]) => {
     const uniqueCategories = [...new Set(productsArray.map(p => p.category))];
@@ -19,7 +19,8 @@ const getUniqueCategories = (productsArray: ProductView[]) => {
 }
 
 export const formatPrice = (value: number) => {
-   return (value % 1 != 0) ? `£${value}` : `£${value}.00`;
+    if (value % 1 != 0) return ((value % 1).toString().length === 3) ? `£${value}0` : `£${value}`; 
+    return `£${value}.00`; 
 }
 
 export const loader = async (): Promise<ProductView[]> => {
@@ -146,10 +147,12 @@ const ProductsPage: React.FC = () => {
             {products.length > 0 && (
                 <ul className="grid grid-cols-3 gap-4">
                     {products.map((product) => (
-                        <li key={`${product.name}-${product.id}`} className="flex justify-evenly">
-                            <h3>{product.name}</h3>
-                            <h3>{formatPrice(product.price)}</h3>
-                        </li>
+                        <Link to={`${product.id}`} key={`${product.id}`}>
+                            <li className="flex justify-evenly">
+                                <h3>{product.name}</h3>
+                                <p>{formatPrice(product.price)}</p>
+                            </li>
+                        </Link>
                     ))}
                 </ul>
             )}
