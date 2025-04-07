@@ -1,7 +1,8 @@
-import { useLoaderData, LoaderFunctionArgs, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { LoaderFunctionArgs, useLoaderData } from "react-router-dom";
 import { productInfo, variant } from "../types/ProductDetailView";
-import { formatPrice } from "./Products";
+import { formatPrice } from "../utils/format";
 
 const getOptionData = (variations: variant[]) => {
     const sizes = new Set<string>();
@@ -25,13 +26,13 @@ const getOptionData = (variations: variant[]) => {
     }
 };
 
-const ProductPage: React.FC = () => {
+const ProductPage:React.FC = () => {
     const info = useLoaderData<productInfo>();
     const {sizes, flavours, getPrice} = getOptionData(info.variations);
     const [selectedOptions, setSelectedOptions] = useState<{size: string, flavour: string, quantity: number}>({size: 'REGULAR', flavour: 'PLAIN', quantity: 1});
     const [price, setPrice] = useState<number | undefined>();
-    const [addToBasket, setAddToBasket] = useState<{id: number, quantity: number}>();
-
+    const [addToBasket, setAddToBasket] = useState<{id: number, quantity: number}>()
+    
     useEffect(()=>{
         (selectedOptions.flavour && selectedOptions.size && selectedOptions.quantity) && setPrice(getPrice(selectedOptions.size, selectedOptions.flavour)*selectedOptions.quantity);
     }, [selectedOptions]);
@@ -50,88 +51,110 @@ const ProductPage: React.FC = () => {
 
     return (
         <>
-            <Link to={`..?cat=${info.category}`}>{info.category}</Link>
-            <h1 className={`text-3xl font-semibold`}>{(info.name).toLowerCase()}</h1>
-            <p className={`text-[1.2em]`}>{info.description}</p>
-            <div>
-                <h4 className={`text-xl font-medium`}>Size</h4>
-                {sizes.map(size => (
+            <Link to={``}>{info.category}</Link>
+            <div className="grid grid-cols-2">
+                <div className="flex justify-center">
+                    <div className="bg-amber-200 w-4/5 h-full aspect-square"></div>
+                </div>
+                <div>
+                    <h1 className={`text-3xl font-semibold`}>{(info.name).toLowerCase()}</h1>
+                    <p className={`text-[1.2em]`}>{info.description}</p>
+                    <h4 className={`text-xl font-medium`}>Size</h4>
+                    {sizes.map(size => (
+                        <button
+                            type='button'
+                            key={`size-${size}`}
+                            className={`text-2xl px-4 py-2 transition-all font-medium
+                                ${
+                                    selectedOptions.size === size
+                                        ? 'text-black'
+                                        : 'hover:text-black text-gray-400'
+                                }
+                            `}
+                            onClick={handleOptionSelect('size')}
+                            data-size={size}
+                        >
+                                {size.toLowerCase()}
+                        </button>
+                    ))}
+                    <h4 className={`text-xl font-medium`}>Flavours</h4>
+                    {flavours.map(flavour => (
+                        <button
+                            type='button'
+                            key={`flavour-${flavour}`}
+                            className={`text-2xl px-4 py-2 transition-all font-medium
+                                ${
+                                    selectedOptions.flavour === flavour
+                                        ? 'text-black'
+                                        : 'hover:text-black text-gray-400'
+                                }
+                            `}
+                            onClick={handleOptionSelect('flavour')}
+                            data-flavour={flavour}
+                        >
+                            {flavour.toLowerCase()}
+                        </button>
+                    ))} 
+                    <h4 className={`text-xl font-medium`}>Quantity</h4>
+                    {Array.from({length: 10}, (_, i) => i + 1).map((q) => (
+                        <button
+                            type='button'
+                            key={`quantity-${q}`}
+                            className={`text-2xl px-4 py-2 transition-all font-medium
+                                ${
+                                    selectedOptions.quantity == q
+                                        ? 'text-black'
+                                        : 'hover:text-black text-gray-400'
+                                }
+                            `}
+                            onClick={handleOptionSelect('quantity')}
+                            data-quantity={q}
+                        >
+                            {q}
+                        </button>
+                    ))}
                     <button
                         type='button'
-                        key={`size-${size}`}
-                        className={`text-2xl px-4 py-2 transition-all font-medium
-                            ${
-                                selectedOptions.size === size
-                                    ? 'text-black'
-                                    : 'hover:text-black text-gray-400'
-                            }
-                        `}
-                        onClick={handleOptionSelect('size')}
-                        data-size={size}
+                        className={`text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
+                        onClick={handleAddToBasket}
                     >
-                            {size.toLowerCase()}
+                        add to basket
                     </button>
-                ))}
-                <h4 className={`text-xl font-medium`}>Flavours</h4>
-                {flavours.map(flavour => (
-                    <button
-                        type='button'
-                        key={`flavour-${flavour}`}
-                        className={`text-2xl px-4 py-2 transition-all font-medium
-                            ${
-                                selectedOptions.flavour === flavour
-                                    ? 'text-black'
-                                    : 'hover:text-black text-gray-400'
-                            }
-                        `}
-                        onClick={handleOptionSelect('flavour')}
-                        data-flavour={flavour}
-                    >
-                        {flavour.toLowerCase()}
-                    </button>
-                ))} 
-                <h4 className={`text-xl font-medium`}>Quantity</h4>
-                {Array.from({length: 10}, (_, i) => i + 1).map((q) => (
-                    <button
-                        type='button'
-                        key={`quantity-${q}`}
-                        className={`text-2xl px-4 py-2 transition-all font-medium
-                            ${
-                                selectedOptions.quantity == q
-                                    ? 'text-black'
-                                    : 'hover:text-black text-gray-400'
-                            }
-                        `}
-                        onClick={handleOptionSelect('quantity')}
-                        data-quantity={q}
-                    >
-                        {q}
-                    </button>
-                ))}
-                <button
-                    type='button'
-                    className={`text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
-                    onClick={handleAddToBasket}
-                >
-                    add to basket
-                </button>
+                    {(price) && <p className="text-xl">{formatPrice(price)}</p>}
+                    {(addToBasket) && <p>{`${addToBasket.id}*${addToBasket.quantity}`}</p>}
+                </div>
             </div>
-            {(price) && <p>{formatPrice(price)}</p>}
-            {(addToBasket) && <p>{`${addToBasket.id}*${addToBasket.quantity}`}</p>}
         </>
     )
 }
+
 export default ProductPage;
 
-export const loader = async ({params}: LoaderFunctionArgs<"id">): Promise<productInfo> => {
-    const id = params.id;
-    const response = await fetch(`http://localhost:8080/api/products/${id}`);
-    if (!response.ok) {
-        throw new Response(JSON.stringify({message: 'Could not retrieve the product you are looking for.'}),{
-            status: response.status,
-            headers: {'Content-Type': 'application/json'},
+export const loader = async({params}: LoaderFunctionArgs<'product-slug'>): Promise<productInfo> => {
+    try { 
+        const slug = params['product-slug'];
+        const productIdResponse = await fetch(
+            `http://localhost:8080/api/products/slug/${slug}`
+        );
+        if (!productIdResponse.ok) {
+            throw new Response(JSON.stringify({message: 'Product not found.'}),{
+                status: 404,
+            });
+        }
+        const id = await productIdResponse.json();
+
+        const productDetailResponse = await fetch(
+            `http://localhost:8080/api/products/${id}`
+        );
+        if (!productDetailResponse.ok) {
+            throw new Response(JSON.stringify({message: 'Could not fetch product details.'}),{
+                status: productDetailResponse.status,
+            });
+        }
+        return await productDetailResponse.json();
+    } catch (error) {
+        throw new Response(JSON.stringify({message: 'Failed to load product.'}),{
+            status: 500,
         });
     }
-    const data = await response.json();
-    return data;
 }

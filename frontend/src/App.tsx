@@ -18,9 +18,8 @@ const router = createBrowserRouter([
         id: 'all-products',
         loader: productsLoader,
         children: [
-          {index: true, element: < ProductsPage />, loader: productsLoader,},
-          {path: ':id', element: < ProductPage />, loader: productLoader},
           {path: 'all', element: < ProductsPage />,},
+          {path: ':product-slug', element: < ProductPage />, loader: productLoader},
           // {path: ':category', element: < ProductPage />, loader: productLoader},
         ]
       },
