@@ -2,11 +2,10 @@ package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.CategoryCountDto;
 import com.alex_lieu.hanok.dto.ProductListDto;
-import com.alex_lieu.hanok.dto.ProductListMapper;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
 import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.entity.Product;
-import com.alex_lieu.hanok.enums.PriceRange;
+import com.alex_lieu.hanok.enums.FilterPriceRange;
 import com.alex_lieu.hanok.service.ProductService;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,12 +69,12 @@ public class ProductController {
             @PageableDefault(size=25, sort="name") Pageable pageable){
             // NEED TO HANDLE EXCEPTION WHERE AN EMPTY LIST IS RETURNED FROM A VALID QUERY
             Category category = Category.fromString(categoryInput);
-            PriceRange priceRange = PriceRange.fromString(priceRangeInput);
+            FilterPriceRange priceRange = FilterPriceRange.fromString(priceRangeInput);
             BigDecimal effectiveMin = priceRange != null ? priceRange.getMin() : min;
             BigDecimal effectiveMax = priceRange != null ? priceRange.getMax() : max;
             Comparator<ProductListDto> comparator = searchProductComparator(sortBy, sortDir);
             List<ProductListDto> productListDtos = productService.searchProducts(category, name, effectiveMin, effectiveMax, available)
-                    .stream().map(ProductListMapper::toProductListDto).sorted(comparator).toList();
+                    .stream().map(ProductListDto::fromProduct).sorted(comparator).toList();
             return ResponseEntity.ok(productListDtos);
     }
 
@@ -115,7 +114,11 @@ public class ProductController {
         Comparator<ProductListDto> comparator = switch (sortBy.toLowerCase()) {
             case "name" -> Comparator.comparing(ProductListDto::name);
             case "category" -> Comparator.comparing(ProductListDto::category);
-            case "price" -> Comparator.comparing(ProductListDto::price);
+            case "price" -> Comparator.comparing(
+                    dto -> dto.priceRange().min(),
+                    Comparator.nullsLast(BigDecimal::compareTo)
+            );
+            case "newest" -> Comparator.comparingLong(ProductListDto::id).reversed();
             default -> throw new IllegalArgumentException("Invalid sortBy parameter: " + sortBy.toLowerCase());
         };
 

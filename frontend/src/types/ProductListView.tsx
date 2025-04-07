@@ -1,9 +1,9 @@
 export type ProductView = {
     id: number;
     name: string;
-    price: number;
     category: string;
     imageUrl?: string;
+    priceRange: {min: number, max: number};
 };
 
 export type CategoryCount = {
