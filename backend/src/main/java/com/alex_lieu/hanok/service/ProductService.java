@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.service;
 
+import com.alex_lieu.hanok.dto.CategoryCountDto;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
 import com.alex_lieu.hanok.dto.VariantUpdateDto;
 import com.alex_lieu.hanok.enums.Category;
@@ -9,12 +10,14 @@ import com.alex_lieu.hanok.repository.ProductRepository;
 import com.alex_lieu.hanok.repository.ProductVariantRepository;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.rowset.serial.SerialException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -186,6 +189,37 @@ public class ProductService {
                                         BigDecimal minPrice, BigDecimal maxPrice,
                                         Boolean available) {
         return productRepository.searchProducts(category, name, minPrice, maxPrice, available, true);
+    }
+
+    public List<CategoryCountDto> getCategoryCounts() {
+        try {
+            Map<Category, Long> counts = productRepository.countProductsGroupByCategory()
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(result -> result.length == 2)
+                .collect(Collectors.toMap(
+                result -> (Category) result[0],
+                result -> (Long) result[1]
+                ));
+
+//            Set<Category> missingCategories = Arrays.stream(Category.values())
+//                    .filter(c -> !counts.containsValue(c))
+//                    .collect(Collectors.toSet());
+//
+//            if (!missingCategories.isEmpty()) {
+//                log.warn("Missing counts for categories: {}", missingCategories);
+//            }
+
+            return Arrays.stream(Category.values())
+                .map(category -> new CategoryCountDto(
+                        category,
+                        category.getDisplayName(),
+                        counts.getOrDefault(category, 0L)
+                ))
+                .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            throw new ServiceException("Failed to fetch category counts due to database error", e);
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.dto.CategoryCountDto;
 import com.alex_lieu.hanok.dto.ProductListDto;
 import com.alex_lieu.hanok.dto.ProductListMapper;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
@@ -51,11 +52,11 @@ public class ProductController {
                     required = false
             ) Boolean available,
             @RequestParam(
-                    value = "sortBy",
+                    value = "sort-by",
                     defaultValue = "name"
             ) String sortBy,
             @RequestParam(
-                    value = "sortDir",
+                    value = "sort-dir",
                     defaultValue = "asc"
             ) String sortDir,
             @PageableDefault(size=25, sort="name") Pageable pageable){
@@ -66,6 +67,10 @@ public class ProductController {
             return ResponseEntity.ok(productListDtos);
     }
 
+    @GetMapping({"/categories"})
+    public ResponseEntity<List<CategoryCountDto>> getCategories() {
+        return ResponseEntity.ok(productService.getCategoryCounts());
+    }
     @GetMapping({"/{id}"})
     public ResponseEntity<Product> getProduct(@PathVariable long id) {
         return ResponseEntity.ok(productService.getProductById(id));
