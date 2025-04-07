@@ -6,6 +6,7 @@ import com.alex_lieu.hanok.dto.ProductListMapper;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
 import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.entity.Product;
+import com.alex_lieu.hanok.enums.PriceRange;
 import com.alex_lieu.hanok.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -36,13 +37,17 @@ public class ProductController {
                     required = false
             ) String name,
             @RequestParam(
-                    value = "cat",
+                    value = "category",
                     required = false
-            ) Category category,
+            ) String categoryInput,
             @RequestParam(
                     value = "min",
                     required = false
             ) BigDecimal min,
+            @RequestParam(
+                    value = "price-range",
+                    required = false
+            )String priceRangeInput,
             @RequestParam(
                     value = "max",
                     required = false
@@ -61,8 +66,12 @@ public class ProductController {
             ) String sortDir,
             @PageableDefault(size=25, sort="name") Pageable pageable){
             // NEED TO HANDLE EXCEPTION WHERE AN EMPTY LIST IS RETURNED FROM A VALID QUERY
+            Category category = Category.fromString(categoryInput);
+            PriceRange priceRange = PriceRange.fromString(priceRangeInput);
+            BigDecimal effectiveMin = priceRange != null ? priceRange.getMin() : min;
+            BigDecimal effectiveMax = priceRange != null ? priceRange.getMax() : max;
             Comparator<ProductListDto> comparator = searchProductComparator(sortBy, sortDir);
-            List<ProductListDto> productListDtos = productService.searchProducts(category, name, min, max, available)
+            List<ProductListDto> productListDtos = productService.searchProducts(category, name, effectiveMin, effectiveMax, available)
                     .stream().map(ProductListMapper::toProductListDto).sorted(comparator).toList();
             return ResponseEntity.ok(productListDtos);
     }
@@ -71,6 +80,7 @@ public class ProductController {
     public ResponseEntity<List<CategoryCountDto>> getCategories() {
         return ResponseEntity.ok(productService.getCategoryCounts());
     }
+
     @GetMapping({"/{id}"})
     public ResponseEntity<Product> getProduct(@PathVariable long id) {
         return ResponseEntity.ok(productService.getProductById(id));
@@ -89,7 +99,7 @@ public class ProductController {
     private Comparator<ProductListDto> searchProductComparator(String sortBy, String sortDir) {
         Comparator<ProductListDto> comparator = switch (sortBy.toLowerCase()) {
             case "name" -> Comparator.comparing(ProductListDto::name);
-            case "cat" -> Comparator.comparing(ProductListDto::category);
+            case "category" -> Comparator.comparing(ProductListDto::category);
             case "price" -> Comparator.comparing(ProductListDto::price);
             default -> throw new IllegalArgumentException("Invalid sortBy parameter: " + sortBy.toLowerCase());
         };
