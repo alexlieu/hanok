@@ -3,9 +3,9 @@ import { NavLink } from "react-router-dom";
 const MainNav: React.FC = () => {
     return (
         <header>
-            <nav>
-                <ul>
-                    <li>
+            <nav className={`flex justify-between items-center mx-auto`}>
+                <ul className={`flex gap-8`}>
+                    <li className="text-xl">
                         <NavLink
                             to=''
                             className={({isActive}) => 
@@ -16,9 +16,9 @@ const MainNav: React.FC = () => {
                             Home
                         </NavLink>
                     </li>
-                    <li>
+                    <li className="text-xl">
                         <NavLink
-                            to='products'
+                            to='products/all'
                             className={({isActive}) => 
                                 isActive ? `underline` : undefined
                             }
