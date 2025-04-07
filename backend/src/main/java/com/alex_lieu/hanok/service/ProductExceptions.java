@@ -5,6 +5,7 @@ public class ProductExceptions {
         public ProductNotFoundException(long id) {
             super("Product with id " + id + " not found");
         }
+        public ProductNotFoundException(String productName) { super("Product with name " + productName + " not found"); }
     }
     public static class ProductVariantNotFoundException extends RuntimeException {
         public ProductVariantNotFoundException(long id) {

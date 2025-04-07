@@ -8,6 +8,7 @@ import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.entity.Product;
 import com.alex_lieu.hanok.enums.PriceRange;
 import com.alex_lieu.hanok.service.ProductService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -79,6 +82,18 @@ public class ProductController {
     @GetMapping({"/categories"})
     public ResponseEntity<List<CategoryCountDto>> getCategories() {
         return ResponseEntity.ok(productService.getCategoryCounts());
+    }
+
+    @GetMapping({"/slug/{product-name}"})
+    public ResponseEntity<Long> getIdBySlug(@PathVariable("product-name") @NotBlank String slug) {
+        if (slug.isBlank()) throw new IllegalArgumentException("Product name slug cannot be blank");
+        String formattedProductName = Arrays.stream(slug.trim().toLowerCase().split("-"))
+                .filter(word -> !word.isBlank())
+                .map(word ->
+                    word.substring(0, 1).toUpperCase() +
+                    word.substring(1))
+                .collect(Collectors.joining(" "));
+        return ResponseEntity.ok(productService.findIdByProductName(formattedProductName));
     }
 
     @GetMapping({"/{id}"})

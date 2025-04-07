@@ -222,4 +222,13 @@ public class ProductService {
         }
     }
 
+    public Long findIdByProductName(String productName) {
+        try {
+            return productRepository.findIdByProductName(productName)
+                    .orElseThrow(() -> new ProductExceptions.ProductNotFoundException(productName));
+        } catch (DataAccessException e) {
+            throw new ServiceException("Failed to fetch product id due to database error", e);
+        }
+    }
+
 }
