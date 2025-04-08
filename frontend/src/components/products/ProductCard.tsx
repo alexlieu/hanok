@@ -1,7 +1,7 @@
-import { ProductView } from "../types/ProductListView";
+import { ProductView } from "../../types/ProductListView";
 import { Link } from "react-router-dom";
-import { formatPriceRange } from "../utils/format";
-import { getProductPath } from "../utils/route";
+import { formatPriceRange } from "../../utils/format";
+import { getProductPath } from "../../utils/route";
 
 type ProductCardProps = {
     product: ProductView

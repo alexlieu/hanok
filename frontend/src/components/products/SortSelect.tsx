@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Flower4SVGComponent from "../assets/SVG/Flower4SVGComponent";
+import Flower4SVGComponent from "../../assets/SVG/Flower4SVGComponent";
 
 interface SortProps {
     searchParams: string | null;

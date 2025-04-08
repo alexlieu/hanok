@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs } from "react-router-dom";
-import CategoryList from "../components/CategoryList";
-import ProductsList from "../components/ProductsList";
+import CategoryList from "../components/products/CategoryList";
+import ProductsList from "../components/products/ProductsList";
 import { LoaderData, ProductView } from "../types/ProductListView";
 
 const ProductsPage: React.FC = () => {

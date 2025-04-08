@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { LoaderFunctionArgs, useLoaderData } from "react-router-dom";
 import { productInfo, variant } from "../types/ProductDetailView";
-import { formatPrice, formatProductNameToSlug } from "../utils/format";
-import { getCategoryPath } from "../utils/route";
+import { formatPrice } from "../utils/format";
+import ProductBreadcrumb from "../components/product/ProductBreadcrumb";
+import ProductHeader from "../components/product/ProductHeader";
+import OptionSelector from "../components/product/OptionSelector";
+import QuantitySelector from "../components/product/QuantitySelector";
+import AddToBasketButton from "../components/product/AddToBasketButton";
+import ProductImage from "../components/product/ProductImage";
 
 const getOptionData = (variations: variant[]) => {
     const sizes = new Set<string>();
@@ -42,7 +46,7 @@ const ProductPage:React.FC = () => {
         (event: React.MouseEvent<HTMLButtonElement>) => {
             event.preventDefault();
             const value = event.currentTarget.dataset[optionTarget];
-            (value) && setSelectedOptions(prevState => ({...prevState, [optionTarget]: value}));
+            setSelectedOptions(prevState => ({...prevState, [optionTarget]: value}));
         };
 
     const handleAddToBasket = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -52,75 +56,33 @@ const ProductPage:React.FC = () => {
 
     return (
         <>
-            <Link to={getCategoryPath(info.category)}>{info.category}</Link>
+            <ProductBreadcrumb category={info.category}/>
             <div className="grid grid-cols-2">
-                <div className="flex justify-center">
-                    <div className="bg-amber-200 w-4/5 h-full aspect-square"></div>
-                </div>
+                <ProductImage
+                    image={info.imageUrl}
+                />
                 <div>
-                    <h1 className={`text-3xl font-semibold`}>{(info.name).toLowerCase()}</h1>
-                    <p className={`text-[1.2em]`}>{info.description}</p>
-                    <h4 className={`text-xl font-medium`}>Size</h4>
-                    {sizes.map(size => (
-                        <button
-                            type='button'
-                            key={`size-${size}`}
-                            className={`text-2xl px-4 py-2 transition-all font-medium
-                                ${
-                                    selectedOptions.size === size
-                                        ? 'text-black'
-                                        : 'hover:text-black text-gray-400'
-                                }
-                            `}
-                            onClick={handleOptionSelect('size')}
-                            data-size={size}
-                        >
-                                {size.toLowerCase()}
-                        </button>
-                    ))}
-                    <h4 className={`text-xl font-medium`}>Flavours</h4>
-                    {flavours.map(flavour => (
-                        <button
-                            type='button'
-                            key={`flavour-${flavour}`}
-                            className={`text-2xl px-4 py-2 transition-all font-medium
-                                ${
-                                    selectedOptions.flavour === flavour
-                                        ? 'text-black'
-                                        : 'hover:text-black text-gray-400'
-                                }
-                            `}
-                            onClick={handleOptionSelect('flavour')}
-                            data-flavour={flavour}
-                        >
-                            {flavour.toLowerCase()}
-                        </button>
-                    ))} 
-                    <h4 className={`text-xl font-medium`}>Quantity</h4>
-                    {Array.from({length: 10}, (_, i) => i + 1).map((q) => (
-                        <button
-                            type='button'
-                            key={`quantity-${q}`}
-                            className={`text-2xl px-4 py-2 transition-all font-medium
-                                ${
-                                    selectedOptions.quantity == q
-                                        ? 'text-black'
-                                        : 'hover:text-black text-gray-400'
-                                }
-                            `}
-                            onClick={handleOptionSelect('quantity')}
-                            data-quantity={q}
-                        >
-                            {q}
-                        </button>
-                    ))}
-                    <button
-                        type='button'
-                        className={`text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
+                    <ProductHeader name={info.name} description={info.description} />
+                    <OptionSelector
+                        type="size" 
+                        options={sizes} 
+                        selected={selectedOptions.size} 
+                        onSelect={handleOptionSelect('size')}
+                    />
+                    <OptionSelector
+                        type="flavour" 
+                        options={flavours} 
+                        selected={selectedOptions.flavour} 
+                        onSelect={handleOptionSelect('flavour')}
+                    />
+                    <QuantitySelector
+                        max = {10} 
+                        selected={selectedOptions.quantity}
+                        onSelect={handleOptionSelect('quantity')}
+                    />
+                    <AddToBasketButton
                         onClick={handleAddToBasket}
-                    >
-                        add to basket
-                    </button>
+                    />
                     {(price) && <p className="text-xl">{formatPrice(price)}</p>}
                     {(addToBasket) && <p>{`${addToBasket.id}*${addToBasket.quantity}`}</p>}
                 </div>

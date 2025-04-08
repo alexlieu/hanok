@@ -1,6 +1,6 @@
 import { useRouteLoaderData, Link } from "react-router-dom";
-import { LoaderData } from "../types/ProductListView";
-import { getCategoryPath } from "../utils/route";
+import { LoaderData } from "../../types/ProductListView";
+import { getCategoryPath } from "../../utils/route";
 
 const CategoryList: React.FC = () => {
     const {categoryCounts} = useRouteLoaderData('all-products') as LoaderData;

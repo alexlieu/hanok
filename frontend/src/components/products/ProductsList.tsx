@@ -1,12 +1,11 @@
 import { useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
-import { LoaderData, ProductView } from "../types/ProductListView";
+import { LoaderData, ProductView } from "../../types/ProductListView";
 import ProductCard from "./ProductCard";
-import { filterCategoryCount } from "../utils/filter";
 
 const ProductsList: React.FC = () => {
     const { categorySlug } = useParams();
     const productsInCategory = useLoaderData() as ProductView[];
-    const { allProducts, categoryCounts } = useRouteLoaderData('all-products') as LoaderData;
+    const { allProducts } = useRouteLoaderData('all-products') as LoaderData;
     
     const products = categorySlug ? productsInCategory : allProducts;
     
