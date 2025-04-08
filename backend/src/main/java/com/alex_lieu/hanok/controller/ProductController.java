@@ -83,16 +83,10 @@ public class ProductController {
         return ResponseEntity.ok(productService.getCategoryCounts());
     }
 
-    @GetMapping({"/slug/{product-name}"})
-    public ResponseEntity<Long> getIdBySlug(@PathVariable("product-name") @NotBlank String slug) {
+    @GetMapping({"/by-slug/{product-name}"})
+    public ResponseEntity<Product> getProductBySlug(@PathVariable("product-name") @NotBlank String slug) {
         if (slug.isBlank()) throw new IllegalArgumentException("Product name slug cannot be blank");
-        String formattedProductName = Arrays.stream(slug.trim().toLowerCase().split("-"))
-                .filter(word -> !word.isBlank())
-                .map(word ->
-                    word.substring(0, 1).toUpperCase() +
-                    word.substring(1))
-                .collect(Collectors.joining(" "));
-        return ResponseEntity.ok(productService.findIdByProductName(formattedProductName));
+        return ResponseEntity.ok(productService.findBySlug(slug.replaceAll("-+"," ")));
     }
 
     @GetMapping({"/{id}"})

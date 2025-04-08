@@ -18,7 +18,7 @@ const MainNav: React.FC = () => {
                     </li>
                     <li className="text-xl">
                         <NavLink
-                            to='products/all'
+                            to='products'
                             className={({isActive}) => 
                                 isActive ? `underline` : undefined
                             }

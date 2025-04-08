@@ -22,10 +22,10 @@ public enum Category {
 
     public static Category fromString(String input) {
         if (input == null) return null;
-        String normalizedInput = input.toUpperCase().trim().replace("-","_");
+        String normalizedInput = input.trim().replace("-","_");
         return Arrays.stream(values())
                 .filter(c -> c.name().equalsIgnoreCase(normalizedInput) ||
-                        c.displayName.equalsIgnoreCase(normalizedInput))
+                        c.displayName.equalsIgnoreCase(normalizedInput.replace("_"," ")))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid category: " + input));
     }

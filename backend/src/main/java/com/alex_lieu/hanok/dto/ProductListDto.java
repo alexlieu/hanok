@@ -14,7 +14,7 @@ import java.util.List;
 public record ProductListDto(
         long id,
         String name,
-        Category category,
+        String category,
         String imageUrl,
         ProductPriceRange priceRange
 ) implements Serializable {
@@ -40,7 +40,7 @@ public record ProductListDto(
         return new ProductListDto(
                 product.getId(),
                 product.getName(),
-                product.getCategory(),
+                product.getCategory().getDisplayName(),
                 product.getImageUrl(),
                 new ProductPriceRange(min, max)
         );

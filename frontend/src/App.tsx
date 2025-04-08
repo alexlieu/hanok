@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ProductsPage, { loader as productsLoader } from './pages/Products';
+import ProductsPage, { loader as productsLoader, productsByCategoryLoader} from './pages/Products';
 import ProductPage, { loader as productLoader } from './pages/Product';
 import './App.css';
 import RootLayout from './pages/Root';
@@ -18,9 +18,21 @@ const router = createBrowserRouter([
         id: 'all-products',
         loader: productsLoader,
         children: [
-          {path: 'all', element: < ProductsPage />,},
-          {path: ':product-slug', element: < ProductPage />, loader: productLoader},
-          // {path: ':category', element: < ProductPage />, loader: productLoader},
+          {
+            index: true,
+            element: < ProductsPage />,
+          },
+          {
+            path: ':categorySlug',
+            element: < ProductsPage />,
+            loader: productsByCategoryLoader,
+
+          },
+          {
+            path: ':categorySlug/:productSlug',
+            element: < ProductPage />,
+            loader: productLoader,
+          },
         ]
       },
     ],

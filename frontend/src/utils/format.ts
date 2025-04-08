@@ -4,7 +4,7 @@ export const formatPrice = (value: number): string => {
     return `£${formattedValue}`;
 };
 
-export const formatProductNameToSlug = (name: string) => {
+export const formatNameToSlug = (name: string) => {
     return Array.from(name.toLowerCase().split(' ')).join('-');
 }
 

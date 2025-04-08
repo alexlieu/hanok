@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ProductService {
@@ -193,6 +194,7 @@ public class ProductService {
 
     public List<CategoryCountDto> getCategoryCounts() {
         try {
+            long activeProductsTotal = productRepository.countAllActiveProducts();
             Map<Category, Long> counts = productRepository.countProductsGroupByCategory()
                 .stream()
                 .filter(Objects::nonNull)
@@ -210,24 +212,26 @@ public class ProductService {
 //                log.warn("Missing counts for categories: {}", missingCategories);
 //            }
 
-            return Arrays.stream(Category.values())
+            return Stream.concat(
+                Stream.of(new CategoryCountDto(null, "All", activeProductsTotal)),
+                Arrays.stream(Category.values())
                 .map(category -> new CategoryCountDto(
                         category,
                         category.getDisplayName(),
                         counts.getOrDefault(category, 0L)
                 ))
-                .collect(Collectors.toList());
+            ).collect(Collectors.toList());
         } catch (DataAccessException e) {
             throw new ServiceException("Failed to fetch category counts due to database error", e);
         }
     }
 
-    public Long findIdByProductName(String productName) {
+    public Product findBySlug(String name) {
         try {
-            return productRepository.findIdByProductName(productName)
-                    .orElseThrow(() -> new ProductExceptions.ProductNotFoundException(productName));
+            return productRepository.findByNameLikeIgnoreCaseAndActiveIsTrue(name)
+                    .orElseThrow(() -> new ProductExceptions.ProductNotFoundException(name));
         } catch (DataAccessException e) {
-            throw new ServiceException("Failed to fetch product id due to database error", e);
+            throw new ServiceException("Failed to fetch product due to database error", e);
         }
     }
 

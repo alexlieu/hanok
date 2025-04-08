@@ -31,9 +31,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("active") Boolean isActive
     );
 
-    @Query("SELECT p.category, COUNT(p) FROM Product p GROUP BY p.category")
+    @Query("SELECT p.category, COUNT(p) FROM Product p WHERE p.active = true GROUP BY p.category")
     List<Object[]> countProductsGroupByCategory();
 
-    @Query("SELECT p.id FROM Product p WHERE p.name = :productName")
-    Optional<Long> findIdByProductName(@Param("productName") String productName);
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.active = true")
+    long countAllActiveProducts();
+
+    Optional<Product> findByNameLikeIgnoreCaseAndActiveIsTrue(String name);
+
 }

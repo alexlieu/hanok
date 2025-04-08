@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LoaderFunctionArgs, useLoaderData } from "react-router-dom";
 import { productInfo, variant } from "../types/ProductDetailView";
-import { formatPrice } from "../utils/format";
+import { formatPrice, formatProductNameToSlug } from "../utils/format";
+import { getCategoryPath } from "../utils/route";
 
 const getOptionData = (variations: variant[]) => {
     const sizes = new Set<string>();
@@ -51,7 +52,7 @@ const ProductPage:React.FC = () => {
 
     return (
         <>
-            <Link to={``}>{info.category}</Link>
+            <Link to={getCategoryPath(info.category)}>{info.category}</Link>
             <div className="grid grid-cols-2">
                 <div className="flex justify-center">
                     <div className="bg-amber-200 w-4/5 h-full aspect-square"></div>
@@ -130,28 +131,18 @@ const ProductPage:React.FC = () => {
 
 export default ProductPage;
 
-export const loader = async({params}: LoaderFunctionArgs<'product-slug'>): Promise<productInfo> => {
+export const loader = async({params}: LoaderFunctionArgs<'productSlug'>): Promise<productInfo> => {
     try { 
-        const slug = params['product-slug'];
-        const productIdResponse = await fetch(
-            `http://localhost:8080/api/products/slug/${slug}`
+        const slug = params.productSlug;
+        const response = await fetch(
+            `http://localhost:8080/api/products/by-slug/${slug}`
         );
-        if (!productIdResponse.ok) {
+        if (!response.ok) {
             throw new Response(JSON.stringify({message: 'Product not found.'}),{
                 status: 404,
             });
         }
-        const id = await productIdResponse.json();
-
-        const productDetailResponse = await fetch(
-            `http://localhost:8080/api/products/${id}`
-        );
-        if (!productDetailResponse.ok) {
-            throw new Response(JSON.stringify({message: 'Could not fetch product details.'}),{
-                status: productDetailResponse.status,
-            });
-        }
-        return await productDetailResponse.json();
+        return await response.json();
     } catch (error) {
         throw new Response(JSON.stringify({message: 'Failed to load product.'}),{
             status: 500,
