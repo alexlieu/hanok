@@ -2,15 +2,11 @@ import { useRouteLoaderData, useParams, Link } from "react-router-dom";
 import { LoaderData } from "../../types/ProductListView";
 import { getCategoryPath } from "../../utils/route";
 import { formatNameToSlug } from "../../utils/format";
+import { getRandomBGColour } from "../../utils/fun";
 
 const checkActiveCategory = (routeParam: string | undefined, target: string) => {
     if (!routeParam && target === 'All') return true;
     return routeParam ? formatNameToSlug(target)  === routeParam : false;
-};
-
-const getRandomBGColour = () => {
-    const colours = ['bg-orange-100', 'bg-lime-100', 'bg-rose-100', 'bg-cyan-100', 'bg-fuchsia-100', 'bg-amber-100'];
-    return colours[Math.floor(Math.random() * colours.length)];
 };
 
 const CategoryList: React.FC = () => {
