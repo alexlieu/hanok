@@ -1,10 +1,11 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ProductsPage, { loader as productsLoader, productsByCategoryLoader} from './pages/Products';
-import ProductPage, { loader as productLoader } from './pages/Product';
-import './App.css';
+import ProductsPage from './pages/Products';
+import ProductPage from './pages/Product';
 import RootLayout from './pages/Root';
 import HomePage from './pages/Home';
 import ErrorPage from './pages/Error';
+import {productsLoader, productsByCategoryLoader, productLoader} from './utils/loader';
+import './App.css';
 
 const router = createBrowserRouter([
   { 
