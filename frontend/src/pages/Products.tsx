@@ -1,13 +1,13 @@
 import { LoaderFunctionArgs } from "react-router-dom";
 import CategoryList from "../components/products/CategoryList";
-import ProductsList from "../components/products/ProductsList";
+import ProductsGrid from "../components/products/ProductsGrid";
 import { LoaderData, ProductView } from "../types/ProductListView";
 
 const ProductsPage: React.FC = () => {
     return(
         <>
             <CategoryList />
-            <ProductsList />
+            <ProductsGrid />
         </>
     );
 }

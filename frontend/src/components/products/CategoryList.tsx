@@ -1,9 +1,22 @@
-import { useRouteLoaderData, Link } from "react-router-dom";
+import { useRouteLoaderData, useParams, Link } from "react-router-dom";
 import { LoaderData } from "../../types/ProductListView";
 import { getCategoryPath } from "../../utils/route";
+import { formatNameToSlug } from "../../utils/format";
+
+const checkActiveCategory = (routeParam: string | undefined, target: string) => {
+    if (!routeParam && target === 'All') return true;
+    return routeParam ? formatNameToSlug(target)  === routeParam : false;
+};
+
+const getRandomBGColour = () => {
+    const colours = ['bg-orange-100', 'bg-lime-100', 'bg-rose-100', 'bg-cyan-100', 'bg-fuchsia-100', 'bg-amber-100'];
+    return colours[Math.floor(Math.random() * colours.length)];
+};
 
 const CategoryList: React.FC = () => {
     const {categoryCounts} = useRouteLoaderData('all-products') as LoaderData;
+    const {categorySlug} = useParams();
+    
     return (
         <div className={`flex justify-center`}>
             <ul className={`flex gap-10`}>
@@ -11,13 +24,15 @@ const CategoryList: React.FC = () => {
                     (count != 0) && 
                     <Link 
                         key={(category) ? category : 'ALL'} 
-                        to={(category) ? 
-                                (getCategoryPath(displayName)) :
-                                ('/products')    
+                        to={checkActiveCategory(categorySlug, displayName) || !category 
+                                ? '/products'
+                                : getCategoryPath(displayName)
                             }
                     >
                         <li className={``}>
-                            <div className={`text-[1.1em]`}>
+                            <div className={`
+                                ${checkActiveCategory(categorySlug, displayName) && `${getRandomBGColour()} transition-colors`} text-[1.1em] pl-2 pr-2 
+                            `}>
                                 {`${displayName}`}
                                 <span className={`pl-1`}>{`(${count})`}</span>
                             </div>

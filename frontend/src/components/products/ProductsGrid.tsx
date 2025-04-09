@@ -2,7 +2,7 @@ import { useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
 import { LoaderData, ProductView } from "../../types/ProductListView";
 import ProductCard from "./ProductCard";
 
-const ProductsList: React.FC = () => {
+const ProductsGrid: React.FC = () => {
     const { categorySlug } = useParams();
     const productsInCategory = useLoaderData() as ProductView[];
     const { allProducts } = useRouteLoaderData('all-products') as LoaderData;
@@ -22,4 +22,4 @@ const ProductsList: React.FC = () => {
     );
 }
 
-export default ProductsList;
+export default ProductsGrid;
