@@ -2,10 +2,12 @@ import { LoaderFunctionArgs } from "react-router-dom";
 import CategoryList from "../components/products/CategoryList";
 import ProductsGrid from "../components/products/ProductsGrid";
 import { LoaderData, ProductView } from "../types/ProductListView";
+import SortControls from "../components/products/SortControls";
 
 const ProductsPage: React.FC = () => {
     return(
         <>
+            <SortControls sortOptions={['A-Z', 'Price', 'Newest']}/>
             <CategoryList />
             <ProductsGrid />
         </>
@@ -35,12 +37,6 @@ export const loader = async(): Promise<LoaderData> => {
             status: 500,
         })
     }
-    // const response = await fetch('http://localhost:8080/api/products');
-    // if (!response.ok) throw new Response(JSON.stringify({message: 'Could not retrieve products.'}),{
-    //     status: response.status,
-    // })
-    // const responseData = await response.json();
-    // return responseData;
 }
 
 export const productsByCategoryLoader = async({params}: LoaderFunctionArgs<'categorySlug'>): Promise<ProductView[]> => {
