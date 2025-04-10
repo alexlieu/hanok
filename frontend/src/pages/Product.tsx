@@ -92,22 +92,3 @@ const ProductPage:React.FC = () => {
 }
 
 export default ProductPage;
-
-export const loader = async({params}: LoaderFunctionArgs<'productSlug'>): Promise<productInfo> => {
-    try { 
-        const slug = params.productSlug;
-        const response = await fetch(
-            `http://localhost:8080/api/products/by-slug/${slug}`
-        );
-        if (!response.ok) {
-            throw new Response(JSON.stringify({message: 'Product not found.'}),{
-                status: 404,
-            });
-        }
-        return await response.json();
-    } catch (error) {
-        throw new Response(JSON.stringify({message: 'Failed to load product.'}),{
-            status: 500,
-        });
-    }
-}

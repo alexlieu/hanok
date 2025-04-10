@@ -1,51 +1,39 @@
-import { LoaderFunctionArgs } from "react-router-dom";
+import { useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
 import CategoryList from "../components/products/CategoryList";
 import ProductsGrid from "../components/products/ProductsGrid";
 import { LoaderData, ProductView } from "../types/ProductListView";
-import SortControls from "../components/products/SortControls";
+import { useMemo } from "react";
+import DropDown from "../components/ui/DropDown";
+import { useProductSort } from "../utils/hooks";
+
+const sortOptions = ["Name (A-Z)", "Price (Low to High)", "Just Added"];
 
 const ProductsPage: React.FC = () => {
-    return(
-        <>
-            <SortControls sortOptions={['A-Z', 'Price', 'Newest']}/>
-            <CategoryList />
-            <ProductsGrid />
-        </>
-    );
-}
+  const { categorySlug } = useParams();
+  const productsInCategory = useLoaderData() as ProductView[];
+  const { allProducts } = useRouteLoaderData("all-products") as LoaderData;
+
+  const unsortedProducts = useMemo(
+    () => (categorySlug ? productsInCategory ?? [] : allProducts ?? []),
+    [categorySlug, productsInCategory, allProducts]
+  );
+
+  const { sortedProducts, sortBy, currentSort } = useProductSort(
+    unsortedProducts,
+    sortOptions[0]
+  );
+
+  return (
+    <>
+      <DropDown
+        options={sortOptions}
+        handleSelect={sortBy}
+        currentSort={currentSort}
+      />
+      <CategoryList />
+      <ProductsGrid products={sortedProducts} />
+    </>
+  );
+};
 
 export default ProductsPage;
-
-export const loader = async(): Promise<LoaderData> => {
-    try {
-        const [allProducts, categoryCounts] = await Promise.all([
-            fetch('http://localhost:8080/api/products')
-                .then(res => res.ok ? res.json() : null)
-                .catch(() => null),
-            fetch('http://localhost:8080/api/products/categories')
-                .then(res => res.ok ? res.json() : null)
-                .catch(() => null),
-        ]);
-        if (!allProducts || !categoryCounts) {
-            throw new Response(JSON.stringify({message: 'Partial data failure.'}), {
-                status: 500
-            });
-        }
-        return {allProducts, categoryCounts};
-    } catch (error) {
-        throw new Response(JSON.stringify({message: 'Failed to fetch products.'}),{
-            status: 500,
-        })
-    }
-}
-
-export const productsByCategoryLoader = async({params}: LoaderFunctionArgs<'categorySlug'>): Promise<ProductView[]> => {
-    const categorySlug = params.categorySlug;
-    const response = await fetch(
-        `http://localhost:8080/api/products?category=${categorySlug}`
-    );
-    if (!response.ok) throw new Response(JSON.stringify({message: `Failed to fetch products.`}), {
-        status: 500,
-    });
-    return await response.json();
-}

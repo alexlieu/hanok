@@ -1,13 +1,11 @@
-import { useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
-import { LoaderData, ProductView } from "../../types/ProductListView";
+import { ProductView } from "../../types/ProductListView";
 import ProductCard from "./ProductCard";
 
-const ProductsGrid: React.FC = () => {
-    const { categorySlug } = useParams();
-    const productsInCategory = useLoaderData() as ProductView[];
-    const { allProducts } = useRouteLoaderData('all-products') as LoaderData;
-    
-    const products = categorySlug ? productsInCategory : allProducts;
+type ProductsGrid = {
+    products: ProductView[] | null;
+};
+
+const ProductsGrid: React.FC<ProductsGrid> = ({products}) => {
     
     if (!products || products.length === 0) return <div>No products found.</div>;
     
