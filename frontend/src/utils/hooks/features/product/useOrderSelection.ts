@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-type Selection = {
+export type Selection = {
   size: string;
   flavour: string;
   quantity: number;

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { productInfo } from "../types/ProductDetailView";
 import { formatPrice } from "../utils/format";
@@ -10,6 +9,7 @@ import AddToBasketButton from "../components/product/AddToBasketButton";
 import ProductImage from "../components/product/ProductImage";
 import useProductVariationDetails from "../utils/hooks/features/product/useProductVariationDetails";
 import useOrderSelection from "../utils/hooks/features/product/useOrderSelection";
+import useAddToBasket from "../utils/hooks/useAddToBasket";
 
 const ProductPage: React.FC = () => {
   const info = useLoaderData<productInfo>();
@@ -18,22 +18,11 @@ const ProductPage: React.FC = () => {
   );
   const { price, selectedOptions, handleOptionSelect } =
     useOrderSelection(getPrice);
-  const [addToBasket, setAddToBasket] = useState<{
-    id: number;
-    quantity: number;
-  }>();
 
-  const handleAddToBasket = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    setAddToBasket({
-      id: info.variations.find(
-        (v) =>
-          v.flavour === selectedOptions.flavour &&
-          v.size === selectedOptions.size
-      )!.id,
-      quantity: selectedOptions.quantity,
-    });
-  };
+  const { addToBasket, handleAddToBasket } = useAddToBasket(
+    selectedOptions,
+    info.variations
+  );
 
   return (
     <>
