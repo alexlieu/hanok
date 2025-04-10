@@ -29,26 +29,36 @@ const ProductPage: React.FC = () => {
       <ProductBreadcrumb category={info.category} />
       <div className="grid grid-cols-2">
         <ProductImage image={info.imageUrl} />
-        <div>
-          <ProductHeader name={info.name} description={info.description} />
-          <OptionSelector
-            type="size"
-            options={sizes}
-            selected={selectedOptions.size}
-            onSelect={handleOptionSelect("size")}
-          />
-          <OptionSelector
-            type="flavour"
-            options={flavours}
-            selected={selectedOptions.flavour}
-            onSelect={handleOptionSelect("flavour")}
-          />
-          <QuantitySelector
-            max={10}
-            selected={selectedOptions.quantity}
-            onSelect={handleOptionSelect("quantity")}
-          />
-          <AddToBasketButton onClick={handleAddToBasket} />
+        <div className={`grid grid-rows-7`}>
+          <div>
+            <ProductHeader name={info.name} description={info.description} />
+          </div>
+          <div>
+            <OptionSelector
+              type="size"
+              options={sizes}
+              selected={selectedOptions.size}
+              onSelect={handleOptionSelect("size")}
+            />
+          </div>
+          <div>
+            <OptionSelector
+              type="flavour"
+              options={flavours}
+              selected={selectedOptions.flavour}
+              onSelect={handleOptionSelect("flavour")}
+            />
+          </div>
+          <div>
+            <QuantitySelector
+              max={10}
+              selected={selectedOptions.quantity}
+              onSelect={handleOptionSelect("quantity")}
+            />
+          </div>
+          <div>
+            <AddToBasketButton onClick={handleAddToBasket} />
+          </div>
           {price !== null && price !== undefined && (
             <p className="text-xl">{formatPrice(price)}</p>
           )}
