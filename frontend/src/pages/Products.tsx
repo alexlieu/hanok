@@ -4,7 +4,7 @@ import ProductsGrid from "../components/products/ProductsGrid";
 import { LoaderData, ProductView } from "../types/ProductListView";
 import { useMemo } from "react";
 import DropDown from "../components/ui/DropDown";
-import { useProductSort } from "../utils/hooks";
+import useProductSort from "../utils/hooks/features/product/useProductSort";
 
 const sortOptions = ["Name (A-Z)", "Price (Low to High)", "Just Added"];
 

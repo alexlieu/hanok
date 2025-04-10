@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ProductView } from "../types/ProductListView";
-import { sortProducts } from "./sort";
+import { ProductView } from "../../../../types/ProductListView";
+import { sortProducts } from "../../../sort";
 
-export const useProductSort = (
-  unsortedProducts?: ProductView[],
+const useProductSort = (
+  unsortedProducts: ProductView[],
   defaultSort: string
 ) => {
   const [sortedProducts, setSortedProducts] = useState<ProductView[]>([]);
@@ -20,3 +20,5 @@ export const useProductSort = (
     currentSort: sortOption,
   };
 };
+
+export default useProductSort;
