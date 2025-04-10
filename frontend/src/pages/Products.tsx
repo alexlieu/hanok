@@ -25,13 +25,19 @@ const ProductsPage: React.FC = () => {
 
   return (
     <>
-      <DropDown
-        options={sortOptions}
-        handleSelect={sortBy}
-        currentSort={currentSort}
-      />
-      <CategoryList />
-      <ProductsGrid products={sortedProducts} />
+      <div className={`grid grid-cols-6`}>
+        <div className={`col-start-2 col-span-4`}>
+          <CategoryList />
+          <ProductsGrid products={sortedProducts} />
+        </div>
+        <div className={`col-span-1`}>
+          <DropDown
+            options={sortOptions}
+            handleSelect={sortBy}
+            currentSort={currentSort}
+          />
+        </div>
+      </div>
     </>
   );
 };
