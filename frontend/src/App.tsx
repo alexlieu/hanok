@@ -1,10 +1,11 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ProductsPage, { loader as productsLoader } from './pages/Products';
-import ProductPage, { loader as productLoader } from './pages/Product';
-import './App.css';
+import ProductsPage from './pages/Products';
+import ProductPage from './pages/Product';
 import RootLayout from './pages/Root';
 import HomePage from './pages/Home';
 import ErrorPage from './pages/Error';
+import {productsLoader, productsByCategoryLoader, productLoader} from './utils/loader';
+import './App.css';
 
 const router = createBrowserRouter([
   { 
@@ -15,9 +16,24 @@ const router = createBrowserRouter([
       {index: true, element: < HomePage />},
       {
         path: 'products', 
+        id: 'all-products',
+        loader: productsLoader,
         children: [
-          {index: true, element: < ProductsPage />, loader: productsLoader,},
-          {path: ':id', element: < ProductPage />, loader: productLoader},
+          {
+            index: true,
+            element: < ProductsPage />,
+          },
+          {
+            path: ':categorySlug',
+            element: < ProductsPage />,
+            loader: productsByCategoryLoader,
+
+          },
+          {
+            path: ':categorySlug/:productSlug',
+            element: < ProductPage />,
+            loader: productLoader,
+          },
         ]
       },
     ],

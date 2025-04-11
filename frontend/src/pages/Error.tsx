@@ -1,4 +1,4 @@
-import MainNav from "../components/MainNav";
+import MainNav from "../components/ui/MainNav";
 import { isRouteErrorResponse, useRouteError } from "react-router-dom";
 
 const ErrorPage: React.FC = () => {

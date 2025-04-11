@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -29,5 +30,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("available") Boolean available,
             @Param("active") Boolean isActive
     );
+
+    @Query("SELECT p.category, COUNT(p) FROM Product p WHERE p.active = true GROUP BY p.category")
+    List<Object[]> countProductsGroupByCategory();
+
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.active = true")
+    long countAllActiveProducts();
+
+    Optional<Product> findByNameLikeIgnoreCaseAndActiveIsTrue(String name);
 
 }
