@@ -1,6 +1,6 @@
 const HomePage: React.FC = () => {
     return (
-        <h1>Hanok</h1>
+        <h1 className={`text-3xl`}>Hanok</h1>
     )
 }
 export default HomePage;

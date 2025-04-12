@@ -12,6 +12,7 @@ import {
 } from "./utils/loader";
 import "./App.css";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -20,25 +21,26 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       {
-        path: "products",
-        id: "all-products",
+        path: 'products', 
+        id: 'all-products',
         loader: productsLoader,
         children: [
           {
             index: true,
-            element: <ProductsPage />,
+            element: < ProductsPage />,
           },
           {
-            path: ":categorySlug",
-            element: <ProductsPage />,
+            path: ':categorySlug',
+            element: < ProductsPage />,
             loader: productsByCategoryLoader,
+
           },
           {
-            path: ":categorySlug/:productSlug",
-            element: <ProductPage />,
+            path: ':categorySlug/:productSlug',
+            element: < ProductPage />,
             loader: productLoader,
           },
-        ],
+        ]
       },
     ],
   },
