@@ -1,19 +1,25 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ProductsPage from './pages/Products';
-import ProductPage from './pages/Product';
-import RootLayout from './pages/Root';
-import HomePage from './pages/Home';
-import ErrorPage from './pages/Error';
-import {productsLoader, productsByCategoryLoader, productLoader} from './utils/loader';
-import './App.css';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BasketProvider } from "./store/BasketProvider";
+import ProductsPage from "./pages/Products";
+import ProductPage from "./pages/Product";
+import RootLayout from "./pages/Root";
+import HomePage from "./pages/Home";
+import ErrorPage from "./pages/Error";
+import {
+  productsLoader,
+  productsByCategoryLoader,
+  productLoader,
+} from "./utils/loader";
+import "./App.css";
+
 
 const router = createBrowserRouter([
-  { 
-    path: '/',
+  {
+    path: "/",
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
-      {index: true, element: < HomePage />},
+      { index: true, element: <HomePage /> },
       {
         path: 'products', 
         id: 'all-products',
@@ -40,6 +46,12 @@ const router = createBrowserRouter([
   },
 ]);
 
-function App() { return <RouterProvider router={router} />; }
+function App() {
+  return (
+    <BasketProvider>
+      <RouterProvider router={router} />
+    </BasketProvider>
+  );
+}
 
-export default App
+export default App;
