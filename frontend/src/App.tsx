@@ -1,29 +1,55 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ProductsPage, { loader as productsLoader } from './pages/Products';
-import ProductPage, { loader as productLoader } from './pages/Product';
-import './App.css';
-import RootLayout from './pages/Root';
-import HomePage from './pages/Home';
-import ErrorPage from './pages/Error';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BasketProvider } from "./store/BasketProvider";
+import ProductsPage from "./pages/Products";
+import ProductPage from "./pages/Product";
+import RootLayout from "./pages/Root";
+import HomePage from "./pages/Home";
+import ErrorPage from "./pages/Error";
+import {
+  productsLoader,
+  productsByCategoryLoader,
+  productLoader,
+} from "./utils/loader";
+import "./App.css";
 
 const router = createBrowserRouter([
-  { 
-    path: '/',
+  {
+    path: "/",
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
-      {index: true, element: < HomePage />},
+      { index: true, element: <HomePage /> },
       {
-        path: 'products', 
+        path: "products",
+        id: "all-products",
+        loader: productsLoader,
         children: [
-          {index: true, element: < ProductsPage />, loader: productsLoader,},
-          {path: ':id', element: < ProductPage />, loader: productLoader},
-        ]
+          {
+            index: true,
+            element: <ProductsPage />,
+          },
+          {
+            path: ":categorySlug",
+            element: <ProductsPage />,
+            loader: productsByCategoryLoader,
+          },
+          {
+            path: ":categorySlug/:productSlug",
+            element: <ProductPage />,
+            loader: productLoader,
+          },
+        ],
       },
     ],
   },
 ]);
 
-function App() { return <RouterProvider router={router} />; }
+function App() {
+  return (
+    <BasketProvider>
+      <RouterProvider router={router} />
+    </BasketProvider>
+  );
+}
 
-export default App
+export default App;
