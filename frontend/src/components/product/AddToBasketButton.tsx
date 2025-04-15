@@ -8,6 +8,9 @@ type AddToBasketButtonProps = {
   product: string;
 };
 
+const buttonStyling =
+  "inline-block text-center text-2xl font-medium px-4 py-2 border border-black transition-colors hover:text-white hover:bg-black w-fit";
+
 const AddToBasketButton: React.FC<AddToBasketButtonProps> = ({
   onClick,
   selection,
@@ -24,7 +27,7 @@ const AddToBasketButton: React.FC<AddToBasketButtonProps> = ({
     return (
       <Link
         to="/basket"
-        className={`text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
+        className={buttonStyling}
         aria-label={`${product} (${selection.flavour}, ${selection.size}) is already in your basket. Go to basket to edit quantity.`}
       >
         in basket
@@ -34,7 +37,7 @@ const AddToBasketButton: React.FC<AddToBasketButtonProps> = ({
   return (
     <button
       type="button"
-      className={`text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
+      className={buttonStyling}
       onClick={onClick}
       aria-label={`Add ${product} (${selection.flavour}, ${selection.size}) to basket`}
     >
