@@ -19,8 +19,9 @@ const ProductPage: React.FC = () => {
   const { price, selectedOptions, handleOptionSelect } =
     useOrderSelection(getPrice);
 
-  const { addToBasket, handleAddToBasket } = useAddToBasket(
+  const { handleAddToBasket } = useAddToBasket(
     selectedOptions,
+    info.name,
     info.variations
   );
 
@@ -57,12 +58,15 @@ const ProductPage: React.FC = () => {
             />
           </div>
           <div>
-            <AddToBasketButton onClick={handleAddToBasket} />
+            <AddToBasketButton
+              onClick={handleAddToBasket}
+              selection={selectedOptions}
+              product={info.name}
+            />
           </div>
           {price !== null && price !== undefined && (
             <p className="text-xl">{formatPrice(price)}</p>
           )}
-          {addToBasket && <p>{`${addToBasket.id}*${addToBasket.quantity}`}</p>}
         </div>
       </div>
     </>

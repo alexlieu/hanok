@@ -25,7 +25,7 @@ const ProductsPage: React.FC = () => {
 
   return (
     <>
-      <div className={`grid grid-rows-[auto-auto]`}>
+      <div className={`grid grid-rows-[auto-auto] gap-8`}>
         <div className={``}>
           <CategoryList />
         </div>

@@ -11,7 +11,7 @@ import {
   productLoader,
 } from "./utils/loader";
 import "./App.css";
-
+import BasketPage from "./pages/Basket";
 
 const router = createBrowserRouter([
   {
@@ -21,27 +21,27 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       {
-        path: 'products', 
-        id: 'all-products',
+        path: "products",
+        id: "all-products",
         loader: productsLoader,
         children: [
           {
             index: true,
-            element: < ProductsPage />,
+            element: <ProductsPage />,
           },
           {
-            path: ':categorySlug',
-            element: < ProductsPage />,
+            path: ":categorySlug",
+            element: <ProductsPage />,
             loader: productsByCategoryLoader,
-
           },
           {
-            path: ':categorySlug/:productSlug',
-            element: < ProductPage />,
+            path: ":categorySlug/:productSlug",
+            element: <ProductPage />,
             loader: productLoader,
           },
-        ]
+        ],
       },
+      { path: "basket", element: <BasketPage /> },
     ],
   },
 ]);

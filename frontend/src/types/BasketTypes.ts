@@ -1,8 +1,11 @@
 export type BasketItem = {
   id: number;
   name: string;
+  flavour: string;
+  size: string;
   price: number;
   quantity: number;
+  url: string;
 };
 
 export type BasketState = {
