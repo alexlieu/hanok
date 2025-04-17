@@ -1,20 +1,10 @@
-import { useBasketDispatch } from "../../utils/hooks/store/useBasket";
-
 type RemoveButtonProps = {
-  itemId: number;
+  onRemove: () => void;
 };
 
-const RemoveButton: React.FC<RemoveButtonProps> = ({ itemId }) => {
-  const dispatch = useBasketDispatch();
-  const handleRemove = () => {
-    dispatch({
-      type: "REMOVE_ITEM",
-      id: itemId,
-    });
-  };
-
+const RemoveButton: React.FC<RemoveButtonProps> = ({ onRemove }) => {
   return (
-    <button onClick={handleRemove} aria-label="Remove item">
+    <button onClick={onRemove} aria-label="Remove item">
       Remove
     </button>
   );
