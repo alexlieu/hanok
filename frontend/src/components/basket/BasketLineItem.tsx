@@ -1,24 +1,21 @@
 import { BasketItem } from "../../types/BasketTypes";
-import { getStableBGColor } from "../../utils/fun";
+import { getRandomBGColour } from "../../utils/fun";
 import { useBasketDispatch } from "../../utils/hooks/store/useBasket";
 import QuantityControls from "./QuantityControls";
 import RemoveButton from "./RemoveButton";
+import { useMemo } from "react";
 import { formatPrice } from "../../utils/format";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
+import { easeInOutExpo } from "../../utils/ease";
 
 type BasketLineItemProps = {
   item: BasketItem;
-  isRemoving?: boolean;
-  onRemove: () => void;
 };
-
-const BasketLineItem: React.FC<BasketLineItemProps> = ({
-  item,
-  isRemoving,
-  onRemove,
-}) => {
+const BasketLineItem: React.FC<BasketLineItemProps> = ({ item }) => {
   const dispatch = useBasketDispatch();
+
+  const bgColor = useMemo(() => getRandomBGColour(), []);
 
   const handleQuantityChange = (itemId: number, newQuantity: number) => {
     dispatch({
@@ -29,68 +26,53 @@ const BasketLineItem: React.FC<BasketLineItemProps> = ({
   };
 
   return (
-    <AnimatePresence mode="popLayout">
-      {!isRemoving && (
-        <motion.div
-          key="hidden"
-          layout
-          transition={{ delay: 1 }}
-          className="overflow-hidden"
-        >
-          <motion.div
-            key="basket-line-item"
-            initial={false}
-            exit={{
-              y: "-104%",
-              transition: {
-                duration: 0.5,
-                ease: [0.4, 0, 0.2, 1],
-                delay: 0.2,
-              },
-            }}
-            role="listitem"
-            className={`grid grid-cols-12 gap-4 p-4 border-b w-4xl`}
-          >
-            <img
-              src="empty"
-              className={`col-span-2 w-full aspect-square object-cover ${getStableBGColor(
-                item.id
-              )}`}
-              alt="empty"
+    <motion.div layout className="overflow-hidden w-4xl">
+      <motion.div
+        layout
+        initial={false}
+        exit={{
+          y: "-104%",
+          transition: { duration: 0.8, ease: easeInOutExpo },
+        }}
+        role="listitem"
+        className={`grid grid-cols-12 gap-4 p-4 border-b`}
+      >
+        <img
+          src="empty"
+          className={`col-span-2 w-full aspect-square object-cover ${bgColor}`}
+          alt="empty"
+        />
+        <div className={`col-span-6 grid`}>
+          <div>
+            <Link to={item.url}>
+              <h3 className="font-medium">{item.name}</h3>
+            </Link>
+            <p
+              className={`text-gray-600 capitalize`}
+            >{`${item.flavour.toLowerCase()} / ${item.size.toLowerCase()}`}</p>
+          </div>
+          <div className={`flex item-center gap-4 mt-2`}>
+            <QuantityControls
+              quantity={item.quantity}
+              onQuantityChange={(newQty) =>
+                handleQuantityChange(item.id, newQty)
+              }
+              onIncrease={() =>
+                handleQuantityChange(item.id, item.quantity + 1)
+              }
+              onDecrease={() =>
+                handleQuantityChange(item.id, item.quantity - 1)
+              }
             />
-            <div className={`col-span-6 grid`}>
-              <div>
-                <Link to={item.url}>
-                  <h3 className="font-medium">{item.name}</h3>
-                </Link>
-                <p
-                  className={`text-gray-600 capitalize`}
-                >{`${item.flavour.toLowerCase()} / ${item.size.toLowerCase()}`}</p>
-              </div>
-              <div className={`flex item-center gap-4 mt-2`}>
-                <QuantityControls
-                  quantity={item.quantity}
-                  onQuantityChange={(newQty) =>
-                    handleQuantityChange(item.id, newQty)
-                  }
-                  onIncrease={() =>
-                    handleQuantityChange(item.id, item.quantity + 1)
-                  }
-                  onDecrease={() =>
-                    handleQuantityChange(item.id, item.quantity - 1)
-                  }
-                />
-                <RemoveButton onRemove={onRemove} />
-              </div>
-            </div>
-            <div className={`col-span-2`}></div>
-            <div className={`col-span-2 justify-items-end`}>
-              <p className="">{formatPrice(item.quantity * item.price)}</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            <RemoveButton itemId={item.id} />
+          </div>
+        </div>
+        <div className={`col-span-2`}></div>
+        <div className={`col-span-2 justify-items-end`}>
+          <p className="">{formatPrice(item.quantity * item.price)}</p>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

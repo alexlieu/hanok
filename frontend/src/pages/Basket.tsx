@@ -1,87 +1,76 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { useBasket } from "../utils/hooks/store/useBasket";
+import { useBasketState } from "../utils/hooks/store/useBasket";
 import BasketLineItem from "../components/basket/BasketLineItem";
-import { formatPrice } from "../utils/format";
-import { motion, AnimatePresence } from "motion/react";
+import BasketFooter from "../components/basket/BasketFooter";
+import { motion, LayoutGroup, AnimatePresence } from "motion/react";
+import { easeInOutExpo } from "../utils/ease";
+import { useEffect, useRef, useState } from "react";
 
 const BasketPage: React.FC = () => {
-  const [removingId, setRemovingId] = useState<number | null>(null);
-  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
-  const { state, dispatch } = useBasket();
+  const state = useBasketState();
 
-  const handleRemove = (id: number) => {
-    const isLastItem = state.items.length === 1;
-    setIsAnimatingOut(true);
-    setRemovingId(id);
-    setTimeout(
-      () => {
-        dispatch({
-          type: "REMOVE_ITEM",
-          id: id,
-        });
-        setRemovingId(null);
-        setIsAnimatingOut(false);
-      },
-      isLastItem ? 2000 : 1000
-    );
-  };
+  const [isEmptyThroughDeletion, setIsEmptyThroughDeletion] = useState(false);
+  const previousItemCount = useRef(state.items.length);
+
+  useEffect(() => {
+    if (state.items.length === 0 && previousItemCount.current > 0) {
+      setIsEmptyThroughDeletion(true);
+    }
+    if (state.items.length > 0) {
+      setIsEmptyThroughDeletion(false);
+    }
+  }, [state.items.length]);
 
   return (
-    <>
-      {!isAnimatingOut && state.items.length === 0 ? (
-        <h2 className="text-9xl text-center">{`Your basket is empty :(`}</h2>
-      ) : (
-        <>
-          <div role="list" className={`space-y-4 grid place-content-center`}>
-            {state.items.map((item) => (
-              <BasketLineItem
-                item={item}
-                key={item.id}
-                isRemoving={removingId === item.id}
-                onRemove={() => handleRemove(item.id)}
-              />
-            ))}
-            {state.items.length !== 0 && (
-              <div className="flex justify-end">
-                <motion.div
-                  key="basket-footer"
-                  layout={"position"}
-                  transition={{
-                    delay: isAnimatingOut ? 1 : 10,
-                  }}
-                  className="grid p-4 gap-3"
-                >
-                  <div className="justify-items-end">
-                    <p className="text-gray-600">Subtotal</p>
-                    <p className="text-xl">{`${formatPrice(state.total)}`}</p>
-                  </div>
-                  <Link
-                    to=""
-                    className={`w-fit text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
-                    aria-label={`Proceed to checkout, total ${formatPrice(
-                      state.total
-                    )}`}
-                  >
-                    Checkout
-                  </Link>
-                </motion.div>
-              </div>
-            )}
-          </div>
-        </>
-      )}
-      <motion.div
-        key="continue-shopping-link"
-        layout={"position"}
-        transition={{
-          delay: isAnimatingOut ? 1 : 0,
-        }}
-        className="flex place-content-center pt-10"
-      >
-        <Link to={`/products`}>Continue shopping</Link>
+    <LayoutGroup>
+      <motion.div layout initial={false} className="min-h-[500px]">
+        <AnimatePresence mode="wait">
+          {state.items.length === 0 ? (
+            <motion.h2
+              key="empty-state"
+              layout="position"
+              className="text-9xl text-center pt-[1em]"
+              initial={isEmptyThroughDeletion ? { opacity: 0 } : false}
+              animate={{
+                opacity: 1,
+                transition: {
+                  duration: 0.8,
+                  ease: easeInOutExpo,
+                  delay: 0.2,
+                },
+              }}
+            >{`Your basket is empty :(`}</motion.h2>
+          ) : (
+            <motion.div
+              key="basket-content"
+              className="space-y-4 grid place-content-center"
+              layout="position"
+              exit={{ opacity: 0 }}
+            >
+              <AnimatePresence mode="sync">
+                {state.items.map((item) => (
+                  <BasketLineItem item={item} key={item.id} />
+                ))}
+              </AnimatePresence>
+              <BasketFooter />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <motion.div
+          layout="position"
+          transition={{
+            delay: state.items.length === 0 ? 0.1 : 0,
+            ease: easeInOutExpo,
+            duration: 0.6,
+          }}
+          className={`flex place-content-center pt-10 ${
+            state.items.length > 0 ? "mt-3" : "pt-5 mt-0"
+          }`}
+        >
+          <Link to="/products">Continue shopping</Link>
+        </motion.div>
       </motion.div>
-    </>
+    </LayoutGroup>
   );
 };
 export default BasketPage;
