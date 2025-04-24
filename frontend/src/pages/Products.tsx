@@ -23,23 +23,23 @@ const ProductsPage: React.FC = () => {
     sortOptions[0]
   );
 
+  const WIDTH = 190;
+
   return (
     <>
-      <div className={`grid grid-rows-[auto-auto] gap-8`}>
-        <div className={``}>
+      <div className={`grid grid-rows-[auto-auto]`}>
+        <div
+          className={`flex flex-col sm:flex-row justify-between max-w-[${WIDTH}ch] min-w-[226px] mx-auto w-full px-4 py-4`}
+        >
           <CategoryList />
+          <DropDown
+            options={sortOptions}
+            handleSelect={sortBy}
+            currentSort={currentSort}
+          />
         </div>
-        <div className={`grid grid-cols-5`}>
-          <div className={`col-start-2 col-span-3`}>
-            <ProductsGrid products={sortedProducts} />
-          </div>
-          <div className={`col-span-1`}>
-            <DropDown
-              options={sortOptions}
-              handleSelect={sortBy}
-              currentSort={currentSort}
-            />
-          </div>
+        <div className={`max-w-[${WIDTH}ch] mx-auto w-full px-4`}>
+          <ProductsGrid products={sortedProducts} />
         </div>
       </div>
     </>

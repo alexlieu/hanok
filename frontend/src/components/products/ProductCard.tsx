@@ -13,7 +13,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const maxPrice = product.priceRange.max;
 
   return (
-    <article>
+    <article className="min-w-0">
       <Link to={getProductPath(product)}>
         <div
           className={`${getStableBGColor(product.id)} w-full aspect-square`}
