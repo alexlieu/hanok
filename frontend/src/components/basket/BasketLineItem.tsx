@@ -26,7 +26,7 @@ const BasketLineItem: React.FC<BasketLineItemProps> = ({ item }) => {
   };
 
   return (
-    <motion.div layout className="overflow-hidden w-4xl">
+    <motion.div layout className="overflow-hidden w-full">
       <motion.div
         layout
         initial={false}
@@ -35,41 +35,50 @@ const BasketLineItem: React.FC<BasketLineItemProps> = ({ item }) => {
           transition: { duration: 0.8, ease: easeInOutExpo },
         }}
         role="listitem"
-        className={`grid grid-cols-12 gap-4 p-4 border-b`}
+        className={`flex items-center gap-4 p-4 border-b border border-indigo-600`}
       >
-        <img
-          src="empty"
-          className={`col-span-2 w-full aspect-square object-cover ${bgColor}`}
-          alt="empty"
-        />
-        <div className={`col-span-6 grid`}>
-          <div>
+        <div className="shrink-0 w-24 h-24">
+          <img
+            src="empty"
+            className={`w-full h-full object-cover ${bgColor}`}
+            alt="empty"
+          />
+        </div>
+        <div
+          className={`flex-1 flex flex-col sm:flex-row justify-between min-w-0 border border-lime-500 h-[96px]`}
+        >
+          <div className="min-w-0 h-fit border border-amber-300">
             <Link to={item.url}>
-              <h3 className="font-medium">{item.name}</h3>
+              <h3 className="font-medium hover:text-blue-500 transition-colors truncate">
+                {item.name}
+              </h3>
             </Link>
             <p
-              className={`text-gray-600 capitalize`}
+              className={`text-gray-600 capitalize truncate`}
             >{`${item.flavour.toLowerCase()} / ${item.size.toLowerCase()}`}</p>
           </div>
-          <div className={`flex item-center gap-4 mt-2`}>
+          <div
+            className={`shrink-0 flex flex-row sm:flex-col gap-x-4 border border-cyan-300 place-content-center`}
+          >
             <QuantityControls
               quantity={item.quantity}
               onQuantityChange={(newQty) =>
                 handleQuantityChange(item.id, newQty)
               }
               onIncrease={() =>
-                handleQuantityChange(item.id, item.quantity + 1)
+                handleQuantityChange(item.id, Number(item.quantity) + 1)
               }
               onDecrease={() =>
-                handleQuantityChange(item.id, item.quantity - 1)
+                handleQuantityChange(item.id, Number(item.quantity) - 1)
               }
             />
             <RemoveButton itemId={item.id} />
           </div>
         </div>
-        <div className={`col-span-2`}></div>
-        <div className={`col-span-2 justify-items-end`}>
-          <p className="">{formatPrice(item.quantity * item.price)}</p>
+        <div className={`shrink-0 w-20 text-right`}>
+          <p className="font-medium">
+            {formatPrice(item.quantity * item.price)}
+          </p>
         </div>
       </motion.div>
     </motion.div>

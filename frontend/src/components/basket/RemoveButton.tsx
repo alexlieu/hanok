@@ -14,8 +14,12 @@ const RemoveButton: React.FC<RemoveButtonProps> = ({ itemId }) => {
   };
 
   return (
-    <button onClick={handleRemove} aria-label="Remove item">
-      Remove
+    <button
+      onClick={handleRemove}
+      className="text-gray-500 text-sm"
+      aria-label="Remove item"
+    >
+      REMOVE
     </button>
   );
 };

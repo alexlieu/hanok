@@ -23,13 +23,13 @@ const BasketPage: React.FC = () => {
 
   return (
     <LayoutGroup>
-      <motion.div layout initial={false} className="min-h-[500px]">
+      <motion.div layout initial={false} className="min-h-[500px] w-full">
         <AnimatePresence mode="wait">
           {state.items.length === 0 ? (
             <motion.h2
               key="empty-state"
               layout="position"
-              className="text-9xl text-center pt-[1em]"
+              className="text-center font-light text-[clamp(4rem,9vw,8rem)] pt-[15vb]"
               initial={isEmptyThroughDeletion ? { opacity: 0 } : false}
               animate={{
                 opacity: 1,
@@ -39,11 +39,14 @@ const BasketPage: React.FC = () => {
                   delay: 0.2,
                 },
               }}
-            >{`Your basket is empty :(`}</motion.h2>
+            >
+              {`Your basket is empty`}
+              <span className="pl-[0.2em] text-nowrap">{`:(`}</span>
+            </motion.h2>
           ) : (
             <motion.div
               key="basket-content"
-              className="space-y-4 grid place-content-center"
+              className="space-y-4 mx-auto w-[clamp(40ch,70%,70ch)]"
               layout="position"
               exit={{ opacity: 0 }}
             >
