@@ -5,6 +5,7 @@ import { LoaderData, ProductView } from "../types/ProductListView";
 import { useMemo } from "react";
 import DropDown from "../components/ui/DropDown";
 import useProductSort from "../utils/hooks/features/product/useProductSort";
+import CategoryDropdown from "../components/products/CategoryDropdown";
 
 const sortOptions = ["Name (A-Z)", "Price (Low to High)", "Just Added"];
 
@@ -29,9 +30,10 @@ const ProductsPage: React.FC = () => {
     <>
       <div className={`grid grid-rows-[auto-auto]`}>
         <div
-          className={`flex flex-col sm:flex-row justify-between max-w-[${WIDTH}ch] min-w-[226px] mx-auto w-full px-4 py-4`}
+          className={`flex flex-row justify-between max-w-[${WIDTH}ch] min-w-[226px] mx-auto w-full px-4 py-4`}
         >
-          <CategoryList />
+          <CategoryList containerClass="hidden md:block" />
+          <CategoryDropdown containerClass="block relative md:hidden" />
           <DropDown
             options={sortOptions}
             handleSelect={sortBy}
