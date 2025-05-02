@@ -41,7 +41,7 @@ const DropDown: React.FC<DropDownProps> = ({
         aria-haspopup="listbox"
         className={`text-[1em] min-w-50 w-auto text-right`}
       >
-        Sort by: {selectedOption}
+        Sort
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -52,9 +52,9 @@ const DropDown: React.FC<DropDownProps> = ({
               tabIndex={-1}
               aria-activedescendant={selectedOption}
               className={`flex flex-col gap-2 py-2 bg-white`}
-              initial={{ y: "-200px" }}
+              initial={{ y: "-100%" }}
               animate={{ y: 0 }}
-              exit={{ y: "-200px" }}
+              exit={{ y: "-100%" }}
               transition={{ ease: easeInOutExpo }}
             >
               {options.map((option) => (
@@ -68,7 +68,7 @@ const DropDown: React.FC<DropDownProps> = ({
                     setIsOpen(false);
                     handleSelect(option);
                   }}
-                  className={`text-[1em] text-right ${
+                  className={`text-[.7em] text-right ${
                     currentSort === option && `text-blue-600 opacity-80`
                   }`}
                 >

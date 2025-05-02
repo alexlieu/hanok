@@ -28,7 +28,7 @@ const ProductsPage: React.FC = () => {
 
   return (
     <>
-      <div className={`grid grid-rows-[auto-auto]`}>
+      <div className={`grid grid-rows-[auto-auto] max-w-[80em] m-auto`}>
         <div
           className={`flex flex-row justify-between max-w-[${WIDTH}ch] min-w-[226px] mx-auto w-full px-4 py-4`}
         >
