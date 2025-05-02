@@ -50,7 +50,9 @@ const MainNav: React.FC = () => {
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="cursor-pointer w-fit h-fit min-[360px]:mr-[20px] mt-[15px]"
         >
-          <LogoWithTextSVG className=" w-full h-fit max-w-[125px]" />
+          <span className="inline">
+            <LogoWithTextSVG className=" w-full h-fit max-w-[125px]" />
+          </span>
         </button>
       </nav>
       <NavMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
