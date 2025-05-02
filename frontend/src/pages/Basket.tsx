@@ -29,7 +29,7 @@ const BasketPage: React.FC = () => {
             <motion.h2
               key="empty-state"
               layout="position"
-              className="text-center font-light text-[clamp(4rem,9vw,8rem)] pt-[15vb]"
+              className="text-center text-[clamp(4rem,9vw,6rem)] pt-[15vb] font-outfit"
               initial={isEmptyThroughDeletion ? { opacity: 0 } : false}
               animate={{
                 opacity: 1,
