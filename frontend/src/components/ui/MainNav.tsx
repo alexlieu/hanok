@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import LogoWithTextSVG from "../../assets/SVG/LogoWithTextSVG";
 import NavMenu from "./NavMenu";
+import useWindowDimensions from "../../utils/hooks/useWindowDimensions";
 
 const navContent = [
   { title: "Home", link: "" },
@@ -11,9 +12,9 @@ const navContent = [
 
 const MainNav: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { width } = useWindowDimensions();
 
   const getNavContent = (className: string, center: boolean) => {
-    const styling = "underline underline-offset-5";
     return (
       <ul className={`${className}`}>
         {navContent.map(({ title, link }) => (
@@ -21,7 +22,9 @@ const MainNav: React.FC = () => {
             <NavLink
               to={link}
               className={({ isActive }) =>
-                isActive ? `${styling}` : `hover:${styling}`
+                isActive
+                  ? "underline underline-offset-5"
+                  : `hover:underline underline-offset-5`
               }
               end
               onClick={() => setIsMenuOpen(false)}
@@ -36,25 +39,34 @@ const MainNav: React.FC = () => {
 
   return (
     <header>
-      <nav className={`w-screen border-b-1 hidden md:block`}>
-        {getNavContent(
-          "flex flex-row w-fit m-auto gap-10 text-[22px] font-dm-sans font-medium h-[110px]",
-          true
-        )}
-      </nav>
-      <div className="hidden md:block md:absolute md:left-auto md:right-[20px] md:top-[15px]">
-        <LogoWithTextSVG className="w-full max-w-[150px]" />
-      </div>
-      <nav className="w-full flex flex-row border-b-1 justify-center min-[360px]:justify-end h-[100px] md:hidden">
-        <button
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="cursor-pointer w-fit h-fit min-[360px]:mr-[20px] mt-[15px]"
-        >
-          <span className="inline">
-            <LogoWithTextSVG className=" w-full h-fit max-w-[125px]" />
+      {width < 768 ? (
+        <nav className="w-screen border-b-1 flex flex-row justify-center min-[360px]:justify-end h-[100px]">
+          <button
+            onClick={() => setIsMenuOpen((prevState) => !prevState)}
+            className="w-fit h-fit min-[360px]:mr-[20px] mt-[15px] cursor-pointer"
+          >
+            <LogoWithTextSVG
+              instanceId="mobile"
+              className="w-full max-w-[125px]"
+            />
+          </button>
+        </nav>
+      ) : (
+        <>
+          <nav className={`w-screen border-b-1`}>
+            {getNavContent(
+              "flex flex-row w-fit m-auto gap-10 text-[22px] font-dm-sans font-medium h-[110px]",
+              true
+            )}
+          </nav>
+          <span className="block absolute left-auto right-[20px] top-[15px]">
+            <LogoWithTextSVG
+              instanceId="desktop"
+              className="w-full max-w-[150px]"
+            />
           </span>
-        </button>
-      </nav>
+        </>
+      )}
       <NavMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
         {getNavContent("flex flex-col gap-3", false)}
       </NavMenu>
