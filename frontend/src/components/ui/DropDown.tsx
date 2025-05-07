@@ -6,11 +6,13 @@ type DropDownProps = {
   options: string[];
   handleSelect: (option: string) => void;
   currentSort: string;
+  className?: string;
 };
 const DropDown: React.FC<DropDownProps> = ({
   options,
   handleSelect,
   currentSort,
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options[0]);
@@ -45,7 +47,9 @@ const DropDown: React.FC<DropDownProps> = ({
       </button>
       <AnimatePresence>
         {isOpen && (
-          <motion.div className="absolute -left-[16px] w-[calc(100%+32px)] pr-[16px] overflow-hidden">
+          <motion.div
+            className={`absolute -left-[16px] w-[calc(100%+32px)] pr-[16px] overflow-hidden ${className}`}
+          >
             <motion.ul
               ref={dropdownRef}
               role="listbox"

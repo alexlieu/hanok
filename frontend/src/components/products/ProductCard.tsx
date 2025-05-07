@@ -13,19 +13,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const maxPrice = product.priceRange.max;
 
   return (
-    <article className="min-w-0">
+    <article className="relative isolate min-w-0">
+      <div
+        className={`${getStableBGColor(product.id)} w-full aspect-square`}
+      ></div>
       <Link to={getProductPath(product)}>
-        <div
-          className={`${getStableBGColor(product.id)} w-full aspect-square`}
-        ></div>
+        <span className="absolute inset-0 z-5"></span>
         <h2 className={`text-[1.1em]`}>{product.name}</h2>
-        <span
-          className={`font-extralight`}
-          aria-label={`Price: ${formatPriceRange(minPrice, maxPrice)}`}
-        >
-          {formatPriceRange(minPrice, maxPrice)}
-        </span>
       </Link>
+      <span
+        className={`font-extralight`}
+        aria-label={`Price: ${formatPriceRange(minPrice, maxPrice)}`}
+      >
+        {formatPriceRange(minPrice, maxPrice)}
+      </span>
     </article>
   );
 };

@@ -38,6 +38,7 @@ const ProductsPage: React.FC = () => {
             options={sortOptions}
             handleSelect={sortBy}
             currentSort={currentSort}
+            className={"z-10"}
           />
         </div>
         <div className={`max-w-[${WIDTH}ch] mx-auto w-full px-4`}>

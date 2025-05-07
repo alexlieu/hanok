@@ -66,7 +66,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className="absolute w-screen -left-2 overflow-x-hidden"
+              className="absolute w-screen -left-2 overflow-x-hidden z-10"
               style={{ scrollbarGutter: "stable" }}
             >
               <motion.div
