@@ -9,7 +9,7 @@ type AddToBasketButtonProps = {
 };
 
 const buttonStyling =
-  "inline-block text-center text-2xl font-medium px-4 py-2 border border-black transition-colors hover:text-white hover:bg-black w-fit";
+  "inline-block text-center text-2xl font-medium px-4 py-2 border border-black transition-colors hover:text-white hover:bg-black w-full my-5";
 
 const AddToBasketButton: React.FC<AddToBasketButtonProps> = ({
   onClick,

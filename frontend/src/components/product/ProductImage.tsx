@@ -1,12 +1,13 @@
 import MouseFollowingTooltip from "../ui/MouseFollowingTooltip";
 
 type ProductImageProps = {
+  className?: string;
   image?: string;
 };
 
-const ProductImage: React.FC<ProductImageProps> = ({ image }) => (
-  <div className="flex justify-center">
-    <div className="bg-amber-200 w-4/5 h-full aspect-square">
+const ProductImage: React.FC<ProductImageProps> = ({ className, image }) => (
+  <div className={`flex justify-center ${className}`}>
+    <div className="bg-amber-500 aspect-square w-full object-cover">
       <MouseFollowingTooltip
         content={
           <svg
