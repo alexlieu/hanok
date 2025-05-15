@@ -1,22 +1,32 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.service.OrderExceptions;
+import com.alex_lieu.hanok.service.PaymentExceptions;
 import com.alex_lieu.hanok.service.ProductExceptions;
 import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.service.spi.ServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ProductExceptions.ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse>
@@ -56,7 +66,7 @@ public class GlobalExceptionHandler {
     handleRuntimeException(RuntimeException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                ex.getMessage(),
+                ex.getMessage(),//"An unexpected internal error occurred. Please try again later.",
                 Instant.now()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -64,17 +74,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(
-            ConstraintViolationException ex) {
-
-        List<String> violationMessages = ex.getConstraintViolations().stream()
-                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
-                .collect(Collectors.toList());
-
-        String errorMessage = String.join("; ", violationMessages);
+            ConstraintViolationException ex
+    ) {
+        Map<String, String> errors = new HashMap<>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+        }
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                errorMessage,
+                errors.toString(),
                 Instant.now()
         );
 
@@ -82,7 +91,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
+    public ResponseEntity<ErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
@@ -148,6 +157,32 @@ public class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST.value(),
             ex.getMessage(),
             Instant.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentExceptions.OrderPlacementFailedException.class)
+    public ResponseEntity<ErrorResponse> handleOrderPlacementFailedException(
+            PaymentExceptions.OrderPlacementFailedException ex
+    ) {
+        log.error("Order placement failed due to: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Sorry we couldn't place your order at this time. Please try again later.",
+                Instant.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(OrderExceptions.InvalidOrderDataException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleInvalidOrderDataException(OrderExceptions.InvalidOrderDataException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                Instant.now()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

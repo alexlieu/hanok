@@ -1,17 +1,19 @@
 package com.alex_lieu.hanok.repository;
-import com.alex_lieu.hanok.entity.Payment;
 
+import com.alex_lieu.hanok.entity.Payment;
+import com.alex_lieu.hanok.enums.PaymentMethod;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Page<Payment> findByOrderId(Long id, Pageable pageable);
-    Page<Payment> findByPaymentMethod(Payment.PaymentMethod paymentMethod, Pageable pageable);
+
+    Page<Payment> findByPaymentMethod(PaymentMethod paymentMethod, Pageable pageable);
     Page<Payment> findByPaymentStatus(Payment.PaymentStatus paymentStatus, Pageable pageable);
     Payment findByTransactionReference(String transactionReference);
     Page<Payment> findByAmountBetween(BigDecimal min, BigDecimal max, Pageable pageable);

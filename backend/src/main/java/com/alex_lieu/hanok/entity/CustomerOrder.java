@@ -1,8 +1,12 @@
 package com.alex_lieu.hanok.entity;
 
+import com.alex_lieu.hanok.validation.AtLeastOneRequired;
+import com.alex_lieu.hanok.validation.ContactNumberConstraint;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -10,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Builder
@@ -19,18 +24,30 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@AtLeastOneRequired(fields = {"email", "phoneNumber"}, message = "{customer.contact.required}")
 public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String orderNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "customer_id")
     @ToString.Exclude
     private Person customer;
 
-    //This tag doesn't work for some reason.
-    //@FutureOrPresent(message = "{order.order.future}")
+    @NotBlank(message = "{customer.name.notblank}")
+    private String customerName;
+
+    @Email(message = "{email.valid}")
+    @Column(name = "email")
+    private String email;
+
+    @ContactNumberConstraint
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     private LocalDateTime orderDateTime;
 
     @Future(message = "{order.pickup.future}")
@@ -44,6 +61,13 @@ public class CustomerOrder {
         LocalDateTime now = LocalDateTime.now();
         this.orderDateTime = now;
         this.updatedAt = now;
+    }
+
+    @PostPersist
+    public void generateOrderNumber() {
+        String base36id = Long.toString(this.id, 36).toUpperCase(Locale.ENGLISH);
+        String paddedId = String.format("%7s", base36id).replace(' ', '0');
+        setOrderNumber("ORD-" + paddedId);
     }
 
     // Called before the entity is updated
@@ -78,14 +102,17 @@ public class CustomerOrder {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Product product = (Product) o;
-        Long id = this.getId();
-        return id != null && Objects.equals(getId(), product.getId());
+        CustomerOrder that = (CustomerOrder) o;
+        return getId() != 0L && Objects.equals(getId(), that.getId());
     }
 
     @Override
     public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+        if (getId() != 0L) {
+            return Objects.hash(getId());
+        }
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass().hashCode() : this.getClass().hashCode();
     }
 
 }

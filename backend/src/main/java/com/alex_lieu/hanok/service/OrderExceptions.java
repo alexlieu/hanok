@@ -11,4 +11,14 @@ public class OrderExceptions {
             super(message, cause);
         }
     }
+
+    public static class InvalidOrderDataException extends RuntimeException {
+        public InvalidOrderDataException(String message) {
+            super(message);
+        }
+
+        public InvalidOrderDataException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

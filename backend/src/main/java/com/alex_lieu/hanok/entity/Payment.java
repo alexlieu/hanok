@@ -1,11 +1,13 @@
 package com.alex_lieu.hanok.entity;
 
+import com.alex_lieu.hanok.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Objects;
 
 @Builder
@@ -26,16 +28,26 @@ public class Payment {
 
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
     private LocalDateTime paymentDateTime;
 
     private String transactionReference;
 
-    public enum PaymentMethod {
-        CREDIT_CARD, DEBIT_CARD, CASH, MOBILE_PAYMENT
+    @PrePersist
+    private void addPaymentDateTime() {
+        this.paymentDateTime = LocalDateTime.now();
+    }
+
+    @PostPersist
+    private void generateTransactionReference() {
+        String base36id = Long.toString(this.id, 36).toUpperCase(Locale.ENGLISH);
+        String paddedId = String.format("%7s", base36id).replace(' ', '0');
+        setTransactionReference("RN-" + paddedId);
     }
 
     public enum PaymentStatus {
@@ -49,14 +61,17 @@ public class Payment {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Product product = (Product) o;
-        Long id = this.getId();
-        return id != null && Objects.equals(getId(), product.getId());
+        Payment that = (Payment) o;
+        return getId() != 0L && Objects.equals(this.getId(), that.getId());
     }
 
     @Override
     public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+        if (getId() != 0L) {
+            return Objects.hash(getId());
+        }
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
+                .getPersistentClass().hashCode() : this.getClass().hashCode();
     }
 
 }

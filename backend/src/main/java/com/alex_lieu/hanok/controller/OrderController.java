@@ -1,16 +1,22 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.dto.OrderConfirmationDto;
 import com.alex_lieu.hanok.dto.OrderCreateDto;
 import com.alex_lieu.hanok.dto.OrderUpdateDto;
 import com.alex_lieu.hanok.dto.OrderViewDto;
 import com.alex_lieu.hanok.entity.CustomerOrder;
+import com.alex_lieu.hanok.service.OrderExceptions;
 import com.alex_lieu.hanok.service.OrderService;
+import com.alex_lieu.hanok.service.PaymentExceptions;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -60,8 +66,18 @@ public class OrderController {
     }
 
     @PostMapping
-    private ResponseEntity<OrderViewDto> placeOrder(@RequestBody OrderCreateDto order) {
-        return ResponseEntity.ok(orderService.placeOrder(order));
+    private ResponseEntity<?> placeOrder(@Valid @RequestBody OrderCreateDto order, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getAllErrors());
+        }
+        try {
+            OrderConfirmationDto confirmationDto = orderService.placeOrder(order, result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(confirmationDto);
+        } catch (OrderExceptions.InvalidOrderDataException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (PaymentExceptions.OrderPlacementFailedException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PatchMapping("/{id}")
