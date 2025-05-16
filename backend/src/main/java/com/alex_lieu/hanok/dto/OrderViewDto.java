@@ -1,6 +1,7 @@
 package com.alex_lieu.hanok.dto;
 
 import com.alex_lieu.hanok.entity.CustomerOrder;
+import com.alex_lieu.hanok.entity.Person;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -22,4 +23,17 @@ public record OrderViewDto(
         String specialInstructions,
         @NotEmpty(message = "{order.items.notempty}") List<OrderItemViewDto> orderItemDtos,
         @NotNull CustomerDto customerDto
-) implements Serializable {}
+) implements Serializable {
+    public static OrderViewDto fromOrder(CustomerOrder order, Person customer) {
+        return new OrderViewDto(
+                order.getId(),
+                order.getOrderDateTime(),
+                order.getPickupDateTime(),
+                order.getOrderStatus(),
+                order.getTotal(),
+                order.getSpecialInstructions(),
+                order.getOrderItems().stream().map(OrderItemViewDto::fromOrderItem).toList(),
+                PersonMapper.toPersonDto(customer)
+        );
+    }
+}

@@ -65,37 +65,6 @@ public class OrderService {
         return customerOrderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + id));
     }
 
-    public List<OrderViewDto> getOrders() {
-        return customerOrderRepository.findAll().stream().map(
-                order -> createOrderDto(order, order.getCustomer())
-        ).toList();
-    }
-
-    public OrderViewDto createOrderDto(CustomerOrder customerOrder, Person person) {
-        return new OrderViewDto(
-                customerOrder.getId(),
-                customerOrder.getOrderDateTime(),
-                customerOrder.getPickupDateTime(),
-                customerOrder.getOrderStatus(),
-                customerOrder.getTotal(),
-                customerOrder.getSpecialInstructions(),
-                customerOrder.getOrderItems().stream().map(this::createOrderItemDto).toList(),
-                PersonMapper.toPersonDto(person)
-        );
-    }
-
-    public OrderItemViewDto createOrderItemDto(OrderItem orderItem) {
-        ProductVariant variant = orderItem.getVariant();
-        return new OrderItemViewDto(
-                variant.getProduct()
-                        .getName(),
-                variant.getFlavour(),
-                variant.getSize(),
-                orderItem.getQuantity(),
-                orderItem.getSubtotal(),
-                orderItem.getNotes()
-        );
-    }
 
     public List<OrderViewDto> filterAll(
             Long customerId,
@@ -107,12 +76,7 @@ public class OrderService {
     ) {
         return customerOrderRepository.filterAll(
                         customerId, orderStatus, orderDateTimeStart, orderDateTimeEnd, pickupDateTimeStart, pickupDateTimeEnd)
-                .stream().map(order -> createOrderDto(order, order.getCustomer())).toList();
-    }
-
-    public List<CustomerOrder> getOrderItemsForOrder(long id) {
-        CustomerOrder customerOrder = getOrderById(id);
-        return customerOrderRepository.findOrderItemsByCustomerId(id);
+                .stream().map(order -> OrderViewDto.fromOrder(order, order.getCustomer())).toList();
     }
 
     public String standardizePhoneNumber(String phoneNumber) {
@@ -188,7 +152,7 @@ public class OrderService {
         if (updateDto.items() != null) updateItems(order, updateDto.items());
         try {
             CustomerOrder savedOrder = customerOrderRepository.save(order);
-            return createOrderDto(savedOrder, savedOrder.getCustomer());
+            return OrderViewDto.fromOrder(savedOrder, savedOrder.getCustomer());
         } catch (DataIntegrityViolationException ex) {
             throw new IllegalStateException("Database integrity violation: " + ex.getMessage(), ex);
         } catch (ConstraintViolationException ex) {

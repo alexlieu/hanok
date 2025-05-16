@@ -2,9 +2,9 @@ package com.alex_lieu.hanok.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.validator.constraints.Range;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -32,7 +32,7 @@ public class OrderItem {
     @ToString.Exclude
     private ProductVariant variant;
 
-    @Positive(message = "{orderitem.quantity.positive}")
+    @Range(min = 1, max = 10, message = "{orderitem.quantity.range}")
     private Integer quantity;
 
     @Column(precision = 10, scale = 2)
