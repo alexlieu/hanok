@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import java.io.Serializable;
 
 public record OrderItemUpdateDto(
-        @NotNull(message = "{variant.id.notblank}") @Positive(message = "{variant.id.positive}") long variantId,
+        @NotNull(message = "{variant.id.notnull}") @Positive(message = "{variant.id.positive}") long variantId,
         @Positive(message = "{orderitem.quantity.positive}") Integer quantity,
         String notes
 ) implements Serializable {}

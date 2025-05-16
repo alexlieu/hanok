@@ -44,11 +44,11 @@ public class ProductVariant {
     @Column(columnDefinition = "boolean default true")
     private boolean available;
 
-    @NotNull(message = "{variant.flavour.notblank}")
+    @NotNull(message = "{variant.flavour.notnull}")
     @Enumerated(EnumType.STRING)
     private Flavour flavour;
 
-    @NotNull(message = "{variant.size.notblank}")
+    @NotNull(message = "{variant.size.notnull}")
     @Enumerated(EnumType.STRING)
     private Size size;
 

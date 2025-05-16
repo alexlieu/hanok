@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.dto.BasketResponseDto;
 import com.alex_lieu.hanok.dto.OrderCreateDto;
 import com.alex_lieu.hanok.dto.OrderUpdateDto;
 import com.alex_lieu.hanok.dto.OrderViewDto;
@@ -59,6 +60,14 @@ public class OrderController {
         if (sortDir.equalsIgnoreCase("desc")) comparator = comparator.reversed();
 
         return comparator;
+    }
+
+    @GetMapping(path = "/basket")
+    private ResponseEntity<BasketResponseDto> getBasket(
+            @RequestParam("itemIds") List<Long> itemIds,
+            @RequestParam("quantities") List<Integer> quantities
+    ) {
+        return ResponseEntity.ok(orderService.getBasket(itemIds, quantities));
     }
 
     @PostMapping

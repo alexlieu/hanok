@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class OrderService {
@@ -159,8 +160,7 @@ public class OrderService {
                             .build();
         }).toList());
         order.setPayment(Payment.builder()
-                .amount(order.getOrderItems().stream().map(OrderItem::getSubtotal)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .amount(order.getTotal())
                 .paymentStatus(orderCreateDto.paymentCreateDto().paymentStatus())
                 .paymentMethod(orderCreateDto.paymentCreateDto().paymentMethod())
                 .order(order)
@@ -236,6 +236,34 @@ public class OrderService {
 
     public String nullIfEmptyOrBlankSpace(String str) {
         return (str == null || str.isBlank()) ? null : str.trim();
+    }
+
+    public BasketResponseDto getBasket(List<Long> itemIds, List<Integer> quantities) {
+        if (itemIds.size() != quantities.size()) {
+            throw new IllegalArgumentException("Item IDs and quantities must have the same length");
+        }
+        List<BasketItemResponseDto> basketItemsResponse = IntStream.range(0, itemIds.size()).mapToObj(i -> {
+            Long variantId = itemIds.get(i);
+            Integer quantity = quantities.get(i);
+            ProductVariant variant = productService.getActiveProductVariantById(variantId);
+            OrderItem orderItem = OrderItem.builder().variant(variant).unitPrice(variant.getPrice())
+                    .quantity(quantity).build();
+            return new BasketItemResponseDto(
+                    variant.getProduct().getName(),
+                    variant.getFlavour(),
+                    variant.getSize(),
+                    orderItem.getUnitPrice(),
+                    orderItem.getSubtotal(),
+                    variantId,
+                    quantity
+            );
+        }).toList();
+        BigDecimal total = basketItemsResponse.stream().map(BasketItemResponseDto::subTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return new BasketResponseDto(
+                basketItemsResponse,
+                total
+        );
     }
 
 }
