@@ -14,10 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +30,19 @@ public class OrderService {
     private final static Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final CustomerOrderRepository customerOrderRepository;
+    private final String defaultCountryCode;
     private final PersonService personService;
     private final ProductService productService;
 
     @Autowired
     public OrderService(
             CustomerOrderRepository customerOrderRepository,
+            String defaultCountryCode,
             PersonService personService,
             ProductService productService
     ) {
         this.customerOrderRepository = customerOrderRepository;
+        this.defaultCountryCode = defaultCountryCode;
         this.personService = personService;
         this.productService = productService;
     }
@@ -112,42 +114,30 @@ public class OrderService {
         return customerOrderRepository.findOrderItemsByCustomerId(id);
     }
 
-    public String standardizePhoneNumber(String phoneNumber, String countryCode, String objectName, String fieldName, BindingResult result) {
+    public String standardizePhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             return null;
         }
-        if (countryCode == null || countryCode.trim().isEmpty()) {
-            result.addError(new FieldError(objectName, fieldName, phoneNumber, false, null, null, "Country code must be provided."));
-            return phoneNumber;
-        }
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         try {
-            Phonenumber.PhoneNumber parsedNumber = phoneUtil.parse(phoneNumber, countryCode);
+            Phonenumber.PhoneNumber parsedNumber = phoneUtil.parse(phoneNumber, defaultCountryCode);
             if (phoneUtil.isValidNumber(parsedNumber)) {
                 return phoneUtil.format(parsedNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
             } else {
-                result.addError(new FieldError(objectName, fieldName, phoneNumber, false, null, new Object[]{countryCode}, "Invalid {0} phone number."));
-                return phoneNumber;
+                throw new OrderExceptions.InvalidOrderDataException(MessageFormat.format("Invalid {0} phone number", defaultCountryCode));
             }
         } catch (com.google.i18n.phonenumbers.NumberParseException e) {
-            result.addError(new FieldError(objectName, fieldName, phoneNumber, false, null, null, "Invalid phone number format."));
-            return phoneNumber;
+            throw new OrderExceptions.InvalidOrderDataException("Invalid phone number format", e);
         }
     }
 
     @Transactional
-    public OrderConfirmationDto placeOrder(OrderCreateDto orderCreateDto, BindingResult result) {
+    public OrderConfirmationDto placeOrder(OrderCreateDto orderCreateDto) {
         Person customerUser = null;
         if (orderCreateDto.customerId() != null) {
             customerUser = personService.findById(orderCreateDto.customerId());
         }
-        String standardizedPhoneNumber = standardizePhoneNumber(orderCreateDto.phoneNumber(), "GB", orderCreateDto.getClass()
-                .getSimpleName(), "phoneNumber", result);
-        if (result.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder("Invalid input data:");
-            result.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()));
-            throw new OrderExceptions.InvalidOrderDataException(errorMessage.toString());
-        }
+        String standardizedPhoneNumber = standardizePhoneNumber(orderCreateDto.phoneNumber());
         CustomerOrder order = CustomerOrder.builder()
                 .customer(customerUser)
                 .orderStatus(CustomerOrder.OrderStatus.PENDING)
