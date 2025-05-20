@@ -11,7 +11,7 @@ import {
   productLoader,
 } from "./utils/loader";
 import "./App.css";
-import BasketPage from "./pages/Basket";
+import BasketWrapper from "./components/basket/BasketWrapper";
 
 const router = createBrowserRouter([
   {
@@ -41,7 +41,10 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "basket", element: <BasketPage /> },
+      {
+        path: "basket",
+        element: <BasketWrapper />,
+      },
     ],
   },
 ]);

@@ -1,2 +1,7 @@
-type ErrorType = Error | null
-export default ErrorType
+export type ErrorType = Error | null;
+
+export type APIResponseError = {
+  status: number;
+  message: string;
+  timestamp: string;
+};

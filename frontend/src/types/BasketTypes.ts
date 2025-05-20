@@ -1,3 +1,23 @@
+export type BasketRequest = {
+  itemIds: number[];
+  quantities: number[];
+};
+
+export type BasketResponseItem = {
+  productName: string;
+  flavour: string;
+  size: string;
+  unitPrice: number;
+  subTotal: number;
+  variantId: number;
+  quantity: number;
+};
+
+export type BasketResponse = {
+  items: BasketResponseItem[];
+  total: number;
+};
+
 export type BasketItem = {
   id: number;
   name: string;
