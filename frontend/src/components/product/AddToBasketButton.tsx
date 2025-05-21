@@ -21,7 +21,7 @@ const AddToBasketButton: React.FC<AddToBasketButtonProps> = ({
     (v) =>
       v.flavour === selection.flavour &&
       v.size === selection.size &&
-      v.name === product
+      v.productName === product
   );
   if (itemAdded) {
     return (

@@ -2,6 +2,8 @@ import { LoaderFunctionArgs } from "react-router-dom";
 import { LoaderData } from "../types/ProductListView";
 import { ProductView } from "../types/ProductListView";
 import { productInfo } from "../types/ProductDetailView";
+import { BasketResponse, BasketItem } from "../types/BasketTypes";
+import getBasketResponse from "./api/basketApi";
 
 export const productsLoader = async (): Promise<LoaderData> => {
   try {
@@ -20,6 +22,7 @@ export const productsLoader = async (): Promise<LoaderData> => {
     }
     return { allProducts, categoryCounts };
   } catch (error) {
+    console.error("Failed to fetch products.", error);
     throw new Response(
       JSON.stringify({ message: "Failed to fetch products." }),
       {
@@ -61,8 +64,45 @@ export const productLoader = async ({
     }
     return await response.json();
   } catch (error) {
+    console.error("Failed to load product", error);
     throw new Response(JSON.stringify({ message: "Failed to load product." }), {
       status: 500,
     });
+  }
+};
+
+export const basketLoader = async (): Promise<BasketResponse | null> => {
+  let basketItems: BasketItem[] = [];
+
+  try {
+    const storedBasket = localStorage.getItem("guestBasket");
+    if (storedBasket) {
+      const parsedState = JSON.parse(storedBasket);
+      if (parsedState && Array.isArray(parsedState.items)) {
+        basketItems = parsedState.items;
+      }
+    }
+  } catch (error) {
+    console.error(
+      "Failed to parse basket items from localStorage in loader",
+      error
+    );
+    localStorage.removeItem("guestBasket");
+  }
+
+  if (basketItems.length === 0) {
+    return { items: [], total: 0 };
+  }
+
+  const ids = basketItems.map((item) => item.variantId);
+  const quantities = basketItems.map((item) => item.quantity);
+
+  try {
+    const response = await getBasketResponse(ids, quantities);
+    console.log("Backend Basket Response in Loader: ", response);
+    return response;
+  } catch (error) {
+    console.error("Error loading basket items from backend in loader", error);
+    throw error;
   }
 };

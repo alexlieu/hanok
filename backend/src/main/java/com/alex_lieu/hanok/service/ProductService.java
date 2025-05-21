@@ -3,9 +3,9 @@ package com.alex_lieu.hanok.service;
 import com.alex_lieu.hanok.dto.CategoryCountDto;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
 import com.alex_lieu.hanok.dto.VariantUpdateDto;
-import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.entity.Product;
 import com.alex_lieu.hanok.entity.ProductVariant;
+import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.repository.ProductRepository;
 import com.alex_lieu.hanok.repository.ProductVariantRepository;
 import jakarta.persistence.PersistenceException;
@@ -17,7 +17,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.rowset.serial.SerialException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;

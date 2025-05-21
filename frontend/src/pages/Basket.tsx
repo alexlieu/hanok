@@ -52,7 +52,7 @@ const BasketPage: React.FC = () => {
             >
               <AnimatePresence mode="sync">
                 {state.items.map((item) => (
-                  <BasketLineItem item={item} key={item.id} />
+                  <BasketLineItem item={item} key={item.variantId} />
                 ))}
               </AnimatePresence>
               <BasketFooter />

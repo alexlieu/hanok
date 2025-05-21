@@ -21,11 +21,11 @@ const useAddToBasket = (
     dispatch({
       type: "ADD_ITEM",
       payload: {
-        id: itemToAdd.id,
-        name: name,
+        variantId: itemToAdd.id,
+        productName: name,
         flavour: itemToAdd.flavour,
         size: itemToAdd.size,
-        price: itemToAdd.price,
+        unitPrice: itemToAdd.price,
         quantity: selectedOptions.quantity,
         url: location.pathname,
       },

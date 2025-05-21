@@ -50,7 +50,7 @@ const BasketLineItem: React.FC<BasketLineItemProps> = ({ item }) => {
           <div className="min-w-0 h-fit border border-amber-300">
             <Link to={item.url}>
               <h3 className="font-medium hover:text-blue-500 transition-colors truncate">
-                {item.name}
+                {item.productName}
               </h3>
             </Link>
             <p
@@ -63,21 +63,21 @@ const BasketLineItem: React.FC<BasketLineItemProps> = ({ item }) => {
             <QuantityControls
               quantity={item.quantity}
               onQuantityChange={(newQty) =>
-                handleQuantityChange(item.id, newQty)
+                handleQuantityChange(item.variantId, newQty)
               }
               onIncrease={() =>
-                handleQuantityChange(item.id, Number(item.quantity) + 1)
+                handleQuantityChange(item.variantId, Number(item.quantity) + 1)
               }
               onDecrease={() =>
-                handleQuantityChange(item.id, Number(item.quantity) - 1)
+                handleQuantityChange(item.variantId, Number(item.quantity) - 1)
               }
             />
-            <RemoveButton itemId={item.id} />
+            <RemoveButton itemId={item.variantId} />
           </div>
         </div>
         <div className={`shrink-0 w-20 text-right`}>
           <p className="font-medium">
-            {formatPrice(item.quantity * item.price)}
+            {formatPrice(item.quantity * item.unitPrice)}
           </p>
         </div>
       </motion.div>

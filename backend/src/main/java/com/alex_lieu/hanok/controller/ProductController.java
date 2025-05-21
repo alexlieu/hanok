@@ -3,8 +3,8 @@ package com.alex_lieu.hanok.controller;
 import com.alex_lieu.hanok.dto.CategoryCountDto;
 import com.alex_lieu.hanok.dto.ProductListDto;
 import com.alex_lieu.hanok.dto.ProductUpdateDto;
-import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.entity.Product;
+import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.enums.FilterPriceRange;
 import com.alex_lieu.hanok.service.ProductService;
 import jakarta.validation.constraints.NotBlank;
@@ -15,10 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -66,7 +64,7 @@ public class ProductController {
                     value = "sort-dir",
                     defaultValue = "asc"
             ) String sortDir,
-            @PageableDefault(size=25, sort="name") Pageable pageable){
+            @PageableDefault(size = 25, sort = "name") Pageable pageable) {
             // NEED TO HANDLE EXCEPTION WHERE AN EMPTY LIST IS RETURNED FROM A VALID QUERY
             Category category = Category.fromString(categoryInput);
             FilterPriceRange priceRange = FilterPriceRange.fromString(priceRangeInput);

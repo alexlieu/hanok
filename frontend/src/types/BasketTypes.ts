@@ -11,6 +11,7 @@ export type BasketResponseItem = {
   subTotal: number;
   variantId: number;
   quantity: number;
+  url?: string;
 };
 
 export type BasketResponse = {
@@ -19,13 +20,14 @@ export type BasketResponse = {
 };
 
 export type BasketItem = {
-  id: number;
-  name: string;
+  variantId: number;
+  productName: string;
   flavour: string;
   size: string;
-  price: number;
+  unitPrice: number;
   quantity: number;
   url: string;
+  subTotal: number;
 };
 
 export type BasketState = {
@@ -34,7 +36,11 @@ export type BasketState = {
 };
 
 export type BasketAction =
-  | { type: "ADD_ITEM"; payload: BasketItem }
+  | {
+      type: "ADD_ITEM";
+      payload: Omit<BasketItem, "subTotal"> & { url: string };
+    }
   | { type: "REMOVE_ITEM"; id: number }
   | { type: "UPDATE_QUANTITY"; id: number; quantity: number }
-  | { type: "CLEAR" };
+  | { type: "CLEAR" }
+  | { type: "SET_BASKET_FROM_BACKEND"; payload: BasketResponse };

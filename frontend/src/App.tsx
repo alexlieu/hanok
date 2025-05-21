@@ -9,9 +9,10 @@ import {
   productsLoader,
   productsByCategoryLoader,
   productLoader,
+  basketLoader,
 } from "./utils/loader";
 import "./App.css";
-import BasketWrapper from "./components/basket/BasketWrapper";
+import BasketPage from "./pages/Basket";
 
 const router = createBrowserRouter([
   {
@@ -43,7 +44,8 @@ const router = createBrowserRouter([
       },
       {
         path: "basket",
-        element: <BasketWrapper />,
+        element: <BasketPage />,
+        loader: basketLoader,
       },
     ],
   },

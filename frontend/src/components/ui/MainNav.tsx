@@ -18,7 +18,10 @@ const MainNav: React.FC = () => {
     return (
       <ul className={`${className}`}>
         {navContent.map(({ title, link }) => (
-          <li className={`${center && "m-auto"}`}>
+          <li
+            key={`navlink-${title.toLowerCase()}`}
+            className={`${center && "m-auto"}`}
+          >
             <NavLink
               to={link}
               className={({ isActive }) =>
