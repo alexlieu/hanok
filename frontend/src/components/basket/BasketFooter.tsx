@@ -17,7 +17,7 @@ const BasketFooter: React.FC = () => {
         <p className="text-xl">{`${formatPrice(state.total)}`}</p>
       </div>
       <Link
-        to=""
+        to="/checkout"
         className={`w-fit text-2xl font-medium px-4 py-2 border-black border-1 transition-colors hover:text-white hover:bg-black`}
         aria-label={`Proceed to checkout, total ${formatPrice(state.total)}`}
       >

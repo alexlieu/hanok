@@ -13,6 +13,7 @@ import {
 } from "./utils/loader";
 import "./App.css";
 import BasketPage from "./pages/Basket";
+import CheckoutPage from "./pages/Checkout";
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,11 @@ const router = createBrowserRouter([
       {
         path: "basket",
         element: <BasketPage />,
+        loader: basketLoader,
+      },
+      {
+        path: "checkout",
+        element: <CheckoutPage />,
         loader: basketLoader,
       },
     ],

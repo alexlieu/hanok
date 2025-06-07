@@ -8,3 +8,7 @@
     --font-outfit: Outfit, "sans-serif";
     --font-dm-sans: DM Sans, "sans-serif";
 }
+
+.form-error {
+    @apply text-red-500;
+}

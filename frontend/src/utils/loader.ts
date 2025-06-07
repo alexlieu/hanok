@@ -71,7 +71,7 @@ export const productLoader = async ({
   }
 };
 
-export const basketLoader = async (): Promise<BasketResponse | null> => {
+export const basketLoader = async (): Promise<BasketResponse> => {
   let basketItems: BasketItem[] = [];
 
   try {
