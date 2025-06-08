@@ -1,12 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  memo,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { useCallback, useEffect, useRef, useState, memo } from "react";
 import { CountryCode } from "libphonenumber-js";
 import { parsePhoneNumber } from "libphonenumber-js/min";
 import InputErrorMessage from "./InputErrorMessage";
@@ -32,8 +24,8 @@ type ContactNumberInputProps = {
   required?: boolean;
   validationError: string;
   updateParentPhoneError: (message: ValidationMessageValue) => void;
-  showErrorMessage: boolean;
-  setShowErrorMessage: Dispatch<SetStateAction<boolean>>;
+  showError: boolean;
+  onBlur: () => void;
 };
 
 const MIN_GB_PHONE_LENGTH_TO_PARSE = 7;
@@ -44,11 +36,11 @@ const ContactNumberInput: React.FC<ContactNumberInputProps> = ({
   onNumberChange,
   label = "Phone Number",
   id = "phone-number-input",
-  required = true,
+  required = false,
   validationError,
   updateParentPhoneError,
-  showErrorMessage,
-  setShowErrorMessage,
+  showError,
+  onBlur,
 }) => {
   const [isValid, setIsValid] = useState(true);
   //   const [errorMessage, updateParentPhoneError] = useState("");
@@ -137,20 +129,13 @@ const ContactNumberInput: React.FC<ContactNumberInputProps> = ({
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setShowErrorMessage(false);
       const result = validateNumber(event.target.value);
       setIsValid(result.isValid);
       setFormattedDisplay(result.formattedDisplay);
       onNumberChangeRef.current(result.e164value, result.isValid);
     },
-    [validateNumber, setShowErrorMessage]
+    [validateNumber]
   );
-
-  const handleBlur = () => {
-    setShowErrorMessage(true);
-    const result = validateNumber(formattedDisplay);
-    updateParentPhoneError(result.errorMessage);
-  };
 
   const errorId = `${id}-error`;
 
@@ -163,26 +148,15 @@ const ContactNumberInput: React.FC<ContactNumberInputProps> = ({
         name={id}
         value={formattedDisplay}
         onChange={handleChange}
-        onBlur={handleBlur}
+        onBlur={onBlur}
         className={!isValid ? "input-invalid" : ""}
         required={required}
         aria-invalid={!isValid}
         aria-describedby={!isValid && validationError ? errorId : undefined}
       />
-      {/* {!isValid && validationError && showErrorMessage && (
-        <p
-          id={errorId}
-          className="error-message"
-          style={{ color: "red", fontSize: "0.8em" }}
-          role="alert"
-        >
-          {validationError}
-        </p>
-      )} */}
       <InputErrorMessage
         id={errorId}
-        show={showErrorMessage}
-        valid={isValid}
+        show={showError}
         error={validationError}
       />
     </div>

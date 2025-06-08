@@ -3,6 +3,7 @@ import ContactNumberInput from "./ContactNumberInput";
 import DateInput from "./DateInput";
 import Checkbox from "../ui/Checkbox";
 import useCheckoutValidation, {
+  VALIDATION_MESSAGES,
   ValidationMessageValue,
 } from "../../utils/hooks/features/checkout/useCheckoutValidation";
 import useUpdateControls from "../../utils/hooks/features/checkout/useUpdateControls";
@@ -13,29 +14,20 @@ import InputErrorMessage from "./InputErrorMessage";
 
 const CheckoutForm: React.FC = () => {
   const {
-    // firstName,
+    firstName,
     handleFirstNameChange,
-    showFirstNameErrorMessage,
     handleFirstNameBlur,
-    // lastName,
+    lastName,
     handleLastNameChange,
-    showLastNameErrorMessage,
     handleLastNameBlur,
     customerNumber,
     handlePhoneChange,
+    handlePhoneBlur,
     isNumberValid,
-    showPhoneErrorMessage,
-    setShowPhoneErrorMessage,
     customerEmail,
     handleEmailInputChange,
     isEmailValid,
     handleEmailInputBlur,
-    showEmailErrorMessage,
-    // setShowEmailErrorMessage,
-    showContactErrorMessage,
-    // setShowContactErrorMessage,
-    showUpdateChoiceErrorMessage,
-    // setShowUpdateChoiceErrorMessage,
     // pickupDate,
     handleDateChange,
     emailUpdatesOn,
@@ -48,6 +40,9 @@ const CheckoutForm: React.FC = () => {
     validationErrors,
     // setValidationErrors,
     validateForm,
+    isFormSubmitted,
+    resetForm,
+    touchedFields,
   } = useCheckoutValidation();
 
   const { disabledFields } = useUpdateControls(
@@ -60,6 +55,31 @@ const CheckoutForm: React.FC = () => {
     smsUpdatesOn,
     setSmsUpdatesOn
   );
+
+  const shouldShowError = (fieldName: keyof ValidationErrors): boolean => {
+    const errorExists =
+      validationErrors[fieldName] !== VALIDATION_MESSAGES.VALID;
+
+    if (
+      fieldName === "firstName" ||
+      fieldName === "lastName" ||
+      fieldName === "email" ||
+      fieldName === "phone"
+    ) {
+      const isFieldTouched = touchedFields[fieldName] ?? false;
+      return errorExists && (isFormSubmitted || isFieldTouched);
+    }
+
+    if (
+      fieldName === "contact" ||
+      fieldName === "updates" ||
+      fieldName === "date"
+    ) {
+      return errorExists && isFormSubmitted;
+    }
+
+    return errorExists && isFormSubmitted;
+  };
 
   const updatePhoneError = useCallback(
     (message: ValidationMessageValue) => {
@@ -78,6 +98,11 @@ const CheckoutForm: React.FC = () => {
     }
   };
 
+  const handleClearForm = useCallback(() => {
+    resetForm();
+    console.log("Form cleared.");
+  }, [resetForm]);
+
   const legendStyling = "text-xl font-medium tracking-wide";
 
   return (
@@ -86,23 +111,25 @@ const CheckoutForm: React.FC = () => {
         <legend className={`${legendStyling}`}>Contact details</legend>
         <NameInput
           label="First Name"
+          value={firstName}
           fieldName="first-name"
           onChange={handleFirstNameChange}
-          showError={showFirstNameErrorMessage}
+          showError={shouldShowError("firstName")}
           onBlur={handleFirstNameBlur}
           errorMessage={validationErrors.firstName}
         />
         <NameInput
           label="Last Name"
+          value={lastName}
           fieldName="last-name"
           onChange={handleLastNameChange}
-          showError={showLastNameErrorMessage}
+          showError={shouldShowError("lastName")}
           onBlur={handleLastNameBlur}
           errorMessage={validationErrors.lastName}
         />
         <InputErrorMessage
           id="contact-error"
-          show={showContactErrorMessage}
+          show={shouldShowError("contact")}
           error={validationErrors.contact}
         />
         <div>
@@ -115,18 +142,19 @@ const CheckoutForm: React.FC = () => {
             aria-invalid={
               !isEmailValid &&
               validationErrors.email.length > 0 &&
-              showEmailErrorMessage
+              shouldShowError("email")
             }
             aria-describedby={
-              !isEmailValid && validationErrors.email && showEmailErrorMessage
+              !isEmailValid &&
+              validationErrors.email &&
+              shouldShowError("email")
                 ? "customer_email-error"
                 : undefined
             }
           />
           <InputErrorMessage
             id="email-error"
-            show={showEmailErrorMessage}
-            valid={isEmailValid}
+            show={shouldShowError("email")}
             error={validationErrors.email}
           />
         </div>
@@ -134,9 +162,9 @@ const CheckoutForm: React.FC = () => {
           onNumberChange={handlePhoneChange}
           required={false}
           validationError={validationErrors.phone}
+          showError={shouldShowError("phone")}
+          onBlur={handlePhoneBlur}
           updateParentPhoneError={updatePhoneError}
-          showErrorMessage={showPhoneErrorMessage}
-          setShowErrorMessage={setShowPhoneErrorMessage}
         />
       </fieldset>
       <fieldset className="flex flex-col">
@@ -145,7 +173,7 @@ const CheckoutForm: React.FC = () => {
         <p>How would you like to receive updates?</p>
         <InputErrorMessage
           id="updates-error"
-          show={showUpdateChoiceErrorMessage}
+          show={shouldShowError("updates")}
           error={validationErrors.updates}
         />
         <Checkbox
@@ -174,7 +202,9 @@ const CheckoutForm: React.FC = () => {
         })}
       </div>
       <button type="submit">Place Order</button>
-      <button type="reset">Clear form</button>
+      <button type="reset" onClick={handleClearForm}>
+        Clear form
+      </button>
     </form>
   );
 };

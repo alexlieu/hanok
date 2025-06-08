@@ -27,6 +27,8 @@ export const VALIDATION_MESSAGES = {
 export type ValidationMessageValue =
   (typeof VALIDATION_MESSAGES)[keyof typeof VALIDATION_MESSAGES];
 
+type TouchedFields = { [K in keyof ValidationErrors]?: boolean };
+
 const useCheckoutValidation = () => {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
@@ -46,15 +48,11 @@ const useCheckoutValidation = () => {
   });
   const [emailUpdatesOn, setEmailUpdatesOn] = useState(false);
   const [smsUpdatesOn, setSmsUpdatesOn] = useState(false);
-  const [showFirstNameErrorMessage, setShowFirstNameErrorMessage] =
-    useState(false);
-  const [showLastNameErrorMessage, setShowLastNameErrorMessage] =
-    useState(false);
-  const [showPhoneErrorMessage, setShowPhoneErrorMessage] = useState(false);
-  const [showEmailErrorMessage, setShowEmailErrorMessage] = useState(false);
-  const [showContactErrorMessage, setShowContactErrorMessage] = useState(false);
-  const [showUpdateChoiceErrorMessage, setShowUpdateChoiceErrorMessage] =
-    useState(false);
+
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [touchedFields, setTouchedFields] = useState<TouchedFields>({});
+
+  const blurTimeout = 85;
 
   const updateFieldError = useCallback(
     (fieldName: keyof ValidationErrors, message: ValidationMessageValue) => {
@@ -66,160 +64,203 @@ const useCheckoutValidation = () => {
     []
   );
 
+  const markFieldAsTouched = useCallback(
+    (fieldName: keyof ValidationErrors) => {
+      setTouchedFields((prevState) => ({ ...prevState, [fieldName]: true }));
+    },
+    []
+  );
+
   const handleFirstNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setShowFirstNameErrorMessage(false);
-      updateFieldError("firstName", "");
-      const input = event.target.value;
-      setFirstName(input);
+      setFirstName(event.target.value);
+      updateFieldError("firstName", VALIDATION_MESSAGES.VALID);
     },
     [updateFieldError]
   );
 
-  const handleFirstNameBlur = () => {
-    setShowFirstNameErrorMessage(true);
-    if (firstName.length < 1) {
-      updateFieldError("firstName", VALIDATION_MESSAGES.REQUIRED_FIRST_NAME);
-    } else {
-      updateFieldError("firstName", "");
-    }
-  };
+  const handleFirstNameBlur = useCallback(() => {
+    markFieldAsTouched("firstName");
+    setTimeout(() => {
+      if (firstName.length < 1) {
+        updateFieldError("firstName", VALIDATION_MESSAGES.REQUIRED_FIRST_NAME);
+      }
+    }, blurTimeout);
+  }, [firstName, markFieldAsTouched, updateFieldError]);
 
   const handleLastNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setShowLastNameErrorMessage(false);
-      updateFieldError("lastName", "");
-      const input = event.target.value;
-      setLastName(input);
+      setLastName(event.target.value);
+      updateFieldError("lastName", VALIDATION_MESSAGES.VALID);
     },
     [updateFieldError]
   );
 
-  const handleLastNameBlur = () => {
-    setShowLastNameErrorMessage(true);
-    if (lastName.length < 1) {
-      updateFieldError("lastName", VALIDATION_MESSAGES.REQUIRED_LAST_NAME);
-    } else {
-      updateFieldError("lastName", "");
-    }
-  };
+  const handleLastNameBlur = useCallback(() => {
+    markFieldAsTouched("lastName");
+    setTimeout(() => {
+      if (lastName.length < 1) {
+        updateFieldError("lastName", VALIDATION_MESSAGES.REQUIRED_LAST_NAME);
+      }
+    }, blurTimeout);
+  }, [lastName, markFieldAsTouched, updateFieldError]);
 
   const handleEmailInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setShowContactErrorMessage(false);
       const email = event.target.value;
       setCustomerEmail(email);
       setIsEmailValid(EMAIL_REGEX.test(email));
-      updateFieldError("email", "");
-      setShowEmailErrorMessage(false);
+      updateFieldError("email", VALIDATION_MESSAGES.VALID);
+      updateFieldError("contact", VALIDATION_MESSAGES.VALID);
     },
     [updateFieldError]
   );
 
   const handleEmailInputBlur = useCallback(() => {
-    setShowEmailErrorMessage(true);
+    markFieldAsTouched("email");
 
     const currentEmailIsValid = EMAIL_REGEX.test(customerEmail);
     setIsEmailValid(currentEmailIsValid);
 
-    if (!currentEmailIsValid && customerEmail.length > 0) {
-      updateFieldError("email", VALIDATION_MESSAGES.INVALID_EMAIL);
-    } else {
-      updateFieldError("email", "");
-    }
-  }, [customerEmail, updateFieldError]);
+    setTimeout(() => {
+      if (!currentEmailIsValid && customerEmail.length > 0) {
+        updateFieldError("email", VALIDATION_MESSAGES.INVALID_EMAIL);
+      }
+    }, blurTimeout);
+  }, [customerEmail, markFieldAsTouched, updateFieldError]);
 
-  const handlePhoneChange = (phoneNumber: string, isValid: boolean) => {
-    setCustomerNumber(phoneNumber);
-    setIsNumberValid(isValid);
-    console.log("Phone number in parent:", phoneNumber, "Is Valid:", isValid);
-  };
+  const handlePhoneChange = useCallback(
+    (phoneNumber: string, isValid: boolean) => {
+      setCustomerNumber(phoneNumber);
+      setIsNumberValid(isValid);
+      updateFieldError("phone", VALIDATION_MESSAGES.VALID);
+      updateFieldError("contact", VALIDATION_MESSAGES.VALID);
+    },
+    [updateFieldError]
+  );
 
-  const validateContactMethod = useCallback(() => {
-    if (customerEmail.length < 1 && customerNumber.length < 1) {
-      updateFieldError("contact", VALIDATION_MESSAGES.REQUIRED_CONTACT);
-      return false;
-    } else {
-      updateFieldError("contact", "");
-      return true;
-    }
-  }, [customerEmail, customerNumber, updateFieldError]);
+  const handlePhoneBlur = useCallback(() => {
+    markFieldAsTouched("phone");
+    setTimeout(() => {
+      if (customerNumber && !isNumberValid) {
+        updateFieldError("phone", VALIDATION_MESSAGES.INVALID_NUMBER);
+      }
+    }, blurTimeout);
+  }, [
+    customerNumber,
+    isNumberValid,
+    isFormSubmitted,
+    updateFieldError,
+    markFieldAsTouched,
+  ]);
 
-  const validateUpdateChoice = useCallback(() => {
-    if (!emailUpdatesOn && !smsUpdatesOn) {
-      updateFieldError("updates", VALIDATION_MESSAGES.REQUIRED_UPDATE_METHOD);
-      return false;
-    } else {
-      updateFieldError("updates", "");
-      return true;
-    }
-  }, [emailUpdatesOn, smsUpdatesOn, updateFieldError]);
+  const handleDateChange = useCallback(
+    (pickupDate: string) => {
+      setPickupDate(pickupDate);
+      updateFieldError("date", VALIDATION_MESSAGES.VALID);
+    },
+    [updateFieldError]
+  );
 
-  const handleDateChange = useCallback((pickupDate: string) => {
-    setPickupDate(pickupDate);
-  }, []);
-
-  const handleEmailUpdates = () => {
-    setShowUpdateChoiceErrorMessage(false);
+  const handleEmailUpdates = useCallback(() => {
     setEmailUpdatesOn((prevState) => !prevState);
-  };
+    updateFieldError("updates", VALIDATION_MESSAGES.VALID);
+  }, [updateFieldError]);
 
-  const handleSmsUpdates = () => {
-    setShowUpdateChoiceErrorMessage(false);
+  const handleSmsUpdates = useCallback(() => {
     setSmsUpdatesOn((prevState) => !prevState);
-  };
+    updateFieldError("updates", VALIDATION_MESSAGES.VALID);
+  }, [updateFieldError]);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
+    setIsFormSubmitted(true);
+    const newErrors: ValidationErrors = {
+      contact: VALIDATION_MESSAGES.VALID,
+      firstName: VALIDATION_MESSAGES.VALID,
+      lastName: VALIDATION_MESSAGES.VALID,
+      updates: VALIDATION_MESSAGES.VALID,
+      phone: VALIDATION_MESSAGES.VALID,
+      email: VALIDATION_MESSAGES.VALID,
+      date: VALIDATION_MESSAGES.VALID,
+    };
+
+    let formIsValid = true;
+
     if (!firstName) {
-      updateFieldError("firstName", VALIDATION_MESSAGES.REQUIRED_FIRST_NAME);
+      newErrors.firstName = VALIDATION_MESSAGES.REQUIRED_FIRST_NAME;
+      formIsValid = false;
     }
     if (!lastName) {
-      updateFieldError("lastName", VALIDATION_MESSAGES.REQUIRED_LAST_NAME);
+      newErrors.lastName = VALIDATION_MESSAGES.REQUIRED_LAST_NAME;
+      formIsValid = false;
     }
-    setShowFirstNameErrorMessage(true);
-    setShowLastNameErrorMessage(true);
-    setShowEmailErrorMessage(true);
-    setShowPhoneErrorMessage(true);
-    setShowContactErrorMessage(true);
-    setShowUpdateChoiceErrorMessage(true);
-    const isContactMethodValid = validateContactMethod();
-    const isUpdateChoiceValid = validateUpdateChoice();
-    const anyValidationErrors = Object.values(validationErrors).every(
-      (error) => error === ""
-    );
-    return (
-      anyValidationErrors &&
-      isContactMethodValid &&
-      isUpdateChoiceValid &&
-      firstName &&
-      lastName
-    );
-  };
+    if (customerEmail.length > 0 && !isEmailValid) {
+      newErrors.email = VALIDATION_MESSAGES.INVALID_EMAIL;
+      formIsValid = false;
+    }
+    if (customerNumber.length > 0 && !isNumberValid) {
+      newErrors.phone = VALIDATION_MESSAGES.INVALID_NUMBER;
+      formIsValid = false;
+    }
+    if (!emailUpdatesOn && !smsUpdatesOn) {
+      newErrors.updates = VALIDATION_MESSAGES.REQUIRED_CONTACT;
+      formIsValid = false;
+    }
+    if (customerEmail.length < 1 && customerNumber.length < 1) {
+      newErrors.contact = VALIDATION_MESSAGES.REQUIRED_CONTACT;
+      formIsValid = false;
+    }
+    setValidationErrors(newErrors);
+    return formIsValid;
+  }, [
+    firstName,
+    lastName,
+    customerEmail,
+    customerNumber,
+    isEmailValid,
+    isNumberValid,
+    emailUpdatesOn,
+    smsUpdatesOn,
+  ]);
+
+  const resetForm = useCallback(() => {
+    setFirstName("");
+    setLastName("");
+    setCustomerNumber("");
+    setIsNumberValid(false);
+    setCustomerEmail("");
+    setIsEmailValid(false);
+    setPickupDate("");
+    setEmailUpdatesOn(false);
+    setSmsUpdatesOn(false);
+    setValidationErrors({
+      contact: "",
+      firstName: "",
+      lastName: "",
+      date: "",
+      updates: "",
+      phone: "",
+      email: "",
+    });
+    setTouchedFields({}); // Reset touched fields!
+    setIsFormSubmitted(false); // Reset form submission flag
+  }, []);
 
   return {
     firstName,
     handleFirstNameChange,
     handleFirstNameBlur,
-    showFirstNameErrorMessage,
     lastName,
     handleLastNameChange,
     handleLastNameBlur,
-    showLastNameErrorMessage,
     customerNumber,
     handlePhoneChange,
+    handlePhoneBlur,
     isNumberValid,
-    showPhoneErrorMessage,
-    setShowPhoneErrorMessage,
     customerEmail,
     handleEmailInputChange,
     isEmailValid,
     handleEmailInputBlur,
-    showEmailErrorMessage,
-    setShowEmailErrorMessage,
-    showContactErrorMessage,
-    setShowContactErrorMessage,
-    showUpdateChoiceErrorMessage,
-    setShowUpdateChoiceErrorMessage,
     pickupDate,
     handleDateChange,
     emailUpdatesOn,
@@ -232,6 +273,10 @@ const useCheckoutValidation = () => {
     validationErrors,
     setValidationErrors,
     validateForm,
+    isFormSubmitted,
+    resetForm,
+    touchedFields,
+    setTouchedFields,
   };
 };
 

@@ -2,6 +2,7 @@ import InputErrorMessage from "./InputErrorMessage";
 
 type NameInputProps = {
   fieldName: string;
+  value: string;
   label: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: () => void;
@@ -11,6 +12,7 @@ type NameInputProps = {
 
 const NameInput: React.FC<NameInputProps> = ({
   fieldName,
+  value,
   label,
   onChange,
   onBlur,
@@ -29,6 +31,7 @@ const NameInput: React.FC<NameInputProps> = ({
         type="text"
         id={fieldName}
         name={fieldName}
+        value={value}
         onChange={onChange}
         onBlur={onBlur}
       ></input>
