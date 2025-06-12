@@ -1,39 +1,31 @@
-import InputErrorMessage from "./InputErrorMessage";
+import { FieldError, Path, UseFormRegister } from "react-hook-form";
+import { FormData } from "../../schemas/checkoutFormSchema";
+import ErrorMessage from "./ErrorMessage";
 
 type NameInputProps = {
-  fieldName: string;
-  value: string;
-  label: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: () => void;
-  showError: boolean;
-  errorMessage: string;
+  name: Path<FormData>;
+  displayLabel: string;
+  register: UseFormRegister<FormData>;
+  error: FieldError | undefined;
+  required?: boolean;
 };
 
 const NameInput: React.FC<NameInputProps> = ({
-  fieldName,
-  value,
-  label,
-  onChange,
-  onBlur,
-  showError,
-  errorMessage,
+  name,
+  displayLabel,
+  register,
+  error,
+  required,
 }) => {
   return (
     <div>
-      <InputErrorMessage
-        show={showError}
-        error={errorMessage}
-        id={`${fieldName}-error`}
-      />
-      <label htmlFor={fieldName}>{label}</label>
+      <ErrorMessage error={error} />
+      <label htmlFor={name}>{displayLabel}</label>
       <input
-        type="text"
-        id={fieldName}
-        name={fieldName}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
+        id={name}
+        {...register(name, {
+          required: required ? `${displayLabel} is required.` : false,
+        })}
       ></input>
     </div>
   );

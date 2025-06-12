@@ -1,54 +1,42 @@
-import { useEffect, useState } from "react";
-
-const getFirstValidDate = () => {
-  const firstValidDate = new Date();
-  firstValidDate.setDate(firstValidDate.getDate() + 3);
-  return firstValidDate;
-};
-
-const getLastValidDate = () => {
-  const lastValidDate = new Date();
-  lastValidDate.setMonth(lastValidDate.getMonth() + 2);
-  return lastValidDate;
-};
-
-const formatDateString = (date: Date) => {
-  return date.toISOString().split("T")[0];
-};
+import { UseFormRegister, Path, FieldError } from "react-hook-form";
+import { FormData } from "../../schemas/checkoutFormSchema";
+import ErrorMessage from "./ErrorMessage";
+import {
+  formatDateString,
+  getFirstValidDate,
+  getLastValidDate,
+} from "../../validator/PickupDateValidator";
 
 type DateInputProps = {
-  onDateChange: (pickupDate: string) => void;
+  name: Path<FormData>;
+  register: UseFormRegister<FormData>;
+  displayLabel: string;
+  error: FieldError | undefined;
 };
 
-const DateInput: React.FC<DateInputProps> = ({ onDateChange }) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(
-    getFirstValidDate()
-  );
-
-  useEffect(() => {
-    onDateChange(getFirstValidDate().toISOString());
-  }, [onDateChange]);
-
-  const handleDateSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const dateString = e.currentTarget.value;
-    if (dateString) {
-      setSelectedDate(new Date(dateString));
-      onDateChange(new Date(dateString).toISOString());
-    } else {
-      setSelectedDate(null);
-      onDateChange("");
-    }
-  };
+const DateInput: React.FC<DateInputProps> = ({
+  name,
+  register,
+  displayLabel,
+  error,
+}) => {
   return (
-    <div>
+    <div className="flex flex-col outline-1">
+      <label htmlFor={name}>{displayLabel}</label>
+      <ErrorMessage error={error} />
       <input
         type="date"
-        id="pickup-date"
-        name="pickup-date"
-        value={selectedDate ? formatDateString(selectedDate) : ""}
+        id={name}
+        {...register(name, {
+          setValueAs: (v) => {
+            if (!v) return undefined;
+            const date = new Date(v);
+            date.setUTCHours(0, 0, 0, 0);
+            return date.toISOString();
+          },
+        })}
         min={formatDateString(getFirstValidDate())}
         max={formatDateString(getLastValidDate())}
-        onChange={handleDateSelection}
       />
     </div>
   );

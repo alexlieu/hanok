@@ -1,208 +1,142 @@
-// import { useCallback, useState, useEffect } from "react";
-import ContactNumberInput from "./ContactNumberInput";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckoutSchema, FormData } from "../../schemas/checkoutFormSchema";
+import NameInput from "./NameInput";
 import DateInput from "./DateInput";
 import Checkbox from "../ui/Checkbox";
-import useCheckoutValidation, {
-  VALIDATION_MESSAGES,
-  ValidationMessageValue,
-} from "../../utils/hooks/features/checkout/useCheckoutValidation";
-import useUpdateControls from "../../utils/hooks/features/checkout/useUpdateControls";
-import { ValidationErrors } from "../../utils/hooks/features/checkout/useCheckoutValidation";
-import { useCallback } from "react";
-import NameInput from "./NameInput";
-import InputErrorMessage from "./InputErrorMessage";
+import ErrorMessage from "./ErrorMessage";
+import { useEffect } from "react";
+
+const DEFAULT_VALUES = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  emailUpdate: false,
+  smsUpdate: false,
+  specialInstructions: "",
+};
 
 const CheckoutForm: React.FC = () => {
   const {
-    firstName,
-    handleFirstNameChange,
-    handleFirstNameBlur,
-    lastName,
-    handleLastNameChange,
-    handleLastNameBlur,
-    customerNumber,
-    handlePhoneChange,
-    handlePhoneBlur,
-    isNumberValid,
-    customerEmail,
-    handleEmailInputChange,
-    isEmailValid,
-    handleEmailInputBlur,
-    // pickupDate,
-    handleDateChange,
-    emailUpdatesOn,
-    setEmailUpdatesOn,
-    smsUpdatesOn,
-    setSmsUpdatesOn,
-    handleEmailUpdates,
-    handleSmsUpdates,
-    updateFieldError,
-    validationErrors,
-    // setValidationErrors,
-    validateForm,
-    isFormSubmitted,
-    resetForm,
-    touchedFields,
-  } = useCheckoutValidation();
+    register,
+    handleSubmit,
+    getFieldState,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, dirtyFields, isSubmitSuccessful },
+  } = useForm<FormData>({
+    resolver: zodResolver(CheckoutSchema),
+    defaultValues: DEFAULT_VALUES,
+    mode: "onSubmit",
+    criteriaMode: "all",
+  });
 
-  const { disabledFields } = useUpdateControls(
-    isNumberValid,
-    customerNumber,
-    isEmailValid,
-    customerEmail,
-    emailUpdatesOn,
-    setEmailUpdatesOn,
-    smsUpdatesOn,
-    setSmsUpdatesOn
-  );
-
-  const shouldShowError = (fieldName: keyof ValidationErrors): boolean => {
-    const errorExists =
-      validationErrors[fieldName] !== VALIDATION_MESSAGES.VALID;
-
-    if (
-      fieldName === "firstName" ||
-      fieldName === "lastName" ||
-      fieldName === "email" ||
-      fieldName === "phone"
-    ) {
-      const isFieldTouched = touchedFields[fieldName] ?? false;
-      return errorExists && (isFormSubmitted || isFieldTouched);
-    }
-
-    if (
-      fieldName === "contact" ||
-      fieldName === "updates" ||
-      fieldName === "date"
-    ) {
-      return errorExists && isFormSubmitted;
-    }
-
-    return errorExists && isFormSubmitted;
+  const onSubmit: SubmitHandler<FormData> = (data: FormData) => {
+    console.log(data);
   };
 
-  const updatePhoneError = useCallback(
-    (message: ValidationMessageValue) => {
-      updateFieldError("phone", message);
-    },
-    [updateFieldError]
-  );
+  // useEffect(() => {
+  //   const subscription = watch((data) => {
+  //     console.log(data);
+  //   });
+  //   return () => subscription.unsubscribe();
+  // }, [watch]);
+  // console.log("Touched fields: ", touchedFields);
+  // console.log("Dirty fields: ", dirtyFields);
+  // console.log("Errors:", errors);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const isValid = validateForm();
-    if (isValid) {
-      console.log("Form is valid");
-    } else {
-      console.log("Form has errors");
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
     }
-  };
-
-  const handleClearForm = useCallback(() => {
-    resetForm();
-    console.log("Form cleared.");
-  }, [resetForm]);
+  }, [isSubmitSuccessful, reset]);
 
   const legendStyling = "text-xl font-medium tracking-wide";
 
+  const isEmailCheckboxDisabled =
+    !dirtyFields.email || getFieldState("email").invalid;
+  const isSmsCheckboxDisabled =
+    !dirtyFields.phoneNumber || getFieldState("phoneNumber").invalid;
+
+  useEffect(() => {
+    if (isEmailCheckboxDisabled) {
+      setValue("emailUpdate", false);
+    }
+    if (isSmsCheckboxDisabled) {
+      setValue("smsUpdate", false);
+    }
+  }, [isEmailCheckboxDisabled, isSmsCheckboxDisabled, setValue, watch]);
+
   return (
-    <form className="flex flex-col" onSubmit={handleSubmit}>
+    <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
       <fieldset>
         <legend className={`${legendStyling}`}>Contact details</legend>
         <NameInput
-          label="First Name"
-          value={firstName}
-          fieldName="first-name"
-          onChange={handleFirstNameChange}
-          showError={shouldShowError("firstName")}
-          onBlur={handleFirstNameBlur}
-          errorMessage={validationErrors.firstName}
+          name="firstName"
+          displayLabel="First Name"
+          register={register}
+          error={errors.firstName}
+          required
         />
         <NameInput
-          label="Last Name"
-          value={lastName}
-          fieldName="last-name"
-          onChange={handleLastNameChange}
-          showError={shouldShowError("lastName")}
-          onBlur={handleLastNameBlur}
-          errorMessage={validationErrors.lastName}
+          name="lastName"
+          displayLabel="Last Name"
+          register={register}
+          error={errors.lastName}
+          required
         />
-        <InputErrorMessage
-          id="contact-error"
-          show={shouldShowError("contact")}
-          error={validationErrors.contact}
-        />
+        <ErrorMessage error={errors.contactMethod} />
         <div>
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            name="email"
-            onChange={handleEmailInputChange}
-            onBlur={handleEmailInputBlur}
-            aria-invalid={
-              !isEmailValid &&
-              validationErrors.email.length > 0 &&
-              shouldShowError("email")
-            }
-            aria-describedby={
-              !isEmailValid &&
-              validationErrors.email &&
-              shouldShowError("email")
-                ? "customer_email-error"
-                : undefined
-            }
-          />
-          <InputErrorMessage
-            id="email-error"
-            show={shouldShowError("email")}
-            error={validationErrors.email}
-          />
+          <input id="email" {...register("email")} />
+          <ErrorMessage error={errors.email} />
         </div>
-        <ContactNumberInput
-          onNumberChange={handlePhoneChange}
-          required={false}
-          validationError={validationErrors.phone}
-          showError={shouldShowError("phone")}
-          onBlur={handlePhoneBlur}
-          updateParentPhoneError={updatePhoneError}
-        />
+        <div>
+          <label htmlFor="phoneNumber">Phone Number</label>
+          <input id="phoneNumber" {...register("phoneNumber")} />
+          <ErrorMessage error={errors.phoneNumber} />
+        </div>
       </fieldset>
       <fieldset className="flex flex-col">
         <legend className={`${legendStyling}`}>Order preferences</legend>
-        <DateInput onDateChange={handleDateChange} />
-        <p>How would you like to receive updates?</p>
-        <InputErrorMessage
-          id="updates-error"
-          show={shouldShowError("updates")}
-          error={validationErrors.updates}
+        <DateInput
+          name="pickup"
+          register={register}
+          displayLabel="What is your preferred pickup date?"
+          error={errors.pickup}
         />
-        <Checkbox
-          name="sms-updates"
-          value="sms-updates"
-          handleChange={handleSmsUpdates}
-          disabled={disabledFields.sms}
-          checked={smsUpdatesOn}
-          label="SMS Updates"
-        />
-        <Checkbox
-          name="email-updates"
-          value="email-updates"
-          handleChange={handleEmailUpdates}
-          disabled={disabledFields.email}
-          checked={emailUpdatesOn}
-          label="Email Updates"
-        />
-        <label htmlFor="special-instructions">Special instructions</label>
+        <div>
+          <p>How would you like to receive updates?</p>
+          <ErrorMessage error={errors.updateChoice} />
+          <Checkbox
+            register={register}
+            name="emailUpdate"
+            displayLabel="Email Update"
+            disabled={isEmailCheckboxDisabled}
+          />
+          <ErrorMessage error={errors.emailUpdate} />
+          <Checkbox
+            register={register}
+            name="smsUpdate"
+            displayLabel="SMS Update"
+            disabled={isSmsCheckboxDisabled}
+          />
+        </div>
+        <ErrorMessage error={errors.smsUpdate} />
+        <label htmlFor="special-instructions">
+          Special instructions (optional)
+        </label>
         <input type="text" name="special-instructions" />
       </fieldset>
-      <div className="pt-10">
-        {Object.keys(validationErrors).map((k) => {
-          const errorMessage = validationErrors[k as keyof ValidationErrors];
-          return errorMessage ? <p key={`${k}-error`}>{errorMessage}</p> : null;
-        })}
-      </div>
       <button type="submit">Place Order</button>
-      <button type="reset" onClick={handleClearForm}>
+      <button
+        type="reset"
+        onClick={() => {
+          reset();
+        }}
+      >
         Clear form
       </button>
     </form>

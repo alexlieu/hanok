@@ -1,36 +1,32 @@
+import { UseFormRegister, Path } from "react-hook-form";
+import { FormData } from "../../schemas/checkoutFormSchema";
+
 type CheckboxProps = {
-  name: string;
-  value: string;
-  handleChange: () => void;
-  checked: boolean;
+  name: Path<FormData>;
+  register: UseFormRegister<FormData>;
+  displayLabel: string;
   disabled: boolean;
-  label: string;
 };
 
 const Checkbox: React.FC<CheckboxProps> = ({
   name,
-  value,
-  handleChange,
-  checked,
+  register,
+  displayLabel,
   disabled,
-  label,
 }) => {
-  const localHandleChange = () => {
-    handleChange();
-  };
   return (
     <div className="flex flex-row gap-2">
       <input
         type="checkbox"
-        name={name}
         id={name}
-        value={value}
-        checked={checked}
-        onChange={localHandleChange}
         disabled={disabled}
+        {...register(name)}
       />
-      <label htmlFor={name} className={disabled ? "text-gray-400" : ""}>
-        {label}
+      <label
+        htmlFor={name}
+        className={disabled ? "text-gray-400" : "text-black"}
+      >
+        {displayLabel}
       </label>
     </div>
   );
