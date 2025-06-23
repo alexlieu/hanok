@@ -7,7 +7,8 @@ public enum PaymentMethod {
     MOBILE("Mobile Payment"),
     APPLE("Apple Pay"),
     ANDROID("Android Pay"),
-    PAYPAL("Paypal");
+    PAYPAL("Paypal"),
+    GOOGLE("Google Pay");
     
     private final String displayName;
 

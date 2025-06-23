@@ -6,6 +6,7 @@ import DateInput from "./DateInput";
 import Checkbox from "../ui/Checkbox";
 import ErrorMessage from "./ErrorMessage";
 import { useEffect } from "react";
+import PaymentForm from "./PaymentForm";
 
 const DEFAULT_VALUES = {
   firstName: "",
@@ -70,76 +71,79 @@ const CheckoutForm: React.FC = () => {
   }, [isEmailCheckboxDisabled, isSmsCheckboxDisabled, setValue, watch]);
 
   return (
-    <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-      <fieldset>
-        <legend className={`${legendStyling}`}>Contact details</legend>
-        <NameInput
-          name="firstName"
-          displayLabel="First Name"
-          register={register}
-          error={errors.firstName}
-          required
-        />
-        <NameInput
-          name="lastName"
-          displayLabel="Last Name"
-          register={register}
-          error={errors.lastName}
-          required
-        />
-        <ErrorMessage error={errors.contactMethod} />
-        <div>
-          <label htmlFor="email">Email</label>
-          <input id="email" {...register("email")} />
-          <ErrorMessage error={errors.email} />
-        </div>
-        <div>
-          <label htmlFor="phoneNumber">Phone Number</label>
-          <input id="phoneNumber" {...register("phoneNumber")} />
-          <ErrorMessage error={errors.phoneNumber} />
-        </div>
-      </fieldset>
-      <fieldset className="flex flex-col">
-        <legend className={`${legendStyling}`}>Order preferences</legend>
-        <DateInput
-          name="pickup"
-          register={register}
-          displayLabel="What is your preferred pickup date?"
-          error={errors.pickup}
-        />
-        <div>
-          <p>How would you like to receive updates?</p>
-          <ErrorMessage error={errors.updateChoice} />
-          <Checkbox
+    <div>
+      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <fieldset>
+          <legend className={`${legendStyling}`}>Contact details</legend>
+          <NameInput
+            name="firstName"
+            displayLabel="First Name"
             register={register}
-            name="emailUpdate"
-            displayLabel="Email Update"
-            disabled={isEmailCheckboxDisabled}
+            error={errors.firstName}
+            required
           />
-          <ErrorMessage error={errors.emailUpdate} />
-          <Checkbox
+          <NameInput
+            name="lastName"
+            displayLabel="Last Name"
             register={register}
-            name="smsUpdate"
-            displayLabel="SMS Update"
-            disabled={isSmsCheckboxDisabled}
+            error={errors.lastName}
+            required
           />
-        </div>
-        <ErrorMessage error={errors.smsUpdate} />
-        <label htmlFor="special-instructions">
-          Special instructions (optional)
-        </label>
-        <input type="text" name="special-instructions" />
-      </fieldset>
-      <button type="submit">Place Order</button>
-      <button
-        type="reset"
-        onClick={() => {
-          reset();
-        }}
-      >
-        Clear form
-      </button>
-    </form>
+          <ErrorMessage error={errors.contactMethod} />
+          <div>
+            <label htmlFor="email">Email</label>
+            <input id="email" {...register("email")} />
+            <ErrorMessage error={errors.email} />
+          </div>
+          <div>
+            <label htmlFor="phoneNumber">Phone Number</label>
+            <input id="phoneNumber" {...register("phoneNumber")} />
+            <ErrorMessage error={errors.phoneNumber} />
+          </div>
+        </fieldset>
+        <fieldset className="flex flex-col">
+          <legend className={`${legendStyling}`}>Order preferences</legend>
+          <DateInput
+            name="pickup"
+            register={register}
+            displayLabel="What is your preferred pickup date?"
+            error={errors.pickup}
+          />
+          <div>
+            <p>How would you like to receive updates?</p>
+            <ErrorMessage error={errors.updateChoice} />
+            <Checkbox
+              register={register}
+              name="emailUpdate"
+              displayLabel="Email Update"
+              disabled={isEmailCheckboxDisabled}
+            />
+            <ErrorMessage error={errors.emailUpdate} />
+            <Checkbox
+              register={register}
+              name="smsUpdate"
+              displayLabel="SMS Update"
+              disabled={isSmsCheckboxDisabled}
+            />
+          </div>
+          <ErrorMessage error={errors.smsUpdate} />
+          <label htmlFor="special-instructions">
+            Special instructions (optional)
+          </label>
+          <input type="text" name="special-instructions" />
+        </fieldset>
+        <button type="submit">Place Order</button>
+        <button
+          type="reset"
+          onClick={() => {
+            reset();
+          }}
+        >
+          Clear form
+        </button>
+      </form>
+      <PaymentForm temp={"string"} />
+    </div>
   );
 };
 
