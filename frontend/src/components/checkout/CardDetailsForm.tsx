@@ -1,39 +1,18 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { CardInformation, CardSchema } from "../../schemas/CardSchema";
-import { useEffect } from "react";
-import BillingAddressForm from "./BillingAddressForm";
+import { useFormContext } from "react-hook-form";
+import { PaymentFormFields } from "../../schemas/PaymentFormSchema";
+import ErrorMessage from "./ErrorMessage";
+import VisaSymbol from "../../assets/checkout_logos/visa_symbol.svg?react";
+import MasterCardSymbol from "../../assets/checkout_logos/mastercard_symbol.svg?react";
+import AmexSymbol from "../../assets/checkout_logos/amex_symbol.svg?react";
 
 const CardDetailsForm: React.FC = () => {
   const {
     register,
-    watch,
     setValue,
     formState: { errors },
-    handleSubmit,
-  } = useForm<CardInformation>({
-    resolver: zodResolver(CardSchema),
-    defaultValues: {
-      cardNumber: "",
-      expiration: "",
-      cvv: "",
-      holderName: "",
-    },
-    mode: "onChange",
-  });
-
-  const onSubmit: SubmitHandler<CardInformation> = (data: CardInformation) => {
-    console.log(data);
-  };
+  } = useFormContext<PaymentFormFields>();
 
   console.log(errors);
-
-  useEffect(() => {
-    const subscription = watch((data) => {
-      console.log(data);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
 
   const cardNumberChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -70,53 +49,72 @@ const CardDetailsForm: React.FC = () => {
     setValue("cvv", finalValue);
   };
 
+  const logoStyling =
+    "h-5 sm:h-6 w-auto border border-stone-200 rounded p-[1px]";
+
   return (
-    <>
-      <div>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <fieldset>
-            <legend>Card information</legend>
-            <input
-              type="text"
-              placeholder="1234 1234 1234 1234"
-              inputMode="numeric"
-              autoCorrect="false"
-              spellCheck="false"
-              autoComplete="false"
-              aria-label="Card Number"
-              {...register("cardNumber", {})}
-              onChange={cardNumberChangeHandler}
-            />
-            <input
-              type="text"
-              placeholder="MM/YY"
-              inputMode="numeric"
-              aria-label="Expiration"
-              {...register("expiration")}
-              onChange={expirationChangeHandler}
-            />
-            <input
-              type="text"
-              placeholder="CVV"
-              inputMode="numeric"
-              aria-label="CVV"
-              {...register("cvv")}
-              onChange={cvvChangeHandler}
-            />
-          </fieldset>
-          <fieldset>
-            <legend>Cardholder name</legend>
-            <input
-              type="text"
-              placeholder="Full name on card"
-              {...register("holderName")}
-            />
-          </fieldset>
-          <button type="submit">Verify payment details</button>
-        </form>
-        <BillingAddressForm />
-      </div>
-    </>
+    <div className="max-w-md mx-auto">
+      <fieldset>
+        <legend>Card information</legend>
+        <div className="relative flex items-center">
+          <input
+            type="text"
+            placeholder="1234 1234 1234 1234"
+            inputMode="numeric"
+            autoCorrect="false"
+            spellCheck="false"
+            autoComplete="false"
+            aria-label="Card Number"
+            {...register("cardNumber", {})}
+            onChange={cardNumberChangeHandler}
+            className={`
+              w-full h-auto pr-[80px] sm:pr-[120px] rounded-tr-md rounded-tl-md form-input-base
+              ${errors.cardNumber ? "border-red-600" : "border-gray-300"}
+            `}
+          />
+          <div
+            className={`
+              absolute right-2 top-1/2 -translate-y-1/2
+              flex flex-row gap-[0.5em] sm:gap-[0.75em]
+            `}
+          >
+            <MasterCardSymbol id="mastercard" className={logoStyling} />
+            <VisaSymbol id="visa" className={logoStyling} />
+            <AmexSymbol id="amex" className={logoStyling} />
+          </div>
+          <ErrorMessage error={errors.cardNumber} />
+        </div>
+        <div className="flex flex-row w-full">
+          <input
+            type="text"
+            placeholder="MM/YY"
+            inputMode="numeric"
+            aria-label="Expiration"
+            {...register("expiration")}
+            onChange={expirationChangeHandler}
+            className="flex-1 rounded-bl-md mt-[-2px] mr-[-2px] form-input-base"
+          />
+          <input
+            type="text"
+            placeholder="CVV"
+            inputMode="numeric"
+            aria-label="CVV"
+            {...register("cvv")}
+            onChange={cvvChangeHandler}
+            className="flex-1 rounded-br-md mt-[-2px] form-input-base"
+          />
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Cardholder name</legend>
+        <input
+          type="text"
+          placeholder="Full name on card"
+          {...register("holderName")}
+          className="rounded-md w-full focus:z-10 form-input-base"
+        />
+      </fieldset>
+    </div>
   );
 };
 

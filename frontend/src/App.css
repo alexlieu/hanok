@@ -2,6 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dongle:wght@300;400;700&family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
+:root {
+    --focus-glow-color: rgba(59, 130, 246, 0.4);
+    --focus-border-color: #93c5fd;
+}
+
 @theme {
     --font-m-plus: "M PLUS Rounded 1c", "sans-serif";
     --font-dongle: Dongle, "sans-serif";
@@ -11,4 +16,14 @@
 
 .form-error {
     @apply text-red-500;
+}
+
+.form-input-base {
+    @apply px-2 py-1 border-2 border-gray-300 focus:outline-none focus:relative focus:z-10;
+    transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.form-input-base:focus {
+    border-color: var(--focus-border-color);
+    box-shadow: 0 0 3px 2px var(--focus-glow-color);
 }

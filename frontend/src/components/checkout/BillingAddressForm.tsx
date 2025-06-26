@@ -1,10 +1,9 @@
-import { useForm, SubmitHandler, useWatch } from "react-hook-form";
+import { useWatch, useFormContext } from "react-hook-form";
 import {
   BillingAddressData,
   BillingAddressSchema,
   countryList,
 } from "../../schemas/BillingAddressSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 
 type FieldLabelConfig = {
@@ -37,105 +36,70 @@ const countryFieldConfigs: Record<string, CountryFieldSpecificConfig> = {
   },
 };
 
-const DEFAULT_VALUES: BillingAddressData = {
-  country: "GB",
-  addressLine1: "",
-  addressLine2: "",
-  townCity: "",
-  stateProvinceRegion: "",
-  county: "",
-  postalCode: "",
-  krCityDistrict: "",
-};
+const fieldsToReset = Object.keys(BillingAddressSchema.shape).filter(
+  (key) => key !== "country"
+) as (keyof BillingAddressData)[];
 
 const BillingAddressForm = () => {
-  const {
-    control,
-    register,
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<BillingAddressData>({
-    resolver: zodResolver(BillingAddressSchema),
-    defaultValues: DEFAULT_VALUES,
-    mode: "onSubmit",
-    criteriaMode: "all",
-  });
-
+  const method = useFormContext<BillingAddressData>();
+  const { control, register, resetField } = method;
   const selectedCountry = useWatch({ name: "country", control });
 
   useEffect(() => {
-    const resetFieldValues = {
-      ...DEFAULT_VALUES,
-      country: selectedCountry,
-    };
-    reset(resetFieldValues);
-  }, [selectedCountry, reset]);
-
-  console.log(errors);
-
-  const onSubmit: SubmitHandler<BillingAddressData> = (data) => {
-    console.log("Submit data: ", data);
-  };
+    fieldsToReset.forEach((field) => resetField(field));
+  }, [selectedCountry, resetField]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <fieldset>
-        <legend>Billing address</legend>
-        <select {...register("country")}>
-          {countryList.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+    <fieldset>
+      <legend>Billing address</legend>
+      <select {...register("country")}>
+        {countryList.map(({ value, label }) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
+      <input
+        type="text"
+        placeholder="Address line 1"
+        {...register("addressLine1")}
+      />
+      <input
+        type="text"
+        placeholder="Address line 2"
+        {...register("addressLine2")}
+      />
+      {selectedCountry === "KR" ? (
         <input
           type="text"
-          placeholder="Address line 1"
-          {...register("addressLine1")}
+          placeholder="City or district"
+          {...register("city")}
         />
+      ) : (
+        <input type="text" placeholder="Town or city" {...register("city")} />
+      )}
+      {selectedCountry === "GB" && (
         <input
           type="text"
-          placeholder="Address line 2"
-          {...register("addressLine2")}
+          placeholder={countryFieldConfigs[selectedCountry].county?.label}
+          {...register("county")}
         />
-        {selectedCountry === "KR" ? (
-          <input
-            type="text"
-            placeholder="City or district"
-            {...register("krCityDistrict")}
-          />
-        ) : (
-          <input
-            type="text"
-            placeholder="Town or city"
-            {...register("townCity")}
-          />
-        )}
-        {selectedCountry === "GB" && (
-          <input
-            type="text"
-            placeholder={countryFieldConfigs[selectedCountry].county?.label}
-            {...register("county")}
-          />
-        )}
-        {["US", "CA"].includes(selectedCountry) && (
-          <input
-            type="text"
-            placeholder={
-              countryFieldConfigs[selectedCountry].stateProvinceRegion?.label
-            }
-            {...register("stateProvinceRegion")}
-          />
-        )}
+      )}
+      {["US", "CA"].includes(selectedCountry) && (
         <input
           type="text"
-          placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
-          {...register("postalCode")}
+          placeholder={
+            countryFieldConfigs[selectedCountry].stateProvinceRegion?.label
+          }
+          {...register("stateProvinceRegion")}
         />
-        <button type="submit">Check billing address</button>
-      </fieldset>
-    </form>
+      )}
+      <input
+        type="text"
+        placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
+        {...register("postalCode")}
+      />
+    </fieldset>
   );
 };
 

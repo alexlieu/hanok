@@ -1,10 +1,12 @@
 import { z } from "zod/v4";
 
 export const CardSchema = z.object({
-  cardNumber: z.string().regex(/^\d{16}$/, "Card number must be 16 digits"),
+  cardNumber: z
+    .string()
+    .regex(/^(\d{4}\s){3}\d{4}$/, "Card number must be 16 digits."),
   expiration: z
     .string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format")
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format.")
     .refine(
       (val) => {
         const [month2Digit, year2Digit] = val.split("/");

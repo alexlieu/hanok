@@ -16,17 +16,14 @@ export const BillingAddressSchema = z
     country: CountryEnum,
     addressLine1: z.string().min(5).max(100),
     addressLine2: z.string().max(100).optional().or(z.literal("")),
-    townCity: z.string().min(2).max(50),
+    city: z.string().min(2).max(100),
     stateProvinceRegion: z.string().max(50).optional().or(z.literal("")),
     county: z.string().max(50).optional().or(z.literal("")),
-
-    krCityDistrict: z.string().min(2).max(100).optional().or(z.literal("")),
 
     postalCode: z.string().min(3).max(15),
   })
   .check((ctx) => {
-    const { country, stateProvinceRegion, krCityDistrict, postalCode } =
-      ctx.value;
+    const { country, stateProvinceRegion, postalCode } = ctx.value;
 
     if (
       (country === COUNTRY_CODES[1] || country === COUNTRY_CODES[2]) &&
@@ -85,14 +82,6 @@ export const BillingAddressSchema = z
             code: "custom",
             message: "Invalid KR Postal Code format.",
             path: ["postalCode"],
-            input: ctx.value,
-          });
-        }
-        if (!krCityDistrict || krCityDistrict.trim() === "") {
-          ctx.issues.push({
-            code: "custom",
-            message: "City/District is required for KR addresses.",
-            path: ["krCityDistrict"],
             input: ctx.value,
           });
         }

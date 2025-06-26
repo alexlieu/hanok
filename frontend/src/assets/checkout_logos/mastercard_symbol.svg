@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 27.9.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 139.25999 139.25999"
+   xml:space="preserve"
+   sodipodi:docname="mastercard_symbol.svg"
+   width="139.25999"
+   height="139.25999"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs4" /><sodipodi:namedview
+   id="namedview4"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="6.9291341"
+   inkscape:cx="65.592611"
+   inkscape:cy="58.59318"
+   inkscape:window-width="1920"
+   inkscape:window-height="1027"
+   inkscape:window-x="0"
+   inkscape:window-y="25"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="g4" />
+<style
+   type="text/css"
+   id="style1">
+	.ms-st0{fill:none;}
+	.ms-st1{fill:#FF5F00;}
+	.ms-st2{fill:#EB001B;}
+	.ms-st3{fill:#F79E1B;}
+</style>
+<g
+   id="g4"
+   transform="translate(-29.608439,-26.770012)">
+	<rect
+   y="0"
+   class="ms-st0"
+   width="152.39999"
+   height="108"
+   id="rect1"
+   x="0" />
+	<g
+   id="g3"
+   transform="translate(23.10229,42.391671)">
+		<rect
+   x="60.400002"
+   y="25.700001"
+   class="ms-st1"
+   width="31.5"
+   height="56.599998"
+   id="rect2" />
+		<path
+   class="ms-st2"
+   d="M 62.4,54 C 62.4,43 67.5,32.5 76.1,25.7 60.5,13.4 37.8,16.1 25.5,31.8 13.3,47.4 16,70 31.7,82.3 44.8,92.6 63.1,92.6 76.2,82.3 67.5,75.5 62.4,65 62.4,54 Z"
+   id="path2" />
+		<path
+   class="ms-st3"
+   d="m 134.4,54 c 0,19.9 -16.1,36 -36,36 -8.1,0 -15.9,-2.7 -22.2,-7.7 15.6,-12.3 18.3,-34.9 6,-50.6 -1.8,-2.2 -3.8,-4.3 -6,-6 15.6,-12.3 38.3,-9.6 50.5,6.1 5,6.3 7.7,14.1 7.7,22.2 z"
+   id="path3" />
+	</g>
+</g>
+</svg>
