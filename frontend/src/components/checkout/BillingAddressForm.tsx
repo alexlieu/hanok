@@ -51,54 +51,67 @@ const BillingAddressForm = () => {
 
   return (
     <fieldset>
-      <legend>Billing address</legend>
-      <select {...register("country")}>
-        {countryList.map(({ value, label }) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
-      <input
-        type="text"
-        placeholder="Address line 1"
-        {...register("addressLine1")}
-      />
-      <input
-        type="text"
-        placeholder="Address line 2"
-        {...register("addressLine2")}
-      />
-      {selectedCountry === "KR" ? (
+      <div className="flex flex-col mx-auto">
+        <legend>Billing address</legend>
+        <select {...register("country")}>
+          {countryList.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
-          placeholder="City or district"
-          {...register("city")}
+          placeholder="Address line 1"
+          {...register("addressLine1")}
+          className="form-input-base rounded-t-md"
         />
-      ) : (
-        <input type="text" placeholder="Town or city" {...register("city")} />
-      )}
-      {selectedCountry === "GB" && (
         <input
           type="text"
-          placeholder={countryFieldConfigs[selectedCountry].county?.label}
-          {...register("county")}
+          placeholder="Address line 2"
+          {...register("addressLine2")}
+          className="form-input-base mt-[-2px]"
         />
-      )}
-      {["US", "CA"].includes(selectedCountry) && (
+        {selectedCountry === "KR" ? (
+          <input
+            type="text"
+            placeholder="City or district"
+            {...register("city")}
+            className="form-input-base mt-[-2px]"
+          />
+        ) : (
+          <input
+            type="text"
+            placeholder="Town or city"
+            {...register("city")}
+            className="form-input-base mt-[-2px]"
+          />
+        )}
+        {selectedCountry === "GB" && (
+          <input
+            type="text"
+            placeholder={countryFieldConfigs[selectedCountry].county?.label}
+            {...register("county")}
+            className="form-input-base mt-[-2px]"
+          />
+        )}
+        {["US", "CA"].includes(selectedCountry) && (
+          <input
+            type="text"
+            placeholder={
+              countryFieldConfigs[selectedCountry].stateProvinceRegion?.label
+            }
+            {...register("stateProvinceRegion")}
+            className="form-input-base mt-[-2px]"
+          />
+        )}
         <input
           type="text"
-          placeholder={
-            countryFieldConfigs[selectedCountry].stateProvinceRegion?.label
-          }
-          {...register("stateProvinceRegion")}
+          placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
+          {...register("postalCode")}
+          className="form-input-base mt-[-2px] rounded-b-md"
         />
-      )}
-      <input
-        type="text"
-        placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
-        {...register("postalCode")}
-      />
+      </div>
     </fieldset>
   );
 };

@@ -53,7 +53,7 @@ const CardDetailsForm: React.FC = () => {
     "h-5 sm:h-6 w-auto border border-stone-200 rounded p-[1px]";
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="mx-auto">
       <fieldset>
         <legend>Card information</legend>
         <div className="relative flex items-center">
@@ -82,8 +82,8 @@ const CardDetailsForm: React.FC = () => {
             <VisaSymbol id="visa" className={logoStyling} />
             <AmexSymbol id="amex" className={logoStyling} />
           </div>
-          <ErrorMessage error={errors.cardNumber} />
         </div>
+        <ErrorMessage error={errors.cardNumber} />
         <div className="flex flex-row w-full">
           <input
             type="text"

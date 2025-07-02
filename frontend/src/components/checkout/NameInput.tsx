@@ -18,7 +18,7 @@ const NameInput: React.FC<NameInputProps> = ({
   required,
 }) => {
   return (
-    <div>
+    <div className="flex flex-col">
       <ErrorMessage error={error} />
       <label htmlFor={name}>{displayLabel}</label>
       <input
@@ -26,7 +26,8 @@ const NameInput: React.FC<NameInputProps> = ({
         {...register(name, {
           required: required ? `${displayLabel} is required.` : false,
         })}
-      ></input>
+        className="form-input-base rounded-md"
+      />
     </div>
   );
 };

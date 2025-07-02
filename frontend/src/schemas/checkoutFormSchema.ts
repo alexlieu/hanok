@@ -4,8 +4,10 @@ import { isPickupValid } from "../validator/PickupDateValidator";
 
 export const CheckoutSchema = z
   .object({
-    firstName: z.string().min(1, { message: "First name is required." }),
-    lastName: z.string().min(1, { message: "Last name is required." }),
+    fullName: z
+      .string()
+      .transform((val) => val.replace(/\s+/g, " "))
+      .pipe(z.string().min(2).max(50)),
     email: z.email().trim().optional().or(z.literal("")),
     phoneNumber: z
       .string()

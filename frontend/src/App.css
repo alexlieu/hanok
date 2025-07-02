@@ -3,8 +3,8 @@
 @import "tailwindcss";
 
 :root {
-    --focus-glow-color: rgba(59, 130, 246, 0.4);
-    --focus-border-color: #93c5fd;
+    --focus-border-color: rgba(72, 142, 254, 0.763);
+    --focus-glow-color: #bbdafa;
 }
 
 @theme {

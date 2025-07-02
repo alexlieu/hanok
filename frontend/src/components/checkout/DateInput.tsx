@@ -21,7 +21,7 @@ const DateInput: React.FC<DateInputProps> = ({
   error,
 }) => {
   return (
-    <div className="flex flex-col outline-1">
+    <div className="flex flex-col">
       <label htmlFor={name}>{displayLabel}</label>
       <ErrorMessage error={error} />
       <input

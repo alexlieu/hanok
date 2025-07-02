@@ -9,14 +9,9 @@ import { BillingAddressData } from "../../schemas/BillingAddressSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CardInformation } from "../../schemas/CardSchema";
 import BillingAddressForm from "./BillingAddressForm";
-
-type PaymentFormProps = { temp: string };
+import { AccordianRadioItem } from "../ui/AccordianItem";
 
 const PAYMENT_METHODS = [
-  {
-    value: "CREDIT",
-    label: "Credit Card",
-  },
   {
     value: "DEBIT",
     label: "Debit Card",
@@ -49,9 +44,9 @@ const PAYMENT_METHODS = [
 
 type PaymentMethodValue = (typeof PAYMENT_METHODS)[number]["value"];
 
-const isPaymentMethod = (value: string): value is PaymentMethodValue => {
-  return PAYMENT_METHODS.some((method) => method.value === value);
-};
+// const isPaymentMethod = (value: string): value is PaymentMethodValue => {
+//   return PAYMENT_METHODS.some((method) => method.value === value);
+// };
 
 const DEFAULT_BILLING_ADDRESS: BillingAddressData = {
   country: "GB",
@@ -75,7 +70,7 @@ const DEFAULT_PAYMENT_FORM_VALUES: PaymentFormFields = {
   ...DEFAULT_BILLING_ADDRESS,
 };
 
-const PaymentForm: React.FC<PaymentFormProps> = () => {
+const PaymentForm: React.FC = () => {
   const methods = useForm<PaymentFormFields>({
     resolver: zodResolver(PaymentFormSchema),
     defaultValues: DEFAULT_PAYMENT_FORM_VALUES,
@@ -104,45 +99,59 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
     PaymentMethodValue | undefined
   >("DEBIT");
 
-  const updatePaymentMethod = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const value = event.currentTarget.value;
-    // if (value !== selectedPaymentMethod) {
-    //   reset();
-    // }
-    if (isPaymentMethod(value)) {
-      setSelectedPaymentMethod((prevState) =>
-        prevState === value ? undefined : value
-      );
-    } else {
-      console.log("Invalid payment method type: ", value);
-    }
+  // const updatePaymentMethod = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   const value = event.currentTarget.value;
+  //   // if (value !== selectedPaymentMethod) {
+  //   //   reset();
+  //   // }
+  //   if (isPaymentMethod(value)) {
+  //     setSelectedPaymentMethod((prevState) =>
+  //       prevState === value ? undefined : value
+  //     );
+  //   } else {
+  //     console.log("Invalid payment method type: ", value);
+  //   }
+  // };
+
+  const updatePaymentMethod = (value: PaymentMethodValue) => {
+    setSelectedPaymentMethod((prevVal) => {
+      if (prevVal !== value) {
+        methods.reset(DEFAULT_PAYMENT_FORM_VALUES);
+      }
+      return value;
+    });
   };
 
   return (
-    <>
-      <h4>Payment method</h4>
-      {selectedPaymentMethod ? <p>{selectedPaymentMethod}</p> : <p>None</p>}
-      <ul>
-        {PAYMENT_METHODS.map(({ value, label }) => (
-          <li key={value}>
-            <button type="button" value={value} onClick={updatePaymentMethod}>
-              {label}
-            </button>
-          </li>
-        ))}
-      </ul>
+    <div className="mx-auto max-w-lg py-3">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {selectedPaymentMethod === "DEBIT" && (
-            <>
-              <CardDetailsForm />
-              <BillingAddressForm />
-            </>
-          )}
-          <button type="submit">Continue</button>
+          <div>
+            {PAYMENT_METHODS.map(({ value, label }) => (
+              <AccordianRadioItem
+                key={value}
+                isExpanded={selectedPaymentMethod === value}
+                title={label}
+                onToggle={() => updatePaymentMethod(value)}
+                radioName="payment-method-accordian-item"
+                radioValue={value}
+                isChecked={selectedPaymentMethod === value}
+              >
+                {value === "DEBIT" && (
+                  <div className="space-y-5">
+                    <CardDetailsForm />
+                    <BillingAddressForm />
+                    <button type="submit" className="mx-auto w-full">
+                      Continue
+                    </button>
+                  </div>
+                )}
+              </AccordianRadioItem>
+            ))}
+          </div>
         </form>
       </FormProvider>
-    </>
+    </div>
   );
 };
 
