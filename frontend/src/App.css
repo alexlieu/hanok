@@ -18,12 +18,22 @@
     @apply text-red-500;
 }
 
+.input-focus-base {
+    @apply focus:outline-none focus:relative focus:z-10;
+    transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
 .form-input-base {
     @apply px-2 py-1 border-2 border-gray-300 focus:outline-none focus:relative focus:z-10;
     transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
-.form-input-base:focus {
+.form-input-base:focus, .input-focus-base:focus {
     border-color: var(--focus-border-color);
-    box-shadow: 0 0 3px 2px var(--focus-glow-color);
+    box-shadow: 0 0 3px 3px var(--focus-glow-color);
+}
+
+.noninput-focus-styling {
+    border-color: var(--focus-border-color);
+    box-shadow: 0 0 3px 3px var(--focus-glow-color);
 }

@@ -53,7 +53,10 @@ const BillingAddressForm = () => {
     <fieldset>
       <div className="flex flex-col mx-auto">
         <legend>Billing address</legend>
-        <select {...register("country")}>
+        <select
+          className="form-input-base rounded-md mb-2"
+          {...register("country")}
+        >
           {countryList.map(({ value, label }) => (
             <option key={value} value={value}>
               {label}

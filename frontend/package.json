@@ -13,6 +13,7 @@
     "@floating-ui/react": "^0.27.8",
     "@hookform/resolvers": "^5.1.1",
     "@tailwindcss/vite": "^4.1.7",
+    "country-flag-icons": "^1.5.19",
     "leaflet": "^1.9.4",
     "libphonenumber-js": "^1.12.8",
     "motion": "^12.12.2",

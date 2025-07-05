@@ -1,24 +1,32 @@
 import { MdOutlineQuestionMark } from "react-icons/md";
-import { FieldError } from "react-hook-form";
+import { FieldValues, FieldPath, FieldErrors } from "react-hook-form";
 
-type ErrorMessageProps = {
-  error: FieldError | undefined;
-  className?: string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getFromPath = (obj: Record<string, any>, path: string) => {
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ error, className }) => {
-  if (!error) return null;
+interface FormErrorProps<T extends FieldValues> {
+  name: FieldPath<T>;
+  errors: FieldErrors<T>;
+}
+
+const FormError = <T extends FieldValues>({
+  name,
+  errors,
+}: FormErrorProps<T>) => {
+  const error = getFromPath(errors, name);
+
+  if (!error) {
+    return null;
+  }
+
   return (
-    <p
-      className={
-        className ? className : `flex items-center text-red-500 gap-0.5`
-      }
-      role="alert"
-    >
+    <p className="mt-1 text-sm text-red-500 flex items-center" role="alert">
       <MdOutlineQuestionMark />
-      {error?.message}
+      {error.message as string}
     </p>
   );
 };
 
-export default ErrorMessage;
+export default FormError;

@@ -2,7 +2,6 @@ export const isPickupValid = (input: string) => {
   const dateInput = new Date(input);
   dateInput.setHours(0, 0, 0, 0);
   const { lower, upper } = getValidDateRange();
-  console.log(lower, upper, dateInput);
   if (dateInput < lower) return false;
   if (dateInput > upper) return false;
   return true;

@@ -1,30 +1,30 @@
-import { UseFormRegister, Path, FieldError } from "react-hook-form";
+import { UseFormRegister, Path, FieldErrors } from "react-hook-form";
 import { FormData } from "../../schemas/checkoutFormSchema";
-import ErrorMessage from "./ErrorMessage";
 import {
   formatDateString,
   getFirstValidDate,
   getLastValidDate,
 } from "../../validator/PickupDateValidator";
+import FormError from "./ErrorMessage";
 
 type DateInputProps = {
   name: Path<FormData>;
   register: UseFormRegister<FormData>;
   displayLabel: string;
-  error: FieldError | undefined;
+  errors: FieldErrors;
 };
 
 const DateInput: React.FC<DateInputProps> = ({
   name,
   register,
   displayLabel,
-  error,
+  errors,
 }) => {
   return (
     <div className="flex flex-col">
       <label htmlFor={name}>{displayLabel}</label>
-      <ErrorMessage error={error} />
       <input
+        className="form-input-base rounded-md"
         type="date"
         id={name}
         {...register(name, {
@@ -38,6 +38,7 @@ const DateInput: React.FC<DateInputProps> = ({
         min={formatDateString(getFirstValidDate())}
         max={formatDateString(getLastValidDate())}
       />
+      <FormError name="pickup" errors={errors} />
     </div>
   );
 };

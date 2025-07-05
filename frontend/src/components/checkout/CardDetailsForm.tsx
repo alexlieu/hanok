@@ -1,6 +1,5 @@
 import { useFormContext } from "react-hook-form";
 import { PaymentFormFields } from "../../schemas/PaymentFormSchema";
-import ErrorMessage from "./ErrorMessage";
 import VisaSymbol from "../../assets/checkout_logos/visa_symbol.svg?react";
 import MasterCardSymbol from "../../assets/checkout_logos/mastercard_symbol.svg?react";
 import AmexSymbol from "../../assets/checkout_logos/amex_symbol.svg?react";
@@ -83,7 +82,6 @@ const CardDetailsForm: React.FC = () => {
             <AmexSymbol id="amex" className={logoStyling} />
           </div>
         </div>
-        <ErrorMessage error={errors.cardNumber} />
         <div className="flex flex-row w-full">
           <input
             type="text"
