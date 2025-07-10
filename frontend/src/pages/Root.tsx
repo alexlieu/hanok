@@ -5,7 +5,7 @@ const RootLayout: React.FC = () => {
   return (
     <>
       <MainNav />
-      <main>
+      <main className="bg-default-bg">
         <Outlet />
       </main>
     </>

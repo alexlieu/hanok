@@ -6,7 +6,7 @@ import {
   countries,
   PhoneData,
 } from "../../schemas/PhoneSchema";
-import { FormData } from "../../schemas/checkoutFormSchema";
+import { FormData } from "../../schemas/CheckoutFormSchema";
 import * as Flags from "country-flag-icons/react/3x2";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 
@@ -138,7 +138,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
       </div>
       <input
         placeholder={selectedCountry.example}
-        className="w-full h-full rounded-r-md py-2 pl-0.5 focus:border-transparent focus:ring-0 focus:outline-none"
+        className="w-full h-full rounded-r-md py-2 pl-2 focus:border-transparent focus:ring-0 focus:outline-none"
         onFocus={() => setInputFocused(true)}
         value={phoneData?.phoneNumber || ""}
         // {...register("phoneNumber.phoneNumber", {

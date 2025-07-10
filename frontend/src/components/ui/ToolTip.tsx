@@ -28,7 +28,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ message }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const ARROW_HEIGHT = 7;
-  const GAP = -5;
+  const GAP = 0;
 
   const arrowRef = useRef(null);
 
@@ -75,8 +75,13 @@ const ToolTip: React.FC<ToolTipProps> = ({ message }) => {
 
   return (
     <>
-      <button type="button" ref={refs.setReference} {...getReferenceProps()}>
-        <HiQuestionMarkCircle className="text-stone-500 size-4" />
+      <button
+        type="button"
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        className="rounded-full focus:ring-3 focus:ring-brand-focus/50 outline-none size-4 my-auto"
+      >
+        <HiQuestionMarkCircle className="text-stone-500" />
       </button>
       <FloatingPortal>
         {isMounted && (
@@ -87,7 +92,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ message }) => {
           >
             <div
               style={{ ...styles }}
-              className="rounded-sm bg-gray-700 py-3 px-4 text-sm text-white shadow-md transition-opacity duration-300 ease-in-out max-w-2xs text-pretty mr-5"
+              className="rounded-sm bg-brand-focus py-3 px-4 text-sm text-white shadow-md transition-opacity duration-300 ease-in-out max-w-2xs text-pretty mr-5"
             >
               {message}
               <FloatingArrow
@@ -95,7 +100,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ message }) => {
                 context={context}
                 height={ARROW_HEIGHT}
                 tipRadius={2}
-                className="fill-gray-700"
+                className="fill-brand-focus"
               />
             </div>
           </div>

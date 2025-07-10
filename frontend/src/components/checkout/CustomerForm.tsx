@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckoutSchema, FormData } from "../../schemas/checkoutFormSchema";
+import { CheckoutSchema, FormData } from "../../schemas/CheckoutFormSchema";
 import DateInput from "./DateInput";
 import Checkbox from "../ui/Checkbox";
 import FormError from "./ErrorMessage";

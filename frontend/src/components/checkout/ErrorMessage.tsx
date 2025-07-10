@@ -22,7 +22,10 @@ const FormError = <T extends FieldValues>({
   }
 
   return (
-    <p className="mt-1 text-sm text-red-500 flex items-center" role="alert">
+    <p
+      className="mt-1 text-sm text-error-red italic flex items-center"
+      role="alert"
+    >
       <MdOutlineQuestionMark />
       {error.message as string}
     </p>

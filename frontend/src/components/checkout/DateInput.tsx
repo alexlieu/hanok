@@ -1,5 +1,5 @@
 import { UseFormRegister, Path, FieldErrors } from "react-hook-form";
-import { FormData } from "../../schemas/checkoutFormSchema";
+import { FormData } from "../../schemas/CheckoutFormSchema";
 import {
   formatDateString,
   getFirstValidDate,
