@@ -22,6 +22,11 @@ const Checkbox: React.FC<CheckboxProps> = ({
           type="checkbox"
           id={name}
           {...register(name, { onChange: () => onChange() })}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+            }
+          }}
         />
         <div
           className="absolute w-full h-full
