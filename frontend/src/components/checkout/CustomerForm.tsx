@@ -61,7 +61,9 @@ const CustomerForm: React.FC = () => {
             <input
               id="fullName"
               {...register("fullName")}
-              className="form-input-base rounded-md"
+              className={`form-input-base rounded-md ${
+                errors.fullName ? "border-error-red" : "border-gray-300"
+              }`}
             />
             <FormError name="fullName" errors={errors} />
           </div>
@@ -73,7 +75,11 @@ const CustomerForm: React.FC = () => {
             <input
               id="email"
               {...register("email", { onChange: () => trigger("contact") })}
-              className="form-input-base rounded-md"
+              className={`form-input-base rounded-md ${
+                errors.contact || errors.email
+                  ? "border-error-red"
+                  : "border-gray-300"
+              }`}
               placeholder="email@example.com"
             />
             <FormError name="email" errors={errors} />
@@ -93,6 +99,7 @@ const CustomerForm: React.FC = () => {
                   onBlur={onBlur}
                   inputRef={ref}
                   watch={watch}
+                  errors={!!(errors.contact || errors.phoneNumber)}
                 />
               )}
             />
@@ -133,7 +140,7 @@ const CustomerForm: React.FC = () => {
             <input
               type="text"
               name="special-instructions"
-              className="form-input-base rounded-md"
+              className="form-input-base rounded-md border-gray-300"
             />
           </div>
         </fieldset>

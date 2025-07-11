@@ -24,7 +24,9 @@ const DateInput: React.FC<DateInputProps> = ({
     <div className="flex flex-col">
       <label htmlFor={name}>{displayLabel}</label>
       <input
-        className="form-input-base rounded-md"
+        className={`form-input-base rounded-md ${
+          errors.pickup ? "border-error-red" : "border-gray-300"
+        }`}
         type="date"
         id={name}
         {...register(name, {

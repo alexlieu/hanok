@@ -18,6 +18,7 @@ type PhoneInputProps = {
   onBlur: () => void; // Controller's onBlur
   inputRef: React.Ref<HTMLInputElement>; // Controller's ref for the input
   watch: UseFormWatch<FormData>; // Pass watch down for internal logic
+  errors: boolean;
 };
 
 const PhoneInput: React.FC<PhoneInputProps> = ({
@@ -26,6 +27,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
   onBlur,
   inputRef,
   watch,
+  errors,
 }) => {
   //   const { register, watch, setValue } = useFormContext<FormData>();
 
@@ -102,9 +104,9 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
 
   return (
     <div
-      className={`flex flex-row rounded-md border-2 border-gray-300 ${
-        inputFocused && "noninput-focus-styling"
-      }`}
+      className={`flex flex-row rounded-md border-2
+        ${inputFocused && "noninput-focus-styling"}
+        ${errors ? "border-error-red" : "border-gray-300"}`}
     >
       <div className="relative w-13 rounded-l-md flex-shrink-0 group -mt-[2px] -ml-[2px] -mb-[2px]">
         {SelectedFlagComponent && (

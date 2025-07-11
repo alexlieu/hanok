@@ -92,7 +92,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ message }) => {
           >
             <div
               style={{ ...styles }}
-              className="rounded-sm bg-brand-focus py-3 px-4 text-sm text-white shadow-md transition-opacity duration-300 ease-in-out max-w-2xs text-pretty mr-5"
+              className="rounded-md bg-brand-focus py-3 px-4 text-sm text-white shadow-md transition-opacity duration-300 ease-in-out max-w-2xs text-pretty mr-5"
             >
               {message}
               <FloatingArrow

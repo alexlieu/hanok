@@ -146,6 +146,11 @@ const PaymentForm: React.FC = () => {
                     </button>
                   </div>
                 )}
+                {value === "PAYPAL" && (
+                  <div>
+                    <h3>PAYPAL</h3>
+                  </div>
+                )}
               </AccordianRadioItem>
             ))}
           </div>
