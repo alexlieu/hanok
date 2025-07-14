@@ -9,6 +9,11 @@ type NavMenuProps = {
   children: React.ReactNode;
 };
 const NavMenu = ({ isOpen, onClose, children }: NavMenuProps) => {
+  if (isOpen) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
   // Need to add focus inside menu when open
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -22,7 +27,7 @@ const NavMenu = ({ isOpen, onClose, children }: NavMenuProps) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 text-3xl font-dm-sans backdrop-blur-3xl flex flex-row justify-between p-10"
+          className="fixed inset-0 text-3xl font-dm-sans backdrop-blur-3xl flex flex-row justify-between p-10 z-1000"
           initial={{ y: "-100%" }}
           animate={{ y: 0 }}
           exit={{ y: "-100%" }}
