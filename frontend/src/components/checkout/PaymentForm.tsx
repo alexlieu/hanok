@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CardInformation } from "../../schemas/CardSchema";
 import BillingAddressForm from "./BillingAddressForm";
 import { AccordianRadioItem } from "../ui/AccordianItem";
+import ExpressCheckout from "./ExpressCheckout";
 
 const PAYMENT_METHODS = [
   {
@@ -126,6 +127,14 @@ const PaymentForm: React.FC = () => {
     <div className="mx-auto max-w-lg py-3">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <fieldset>
+              <legend className="text-xl font-medium tracking-wide mx-auto">
+                Express checkout
+              </legend>
+              <ExpressCheckout />
+            </fieldset>
+          </div>
           <div>
             {PAYMENT_METHODS.map(({ value, label }) => (
               <AccordianRadioItem

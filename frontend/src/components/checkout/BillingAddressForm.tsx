@@ -54,7 +54,7 @@ const BillingAddressForm = () => {
       <div className="flex flex-col mx-auto">
         <legend>Billing address</legend>
         <select
-          className="form-input-base rounded-md mb-2"
+          className={`form-input-base border-gray-300 rounded-md mb-2`}
           {...register("country")}
         >
           {countryList.map(({ value, label }) => (
@@ -67,27 +67,27 @@ const BillingAddressForm = () => {
           type="text"
           placeholder="Address line 1"
           {...register("addressLine1")}
-          className="form-input-base rounded-t-md"
+          className={`form-input-base border-gray-300 rounded-t-md`}
         />
         <input
           type="text"
           placeholder="Address line 2"
           {...register("addressLine2")}
-          className="form-input-base mt-[-2px]"
+          className={`form-input-base border-gray-300 mt-[-2px]`}
         />
         {selectedCountry === "KR" ? (
           <input
             type="text"
             placeholder="City or district"
             {...register("city")}
-            className="form-input-base mt-[-2px]"
+            className={`form-input-base border-gray-300 mt-[-2px]`}
           />
         ) : (
           <input
             type="text"
             placeholder="Town or city"
             {...register("city")}
-            className="form-input-base mt-[-2px]"
+            className={`form-input-base border-gray-300 mt-[-2px]`}
           />
         )}
         {selectedCountry === "GB" && (
@@ -95,7 +95,7 @@ const BillingAddressForm = () => {
             type="text"
             placeholder={countryFieldConfigs[selectedCountry].county?.label}
             {...register("county")}
-            className="form-input-base mt-[-2px]"
+            className={`form-input-base border-gray-300 mt-[-2px]`}
           />
         )}
         {["US", "CA"].includes(selectedCountry) && (
@@ -105,14 +105,14 @@ const BillingAddressForm = () => {
               countryFieldConfigs[selectedCountry].stateProvinceRegion?.label
             }
             {...register("stateProvinceRegion")}
-            className="form-input-base mt-[-2px]"
+            className={`form-input-base border-gray-300 mt-[-2px]`}
           />
         )}
         <input
           type="text"
           placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
           {...register("postalCode")}
-          className="form-input-base mt-[-2px] rounded-b-md"
+          className={`form-input-base border-gray-300 mt-[-2px] rounded-b-md`}
         />
       </div>
     </fieldset>

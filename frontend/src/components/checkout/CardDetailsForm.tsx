@@ -68,7 +68,7 @@ const CardDetailsForm: React.FC = () => {
             onChange={cardNumberChangeHandler}
             className={`
               w-full h-auto pr-[80px] sm:pr-[120px] rounded-tr-md rounded-tl-md form-input-base
-              ${errors.cardNumber ? "border-red-600" : "border-gray-300"}
+              ${errors.cardNumber ? "border-error-red" : "border-gray-300"}
             `}
           />
           <div
@@ -90,7 +90,7 @@ const CardDetailsForm: React.FC = () => {
             aria-label="Expiration"
             {...register("expiration")}
             onChange={expirationChangeHandler}
-            className="flex-1 rounded-bl-md mt-[-2px] mr-[-2px] form-input-base"
+            className="flex-1 rounded-bl-md mt-[-2px] mr-[-2px] form-input-base border-gray-300"
           />
           <input
             type="text"
@@ -99,7 +99,7 @@ const CardDetailsForm: React.FC = () => {
             aria-label="CVV"
             {...register("cvv")}
             onChange={cvvChangeHandler}
-            className="flex-1 rounded-br-md mt-[-2px] form-input-base"
+            className="flex-1 rounded-br-md mt-[-2px] form-input-base border-gray-300"
           />
         </div>
       </fieldset>
@@ -109,7 +109,7 @@ const CardDetailsForm: React.FC = () => {
           type="text"
           placeholder="Full name on card"
           {...register("holderName")}
-          className="rounded-md w-full focus:z-10 form-input-base"
+          className="rounded-md w-full focus:z-10 form-input-base border-gray-300"
         />
       </fieldset>
     </div>

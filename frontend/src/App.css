@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dongle:wght@300;400;700&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -12,7 +13,10 @@
     --font-dongle: Dongle, "sans-serif";
     --font-outfit: Outfit, "sans-serif";
     --font-dm-sans: DM Sans, "sans-serif";
-    --color-error-red: #D04848;
+    --font-quicksand: Quicksand, "sans-serif";
+    --font-jost: Jost, "sans-serif";
+    --font-wix-madefor: Wix Madefor, "sans-serif";
+    --color-error-red: #c03d1a;
     --color-default-bg: #F7F8F4;
     --color-brand-focus: #8ba888;
     --color-brand-colour-1: #D0A49E;
@@ -29,7 +33,7 @@
 }
 
 .form-input-base {
-    @apply px-2 py-1 border-2 border-gray-300 focus:outline-none focus:relative focus:z-10;
+    @apply px-2 py-1 border-2 focus:outline-none focus:relative focus:z-10;
     transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
