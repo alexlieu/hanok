@@ -9,7 +9,7 @@ interface OrderSummaryProps {
 const OrderSummary: React.FC<OrderSummaryProps> = ({ items, total }) => {
   return (
     <>
-      <div>
+      <div className="w-full bg-cyan-500">
         <ul>
           {items.map((item) => (
             <li

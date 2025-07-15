@@ -52,7 +52,7 @@ const CustomerForm: React.FC = () => {
   const legendStyling = "text-xl font-medium tracking-wide";
 
   return (
-    <div className="max-w-lg mx-auto px-7 py-3">
+    <div className="mx-auto">
       <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         <fieldset className="">
           <legend className={`${legendStyling}`}>Contact details</legend>

@@ -41,7 +41,7 @@ export const AccordianItem: React.FC<AccordianItemProps> = ({
         }`}
       >
         <div className="overflow-hidden">
-          <div className={`p-4 border-t-2 border-gray-200`}>{children}</div>
+          <div className={`p-4`}>{children}</div>
         </div>
       </div>
     </div>
@@ -111,9 +111,7 @@ export const AccordianRadioItem: React.FC<AccordianRadioItemProps> = ({
         }`}
       >
         <div className="overflow-hidden">
-          <div className={`px-7 pt-3 border-t-2 border-gray-200`}>
-            {children}
-          </div>
+          <div className={``}>{children}</div>
         </div>
       </div>
     </div>

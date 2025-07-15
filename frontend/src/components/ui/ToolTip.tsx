@@ -89,6 +89,7 @@ const ToolTip: React.FC<ToolTipProps> = ({ message }) => {
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
+            className="z-1000"
           >
             <div
               style={{ ...styles }}

@@ -44,16 +44,15 @@ const ExpressCheckout: React.FC = () => {
       <Modal showModal={!!(modalManager !== null)}>
         <div
           ref={objectRef}
-          className="h-[50vh] w-[80vw] max-w-[20em] py-5 px-10 font-dm-sans text-xl flex flex-col items-center"
+          className="h-[170px] w-[80vw] max-w-[20em] pt-3 pb-10 px-7 gap-3 font-dm-sans text-xl flex flex-col items-end"
         >
-          <div className="w-full flex justify-end">
-            <button
-              type="button"
-              onClick={() => setModalManager(null)}
-              className="relative cursor-pointer"
-            >
-              <div
-                className="
+          <button
+            type="button"
+            onClick={() => setModalManager(null)}
+            className="relative cursor-pointer h-1/3 hover:rotate-5"
+          >
+            <div
+              className="
                 w-[1.5em] h-[1.5em]
 
                 before:content-[''] before:absolute
@@ -68,12 +67,11 @@ const ExpressCheckout: React.FC = () => {
                 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2
                 after:transform after:-rotate-45
               "
-              ></div>
-            </button>
-          </div>
+            ></div>
+          </button>
           <button
             type="button"
-            className="border-2 p-2 hover:bg-black hover:text-white mt-10 w-[70%] active:rotate-1"
+            className="p-2 border-2 bg-white/50 hover:bg-black hover:border-black hover:text-white tracking-wide w-[70%] active:rotate-1 self-center h-2/3"
           >
             Pay with{" "}
             <span className="capitalize">

@@ -12,7 +12,7 @@ const Modal: React.FC<ModalProps> = ({ children, showModal }) => {
     document.body.style.overflow = "";
   }
   const modalOverlay = (
-    <div className="fixed inset-0 flex justify-center items-center z-[1000] backdrop-blur-3xl">
+    <div className="fixed inset-0 flex justify-center items-center z-[1000] backdrop-blur-xs bg-gray-600/50">
       {children}
     </div>
   );

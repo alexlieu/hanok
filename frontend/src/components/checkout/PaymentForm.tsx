@@ -124,7 +124,7 @@ const PaymentForm: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto max-w-lg py-3">
+    <div className="mx-auto">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>

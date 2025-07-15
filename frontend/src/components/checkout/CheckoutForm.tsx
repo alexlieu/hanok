@@ -26,7 +26,7 @@ const CheckoutForm: React.FC = () => {
   // console.log("Errors:", errors);
 
   return (
-    <div className="border-1 max-w-lg mx-auto">
+    <div className="mx-auto px-10 border-r-2">
       <AccordianItem
         title="Contact details"
         isExpanded={customerFormOpen}
