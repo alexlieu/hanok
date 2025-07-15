@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 import Apple from "../../assets/checkout_logos/payment-types/apple-pay-logo-dark.svg?react";
 import Google from "../../assets/checkout_logos/payment-types/google-pay-logo-dark.svg?react";
+import PayPal from "../../assets/checkout_logos/payment-types/paypal-logo-alternative.svg?react";
 import Modal from "../ui/Modal";
 import { useClickOutside } from "../../utils/hooks/useClickOutside";
 
-const EXPRESS_PAYMENT_OPTIONS = ["apple", "google"];
+const EXPRESS_PAYMENT_OPTIONS = ["apple", "paypal", "google"];
 
-type ModalManagerType = "apple" | "google" | null;
+type ModalManagerType = "apple" | "google" | "paypal" | null;
 
 const ExpressCheckout: React.FC = () => {
   const [modalManager, setModalManager] = useState<ModalManagerType>(null);
@@ -15,11 +16,15 @@ const ExpressCheckout: React.FC = () => {
   useClickOutside(triggerRef, objectRef, () => setModalManager(null));
 
   return (
-    <div className="flex flex-row justify-between w-full h-full">
+    <div className="flex flex-row w-full h-full items-center justify-center gap-[1.5em]">
       {EXPRESS_PAYMENT_OPTIONS.map((po) => (
         <button
           type="button"
-          className="flex-1 m-[0.75em] py-2 scale-100 bg-black hover:bg-[#3c4043]"
+          className={`flex-1 py-2 flex justify-center ${
+            po === "paypal"
+              ? "bg-[#ffc439] hover:brightness-95"
+              : "bg-black hover:bg-[#3c4043]"
+          }`}
           onClick={() =>
             setModalManager((prevState) =>
               prevState != po.toLowerCase() ? (po as ModalManagerType) : null
@@ -28,9 +33,11 @@ const ExpressCheckout: React.FC = () => {
           ref={triggerRef}
         >
           {po === "apple" ? (
-            <Apple className="h-[1.5em] m-auto" />
+            <Apple className="h-[1.5em]" />
+          ) : po === "google" ? (
+            <Google className="h-[1.5em]" />
           ) : (
-            <Google className="h-[1.5em] m-auto" />
+            <PayPal className="h-[1.5em]" />
           )}
         </button>
       ))}
@@ -68,7 +75,12 @@ const ExpressCheckout: React.FC = () => {
             type="button"
             className="border-2 p-2 hover:bg-black hover:text-white mt-10 w-[70%] active:rotate-1"
           >
-            Pay with <span className="capitalize">{modalManager} Pay</span>
+            Pay with{" "}
+            <span className="capitalize">
+              {modalManager !== "paypal"
+                ? `${modalManager} Pay`
+                : `${modalManager}`}
+            </span>
           </button>
         </div>
       </Modal>
