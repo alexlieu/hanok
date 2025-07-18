@@ -51,10 +51,10 @@ const BillingAddressForm = () => {
 
   return (
     <fieldset>
-      <div className="flex flex-col mx-auto">
+      <div className="flex flex-col">
         <legend>Billing address</legend>
         <select
-          className={`form-input-base border-gray-300 rounded-md mb-2`}
+          className={`form-input-base border-gray-300 mb-2`}
           {...register("country")}
         >
           {countryList.map(({ value, label }) => (
@@ -67,7 +67,7 @@ const BillingAddressForm = () => {
           type="text"
           placeholder="Address line 1"
           {...register("addressLine1")}
-          className={`form-input-base border-gray-300 rounded-t-md`}
+          className={`form-input-base border-gray-300`}
         />
         <input
           type="text"
@@ -112,7 +112,7 @@ const BillingAddressForm = () => {
           type="text"
           placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
           {...register("postalCode")}
-          className={`form-input-base border-gray-300 mt-[-2px] rounded-b-md`}
+          className={`form-input-base border-gray-300 mt-[-2px]`}
         />
       </div>
     </fieldset>

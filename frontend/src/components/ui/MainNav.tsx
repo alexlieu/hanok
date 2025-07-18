@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import LogoWithTextSVG from "../../assets/SVG/LogoWithTextSVG";
 import NavMenu from "./NavMenu";
-import useWindowDimensions from "../../utils/hooks/useWindowDimensions";
+import { useWindowDimensions } from "../../utils/hooks/useWindowDimensions";
 
 const navContent = [
   { title: "Home", link: "" },

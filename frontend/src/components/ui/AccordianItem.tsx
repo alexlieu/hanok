@@ -1,10 +1,14 @@
 import React from "react";
+import { IoIosArrowDown } from "react-icons/io";
 
 type AccordianItemProps = {
   title: string;
   children: React.ReactNode;
   isExpanded: boolean;
   onToggle: () => void;
+  containerStyle?: string;
+  buttonStyle?: string;
+  contentStyle?: string;
 };
 
 type AccordianRadioItemProps = {
@@ -22,16 +26,26 @@ export const AccordianItem: React.FC<AccordianItemProps> = ({
   children,
   isExpanded,
   onToggle,
+  containerStyle,
+  buttonStyle,
+  contentStyle,
 }) => {
   return (
-    <div className="overflow-hidden transition-all duration-500 ease-in-out">
+    <div
+      className={`overflow-hidden transition-all duration-500 ease-in-out ${containerStyle}`}
+    >
       <button
-        className="text-xl cursor-pointer font-medium tracking-wide"
+        className={`${buttonStyle} flex gap-2 group`}
         type="button"
         onClick={onToggle}
         aria-expanded={isExpanded}
       >
         {title}
+        <IoIosArrowDown
+          className={`self-center size-[1.1em] ${
+            isExpanded ? "-rotate-180" : "rotate-0"
+          } transition-transform ease-in-out duration-200`}
+        />
       </button>
       <div
         className={`grid transition-[grid-template-rows,opacity] duration-600 ease-[cubic-bezier(0.65, 0, 0.35, 1)] ${
@@ -41,7 +55,7 @@ export const AccordianItem: React.FC<AccordianItemProps> = ({
         }`}
       >
         <div className="overflow-hidden">
-          <div className={`p-4`}>{children}</div>
+          <div className={contentStyle}>{children}</div>
         </div>
       </div>
     </div>
@@ -58,8 +72,10 @@ export const AccordianRadioItem: React.FC<AccordianRadioItemProps> = ({
   isChecked,
 }) => {
   return (
-    // Not sure what the styling here does.
-    <div className={`overflow-hidden transition-all duration-500 ease-in-out`}>
+    <div
+      // Made this larger than the container so that the box shadow styling on the children doesn't get clipped.
+      className={`overflow-hidden transition-all duration-500 ease-in-out relative w-[calc(100%+16px)] -left-[8px]`}
+    >
       <button
         className="text-xl cursor-pointer"
         type="button"
@@ -111,7 +127,7 @@ export const AccordianRadioItem: React.FC<AccordianRadioItemProps> = ({
         }`}
       >
         <div className="overflow-hidden">
-          <div className={``}>{children}</div>
+          <div className={`p-[8px]`}>{children}</div>
         </div>
       </div>
     </div>

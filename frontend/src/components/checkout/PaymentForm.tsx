@@ -135,6 +135,13 @@ const PaymentForm: React.FC = () => {
               <ExpressCheckout />
             </fieldset>
           </div>
+          <p
+            className="flex items-center font-semibold tracking-wider text-xl text-gray-400 my-5 
+          before:content-[''] before:flex-1 before:h-[3px] before:bg-gray-300 before:mr-2
+          after:content-[''] after:flex-1 after:h-[3px] after:bg-gray-300 after:ml-2"
+          >
+            OR
+          </p>
           <div>
             {PAYMENT_METHODS.map(({ value, label }) => (
               <AccordianRadioItem
@@ -147,7 +154,7 @@ const PaymentForm: React.FC = () => {
                 isChecked={selectedPaymentMethod === value}
               >
                 {value === "DEBIT" && (
-                  <div className="space-y-5">
+                  <div className="flex flex-col w-full mx-auto">
                     <CardDetailsForm />
                     <BillingAddressForm />
                     <button type="submit" className="mx-auto w-full">

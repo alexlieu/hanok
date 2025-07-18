@@ -5,7 +5,7 @@ const position: [number, number] = [51.40313097396538, -0.2730678337183401];
 
 const PickupMap: React.FC = () => {
   return (
-    <div className="relative w-full aspect-square mx-auto">
+    <div className="relative w-full aspect-3/2 sm:aspect-square mx-auto">
       <MapContainer
         center={position}
         zoom={40}

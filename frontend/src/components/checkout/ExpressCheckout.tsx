@@ -16,15 +16,18 @@ const ExpressCheckout: React.FC = () => {
   useClickOutside(triggerRef, objectRef, () => setModalManager(null));
 
   return (
-    <div className="flex flex-row w-full h-full items-center justify-center gap-[1.5em]">
+    <div className="flex flex-wrap w-full h-full items-center justify-center gap-[1.5em]">
       {EXPRESS_PAYMENT_OPTIONS.map((po) => (
         <button
           type="button"
-          className={`flex-1 py-2 flex justify-center ${
+          className={`py-2 flex justify-center ${
             po === "paypal"
-              ? "bg-[#ffc439] hover:brightness-95"
+              ? "bg-[#ffc439] hover:brightness-95 order-1 md:order-2 w-full md:flex-1"
               : "bg-black hover:bg-[#3c4043]"
-          }`}
+          }
+            ${po === "apple" && "order-2 md:order-1 flex-1"}
+            ${po === "google" && "order-3 flex-1"}
+          `}
           onClick={() =>
             setModalManager((prevState) =>
               prevState != po.toLowerCase() ? (po as ModalManagerType) : null

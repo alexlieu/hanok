@@ -61,7 +61,7 @@ const CustomerForm: React.FC = () => {
             <input
               id="fullName"
               {...register("fullName")}
-              className={`form-input-base rounded-md ${
+              className={`form-input-base ${
                 errors.fullName ? "border-error-red" : "border-gray-300"
               }`}
             />
@@ -75,7 +75,7 @@ const CustomerForm: React.FC = () => {
             <input
               id="email"
               {...register("email", { onChange: () => trigger("contact") })}
-              className={`form-input-base rounded-md ${
+              className={`form-input-base ${
                 errors.contact || errors.email
                   ? "border-error-red"
                   : "border-gray-300"
@@ -140,7 +140,7 @@ const CustomerForm: React.FC = () => {
             <input
               type="text"
               name="special-instructions"
-              className="form-input-base rounded-md border-gray-300"
+              className="form-input-base border-gray-300"
             />
           </div>
         </fieldset>

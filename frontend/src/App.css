@@ -33,7 +33,7 @@
 }
 
 .form-input-base {
-    @apply px-2 py-1 border-2 focus:outline-none focus:relative focus:z-10;
+    @apply px-2 py-1 border-2 focus:outline-none focus:relative focus:z-100;
     transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 

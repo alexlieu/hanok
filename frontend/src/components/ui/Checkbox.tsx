@@ -32,18 +32,18 @@ const Checkbox: React.FC<CheckboxProps> = ({
           className="absolute w-full h-full
                         flex items-center justify-center
                         transition-all duration-150 ease-out
-                        box-border border-2 rounded-[4px] border-[#EAE3D6] 
+                        box-border border-2 border-[#EAE3D6] 
                         peer-checked:border-[#F0D1B0] peer-checked:bg-[#F0D1B0]
                         peer-checked:peer-hover:bg-transparent
                         peer-focus:ring-3 peer-focus:ring-brand-focus/50 peer-focus:ring-offset-[1px]
 
                         before:content-['']
                         before:block before:absolute
-                        before:inset-[-2px] before:border-2 before:border-[#D6CBB8] before:rounded-[4px]
+                        before:inset-[-2px] before:border-2 before:border-[#D6CBB8]
                         before:transition-all before:ease-out before:duration-150
 
                         peer-hover:before:transition-all peer-hover:before:will-change-transform
-                        peer-hover:before:inset-[0px] peer-hover:before:rounded-[2px]
+                        peer-hover:before:inset-[0px]
 
                         peer-checked:before:border-[#E2BD96]
                     "

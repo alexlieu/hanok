@@ -52,10 +52,10 @@ const CardDetailsForm: React.FC = () => {
     "h-5 sm:h-6 w-auto border border-stone-200 rounded p-[1px]";
 
   return (
-    <div className="mx-auto">
+    <>
       <fieldset>
         <legend>Card information</legend>
-        <div className="relative flex items-center">
+        <div className="relative flex items-center w-full">
           <input
             type="text"
             placeholder="1234 1234 1234 1234"
@@ -67,7 +67,7 @@ const CardDetailsForm: React.FC = () => {
             {...register("cardNumber", {})}
             onChange={cardNumberChangeHandler}
             className={`
-              w-full h-auto pr-[80px] sm:pr-[120px] rounded-tr-md rounded-tl-md form-input-base
+              w-full form-input-base
               ${errors.cardNumber ? "border-error-red" : "border-gray-300"}
             `}
           />
@@ -83,24 +83,28 @@ const CardDetailsForm: React.FC = () => {
           </div>
         </div>
         <div className="flex flex-row w-full">
-          <input
-            type="text"
-            placeholder="MM/YY"
-            inputMode="numeric"
-            aria-label="Expiration"
-            {...register("expiration")}
-            onChange={expirationChangeHandler}
-            className="flex-1 rounded-bl-md mt-[-2px] mr-[-2px] form-input-base border-gray-300"
-          />
-          <input
-            type="text"
-            placeholder="CVV"
-            inputMode="numeric"
-            aria-label="CVV"
-            {...register("cvv")}
-            onChange={cvvChangeHandler}
-            className="flex-1 rounded-br-md mt-[-2px] form-input-base border-gray-300"
-          />
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="MM/YY"
+              inputMode="numeric"
+              aria-label="Expiration"
+              {...register("expiration")}
+              onChange={expirationChangeHandler}
+              className="w-full mt-[-2px] form-input-base border-gray-300"
+            />
+          </div>
+          <div className="flex-1 ml-[-2px]">
+            <input
+              type="text"
+              placeholder="CVV"
+              inputMode="numeric"
+              aria-label="CVV"
+              {...register("cvv")}
+              onChange={cvvChangeHandler}
+              className="w-full mt-[-2px] form-input-base border-gray-300"
+            />
+          </div>
         </div>
       </fieldset>
       <fieldset>
@@ -109,10 +113,10 @@ const CardDetailsForm: React.FC = () => {
           type="text"
           placeholder="Full name on card"
           {...register("holderName")}
-          className="rounded-md w-full focus:z-10 form-input-base border-gray-300"
+          className="w-full focus:z-10 form-input-base border-gray-300"
         />
       </fieldset>
-    </div>
+    </>
   );
 };
 

@@ -1,19 +1,19 @@
-import { useState } from "react";
+// import { useState } from "react";
 import PaymentForm from "./PaymentForm";
 import CustomerForm from "./CustomerForm";
-import { AccordianItem } from "../ui/AccordianItem";
+// import { AccordianItem } from "../ui/AccordianItem";
 
 const CheckoutForm: React.FC = () => {
-  const [customerFormOpen, setCustomerFormOpen] = useState(true);
-  const [paymentFormOpen, setPaymentFormOpen] = useState(false);
+  // const [customerFormOpen, setCustomerFormOpen] = useState(true);
+  // const [paymentFormOpen, setPaymentFormOpen] = useState(false);
 
-  const openPaymentForm = () => {
-    setPaymentFormOpen((prevVal) => !prevVal);
-  };
+  // const openPaymentForm = () => {
+  //   setPaymentFormOpen((prevVal) => !prevVal);
+  // };
 
-  const openCustomerForm = () => {
-    setCustomerFormOpen((prevVal) => !prevVal);
-  };
+  // const openCustomerForm = () => {
+  //   setCustomerFormOpen((prevVal) => !prevVal);
+  // };
 
   // useEffect(() => {
   //   const subscription = watch((data) => {
@@ -26,8 +26,8 @@ const CheckoutForm: React.FC = () => {
   // console.log("Errors:", errors);
 
   return (
-    <div className="mx-auto px-10 border-r-2">
-      <AccordianItem
+    <div className="mx-auto px-10">
+      {/* <AccordianItem
         title="Contact details"
         isExpanded={customerFormOpen}
         onToggle={() => openCustomerForm()}
@@ -40,7 +40,9 @@ const CheckoutForm: React.FC = () => {
         onToggle={() => openPaymentForm()}
       >
         <PaymentForm />
-      </AccordianItem>
+      </AccordianItem> */}
+      <CustomerForm />
+      <PaymentForm />
     </div>
   );
 };

@@ -104,11 +104,11 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
 
   return (
     <div
-      className={`flex flex-row rounded-md border-2
+      className={`flex flex-row  border-2
         ${inputFocused && "noninput-focus-styling"}
         ${errors ? "border-error-red" : "border-gray-300"}`}
     >
-      <div className="relative w-13 rounded-l-md flex-shrink-0 group -mt-[2px] -ml-[2px] -mb-[2px]">
+      <div className="relative w-13  flex-shrink-0 group -mt-[2px] -ml-[2px] -mb-[2px]">
         {SelectedFlagComponent && (
           <span className="absolute items-center top-1/2 left-1/2 -translate-1/2 justify-center pointer-events-none">
             <SelectedFlagComponent
@@ -121,7 +121,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
           </span>
         )}
         <select
-          className="absolute size-full text-amber-50/0 border-2 input-focus-base rounded-l-md"
+          className="absolute size-full text-amber-50/0 border-2 input-focus-base"
           id="country-select"
           //   {...register("phoneNumber.countryCode")}
           value={phoneData?.countryCode}
