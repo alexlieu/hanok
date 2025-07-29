@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record BasketItemResponseDto(
-        @NotBlank(message = "{product.name.notblank}") String productName,
+        @NotBlank(message = "{product.name.notBlank}") String productName,
         @NotNull(message = "{variant.flavour.notnull}") ProductVariant.Flavour flavour,
         @NotNull(message = "{variant.size.notnull}") ProductVariant.Size size,
         @Positive(message = "{unitprice.positive}") @NotNull(message = "{unitprice.notnull}") BigDecimal unitPrice,

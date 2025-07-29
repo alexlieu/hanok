@@ -1,10 +1,14 @@
 package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.BasketResponseDto;
-import com.alex_lieu.hanok.dto.OrderCreateDto;
-import com.alex_lieu.hanok.dto.OrderUpdateDto;
-import com.alex_lieu.hanok.dto.OrderViewDto;
+import com.alex_lieu.hanok.dto.order.OrderRequestDto;
+import com.alex_lieu.hanok.dto.order.OrderSuccessDto;
+import com.alex_lieu.hanok.dto.order.OrderUpdateDto;
+import com.alex_lieu.hanok.dto.order.OrderViewDto;
 import com.alex_lieu.hanok.entity.CustomerOrder;
+import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
+import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
+import com.alex_lieu.hanok.service.OrderProcessingService;
 import com.alex_lieu.hanok.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +26,13 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173/")
 public class OrderController {
     private final OrderService orderService;
+    private final OrderProcessingService orderProcessingService;
 
     @Autowired
-    public OrderController(OrderService orderService) { this.orderService = orderService; }
+    public OrderController(OrderService orderService, OrderProcessingService orderProcessingService) {
+        this.orderService = orderService;
+        this.orderProcessingService = orderProcessingService;
+    }
 
     @GetMapping
     public ResponseEntity<List<OrderViewDto>> filterOrders(
@@ -71,9 +79,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getBasket(itemIds, quantities));
     }
 
+//    @PostMapping
+//    private ResponseEntity<?> placeOrder(@Valid @RequestBody OrderCreateDto order) {
+//        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(order));
+//    }
+
     @PostMapping
-    private ResponseEntity<?> placeOrder(@Valid @RequestBody OrderCreateDto order) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(order));
+    private ResponseEntity<OrderSuccessDto> createOrder(@Valid @RequestBody OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.convertToOrderEntity(order));
     }
 
     @PatchMapping("/{id}")

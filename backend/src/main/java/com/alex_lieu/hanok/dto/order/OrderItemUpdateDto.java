@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.dto;
+package com.alex_lieu.hanok.dto.order;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.dto;
+package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.validation.AtLeastOneRequired;
 import com.alex_lieu.hanok.validation.ContactNumberConstraint;

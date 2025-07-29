@@ -1,7 +1,14 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.enums.PaymentMethod;
+import com.alex_lieu.hanok.validation.ValidPaymentDetails;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -17,6 +24,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@ValidPaymentDetails
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,16 +34,35 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private CustomerOrder order;
 
-    private BigDecimal amount;
+    @NotNull(message = "payment.total.notNull")
+    @Positive(message = "payment.total.positive")
+    private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "payment.method.notNull")
     private PaymentMethod paymentMethod;
+
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "card_details_id", referencedColumnName = "id")
+    @JsonManagedReference
+    @Valid
+    @ToString.Exclude
+    private CardDetails cardDetails;
+
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @JoinColumn(name = "tokenized_payment_details_id", referencedColumnName = "id")
+    @Valid
+    @ToString.Exclude
+    private TokenizedPaymentDetails tokenizedPaymentDetails;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
     private LocalDateTime paymentDateTime;
 
+    @NotBlank(message = "payment.transactionalRef.notBlank")
+    @Size(min = 10, max = 50, message = "payment.transactionalRef.size")
     private String transactionReference;
 
     @PrePersist

@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.dto;
+package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.entity.Payment;
 import com.alex_lieu.hanok.enums.PaymentMethod;

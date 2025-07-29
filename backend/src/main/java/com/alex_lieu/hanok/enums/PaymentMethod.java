@@ -1,12 +1,13 @@
 package com.alex_lieu.hanok.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum PaymentMethod {
-    CREDIT("Credit Card"),
-    DEBIT("Debit Card"),
+    CARD("card"),
     CASH("Cash"),
     MOBILE("Mobile Payment"),
     APPLE("Apple Pay"),
-    ANDROID("Android Pay"),
     PAYPAL("Paypal"),
     GOOGLE("Google Pay");
     
@@ -16,7 +17,4 @@ public enum PaymentMethod {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
 }

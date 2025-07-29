@@ -1,6 +1,8 @@
 package com.alex_lieu.hanok.service;
 
-import com.alex_lieu.hanok.dto.*;
+import com.alex_lieu.hanok.dto.BasketItemResponseDto;
+import com.alex_lieu.hanok.dto.BasketResponseDto;
+import com.alex_lieu.hanok.dto.order.*;
 import com.alex_lieu.hanok.entity.*;
 import com.alex_lieu.hanok.repository.CustomerOrderRepository;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -124,7 +126,7 @@ public class OrderService {
                             .build();
         }).toList());
         order.setPayment(Payment.builder()
-                .amount(order.getTotal())
+                .total(order.getTotal())
                 .paymentStatus(orderCreateDto.paymentCreateDto().paymentStatus())
                 .paymentMethod(orderCreateDto.paymentCreateDto().paymentMethod())
                 .order(order)

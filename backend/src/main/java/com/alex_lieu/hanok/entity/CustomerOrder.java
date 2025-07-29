@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -61,6 +62,7 @@ public class CustomerOrder {
         LocalDateTime now = LocalDateTime.now();
         this.orderDateTime = now;
         this.updatedAt = now;
+        this.orderStatus = OrderStatus.PENDING;
     }
 
     @PostPersist
@@ -79,6 +81,7 @@ public class CustomerOrder {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
+    @Size(max = 500, message = "order.specialInstructions.size")
     private String specialInstructions;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)

@@ -6,4 +6,5 @@ public class PaymentExceptions {
             super(message, cause);
         }
     }
+
 }

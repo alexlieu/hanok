@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.dto;
+package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.entity.OrderItem;
 import com.alex_lieu.hanok.entity.ProductVariant;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * DTO for {@link OrderItem}
  */
 public record OrderItemViewDto(
-        @NotBlank(message = "{product.name.notblank}") String itemName,
+        @NotBlank(message = "{product.name.notBlank}") String itemName,
         @NotNull(message = "{variant.flavour.notnull}") ProductVariant.Flavour flavour,
         @NotNull(message = "{variant.size.notnull}") ProductVariant.Size size,
         @Range(min = 1, max = 10, message = "{orderitem.quantity.range}") Integer quantity,

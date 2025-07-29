@@ -1,8 +1,7 @@
-package com.alex_lieu.hanok.dto;
+package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.entity.CustomerOrder;
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

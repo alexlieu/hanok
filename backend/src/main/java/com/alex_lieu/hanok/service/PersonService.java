@@ -1,6 +1,7 @@
 package com.alex_lieu.hanok.service;
 
 import com.alex_lieu.hanok.entity.Person;
+import com.alex_lieu.hanok.exceptions.CustomerNotFoundException;
 import com.alex_lieu.hanok.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,6 @@ public class PersonService {
     }
 
     public Person findById(long id) {
-        return personRepository.findById(id).orElseThrow(() -> new PersonException.CustomerNotFoundException(id));
+        return personRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException(String.valueOf(id)));
     }
 }

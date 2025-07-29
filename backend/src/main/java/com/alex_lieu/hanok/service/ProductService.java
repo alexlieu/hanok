@@ -6,6 +6,8 @@ import com.alex_lieu.hanok.dto.VariantUpdateDto;
 import com.alex_lieu.hanok.entity.Product;
 import com.alex_lieu.hanok.entity.ProductVariant;
 import com.alex_lieu.hanok.enums.Category;
+import com.alex_lieu.hanok.exceptions.product.ProductNotFoundException;
+import com.alex_lieu.hanok.exceptions.product.ProductVariantNotFoundException;
 import com.alex_lieu.hanok.repository.ProductRepository;
 import com.alex_lieu.hanok.repository.ProductVariantRepository;
 import jakarta.persistence.PersistenceException;
@@ -39,23 +41,25 @@ public class ProductService {
     }
 
     public Product getProductById(long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductExceptions.ProductNotFoundException(id));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(String.valueOf(id), "Product with ID " + id + " not found"));
 //        return product.getActive() ? product : throwProductNotFoundException(id);
         return product;
     }
 
     private Product throwProductNotFoundException(Long id) {
-        throw new ProductExceptions.ProductNotFoundException(id);
+        throw new ProductNotFoundException(String.valueOf(id), "Product with ID " + id + " not found");
     }
 
 
     public ProductVariant getActiveProductVariantById(long id) {
-        ProductVariant variant = productVariantRepository.findById(id).orElseThrow(() -> new ProductExceptions.ProductNotFoundException(id));
+        ProductVariant variant = productVariantRepository.findById(id)
+                .orElseThrow(() -> new ProductVariantNotFoundException(String.valueOf(id), "Product variant with ID " + id + " not found"));
         return variant.getActive() ? variant : throwProductVariantNotFoundException(id);
     }
 
     private ProductVariant throwProductVariantNotFoundException(long id) {
-        throw new ProductExceptions.ProductVariantNotFoundException(id);
+        throw new ProductVariantNotFoundException(String.valueOf(id), "Product variant with ID " + id + " not found");
     }
 
     /**
@@ -228,7 +232,7 @@ public class ProductService {
     public Product findBySlug(String name) {
         try {
             return productRepository.findByNameLikeIgnoreCaseAndActiveIsTrue(name)
-                    .orElseThrow(() -> new ProductExceptions.ProductNotFoundException(name));
+                    .orElseThrow(() -> new ProductNotFoundException(name, "Product with name " + name + " not found"));
         } catch (DataAccessException e) {
             throw new ServiceException("Failed to fetch product due to database error", e);
         }

@@ -33,8 +33,8 @@ const PickupMap: React.FC = () => {
           type="button"
           className="w-1/2 aspect-square bg-stone-200 border-2 border-stone-900 group"
           onClick={() => {
-            // map.setView(position, zoom, { animate: true });
-            map.flyTo(position, maxZoom, { duration: 1, easeLinearity: 0.5 });
+            map.setView(position, maxZoom, { animate: true });
+            // map.flyTo(position, maxZoom, { duration: 1, easeLinearity: 0.5 });
           }}
         >
           <AiOutlineShop className="size-full" />

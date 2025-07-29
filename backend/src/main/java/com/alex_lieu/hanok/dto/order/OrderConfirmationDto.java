@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.dto;
+package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.entity.CustomerOrder;
 import com.alex_lieu.hanok.entity.Payment;
@@ -26,7 +26,7 @@ public record OrderConfirmationDto(
                 order.getOrderStatus(),
                 order.getOrderDateTime(),
                 order.getOrderItems().stream().map(OrderItemViewDto::fromOrderItem).toList(),
-                order.getPayment().getAmount(),
+                order.getPayment().getTotal(),
                 order.getPayment().getPaymentMethod(),
                 order.getPayment().getPaymentStatus(),
                 order.getSpecialInstructions()
