@@ -5,13 +5,14 @@ import com.alex_lieu.hanok.validation.ContactNumberConstraint;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +52,18 @@ public class CustomerOrder {
 
     private LocalDateTime orderDateTime;
 
-    @Future(message = "{order.pickup.future}")
-    private LocalDateTime pickupDateTime;
+    //  @ValidPickupDate only works at the controller level, but fails during data persistence of the entity
+    //  There are 2 different validation contexts in the application - Spring MVC Validations VS JPA/Hibernate Validation
+    //      -   Spring is responsible for validating the OrderRequestDto payload when it hits the OrderController.
+    //          Spring is aware of the @Component annotation on PickupDateValidator and correctly uses dependency injection to create it,
+    //          providing the necessary values from the application.properties file.
+    //      -   Hibernate has the same annotation and attempts to validate the field upon attempting to persist a new order to the DB.
+    //          Hibernate's validation mechanisms is not aware of the Spring context.
+    //          It tries to create a new instance of the validator by calling its default no-argument constructor <init>()
+    //          but since the validator only has a constructor that requires parameter for dependency injection, this fails with a
+    //          NoSuchMethodException.
+    @NotNull(message = "order.pickup-date.notNull")
+    private LocalDate pickupDate;
 
     private LocalDateTime updatedAt;
 

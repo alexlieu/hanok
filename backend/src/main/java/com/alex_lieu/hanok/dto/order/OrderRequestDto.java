@@ -1,10 +1,12 @@
 package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.validation.ValidPhoneNumber;
+import com.alex_lieu.hanok.validation.ValidPickupDate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 public record OrderRequestDto(
@@ -30,7 +32,11 @@ public record OrderRequestDto(
 
         @Valid
         @NotNull(message = "order.payment.notNull")
-        PaymentRequestDto payment
+        PaymentRequestDto payment,
+
+        @NotNull(message = "order.pickup.notNull")
+        @ValidPickupDate
+        LocalDate pickupDate
 
 ) implements Serializable {
 }

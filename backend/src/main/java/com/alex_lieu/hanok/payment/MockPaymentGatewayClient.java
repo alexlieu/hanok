@@ -42,11 +42,12 @@ public class MockPaymentGatewayClient implements PaymentGatewayClient {
             BigDecimal total,
             String currency
     ) {
-        if (token != null && token.isEmpty()) {
+        if (token == null || token.isBlank()) {
             return new PaymentGatewayResponse(false, null, null, "Mock: Payment token is missing", null, total, currency, "TOKEN_PROCESSED_FAILED");
         }
 
-        String gatewayToken = "mock_tok_card_" + UUID.randomUUID().toString();
+        String gatewayToken = "mock_tok_card_" + token.substring(0, Math.min(token.length(), 10)) + UUID.randomUUID()
+                .toString();
         String transactionId = "mock_txn_card_" + UUID.randomUUID().toString();
         return new PaymentGatewayResponse(true, gatewayToken, null, "Mock: Token payment approved", transactionId, total, currency, null);
     }

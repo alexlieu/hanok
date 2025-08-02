@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
 public record OrderViewDto(
         @NotNull(message = "{order.id.notblank}") long id,
         LocalDateTime orderDateTime,
-        LocalDateTime pickupDateTime,
+        LocalDate pickupDate,
         @NotNull(message = "{order.status.notblank}") CustomerOrder.OrderStatus orderStatus,
         @Positive(message = "{order.total.positive}") BigDecimal totalPrice,
         String specialInstructions,
@@ -30,7 +31,7 @@ public record OrderViewDto(
         return new OrderViewDto(
                 order.getId(),
                 order.getOrderDateTime(),
-                order.getPickupDateTime(),
+                order.getPickupDate(),
                 order.getOrderStatus(),
                 order.getTotal(),
                 order.getSpecialInstructions(),

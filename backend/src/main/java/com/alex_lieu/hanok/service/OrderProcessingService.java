@@ -69,6 +69,7 @@ public class OrderProcessingService {
                 .phoneNumber(canonicalPhoneNumber)
                 .email(dto.email())
                 .orderItems(dto.orderItems().stream().map(this::convertToOrderItem).collect(Collectors.toList()))
+                .pickupDate(dto.pickupDate())
                 .build();
         BigDecimal total = order.getTotal();
         Payment payment = paymentService.processPaymentForOrder(dto.payment(), total);

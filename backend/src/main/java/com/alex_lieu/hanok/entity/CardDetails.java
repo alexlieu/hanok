@@ -1,6 +1,6 @@
 package com.alex_lieu.hanok.entity;
 
-import com.alex_lieu.hanok.validation.CardExpirationValidator;
+import com.alex_lieu.hanok.validation.ValidCardExpiration;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@CardExpirationValidator
+@ValidCardExpiration
 public class CardDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
