@@ -19,7 +19,7 @@ public @interface AtLeastOneRequired {
     /**
      * @return The error message template.
      */
-    String message() default "{fields.atleastone.required}";
+    String message() default "At least one of these fields [{fields}] must be provided";
 
     /**
      * @return The validation groups.

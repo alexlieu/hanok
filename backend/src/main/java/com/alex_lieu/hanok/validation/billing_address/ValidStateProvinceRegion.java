@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.validation;
+package com.alex_lieu.hanok.validation.billing_address;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidStateProvinceRegion {
-    String message() default "{stateProvinceRegion.message}";
+    String message() default "{state-province-region.message}";
 
     Class<?>[] groups() default {};
 

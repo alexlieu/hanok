@@ -2,37 +2,44 @@ package com.alex_lieu.hanok.dto.payment;
 
 import com.alex_lieu.hanok.validation.CountryCode;
 import com.alex_lieu.hanok.validation.MinIfPresent;
+import com.alex_lieu.hanok.validation.billing_address.ValidStateProvinceRegionDto;
+import com.alex_lieu.hanok.validation.groups.FirstValidationGroup;
+import com.alex_lieu.hanok.validation.groups.SecondValidationGroup;
+import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 
+@ValidStateProvinceRegionDto
+@GroupSequence({BillingAddressDto.class, FirstValidationGroup.class, SecondValidationGroup.class})
 public record BillingAddressDto(
-        @NotBlank(message = "billing.addressLine1.notBlank")
-        @Size(min = 3, max = 100, message = "billing.addressLine1.size")
+        @NotBlank(message = "{billing.address-line-1.not-blank}", groups = {FirstValidationGroup.class})
+        @Size(min = 3, max = 100, message = "{billing.address-line-1.size}", groups = {SecondValidationGroup.class})
         String addressLine1,
 
-        @MinIfPresent(min = 5, message = "billing.addressLine2.minIfPresent")
-        @Size(max = 100, message = "billing.addressLine2.size")
+        @MinIfPresent(min = 5, message = "{billing.address-line-2.min-if-present}", groups = {FirstValidationGroup.class})
+        @Size(max = 100, message = "{billing.address-line-2.size}", groups = {SecondValidationGroup.class})
         String addressLine2,
 
-        @NotBlank(message = "billing.city.notBlank")
-        @Size(min = 2, max = 100, message = "billing.city.size")
+        @Size(min = 2, max = 100, message = "{billing.state-province-region.size}", groups = {FirstValidationGroup.class})
         String stateProvinceRegion,
 
-        @MinIfPresent(min = 3, message = "billing.county.minIfPresent")
-        @Size(max = 100, message = "billing.county.size")
+        @MinIfPresent(min = 3, message = "{billing.county.min-if-present}", groups = {FirstValidationGroup.class})
+        @Size(max = 100, message = "{billing.county.size}", groups = {SecondValidationGroup.class})
         String county,
 
-        @MinIfPresent(min = 3, message = "billing.county.minIfPresent")
-        @Size(max = 100, message = "billing.county.size")
+        @NotBlank(message = "{billing.city.not-blank}", groups = {FirstValidationGroup.class})
+        @MinIfPresent(min = 3, message = "{billing.city.min-if-present}", groups = {SecondValidationGroup.class})
+        @Size(max = 100, message = "{billing.city.size}", groups = {SecondValidationGroup.class})
         String city,
 
-        @Size(min = 3, max = 12, message = "billing.postalCode.size")
+        @NotBlank(message = "{billing.postal-code.not-blank}", groups = {FirstValidationGroup.class})
+        @Size(min = 3, max = 12, message = "{billing.postal-code.size}", groups = {SecondValidationGroup.class})
         String postalCode,
 
-        @NotBlank(message = "billing.country.notBlank")
-        @Size(min = 2, max = 2, message = "billing.country.size")
+        @NotBlank(message = "{billing.country.not-blank}", groups = {FirstValidationGroup.class})
+        @Size(min = 2, max = 2, message = "{billing.country.size}", groups = {FirstValidationGroup.class})
         @CountryCode
         String countryCode
 

@@ -1,7 +1,6 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.validation.AtLeastOneRequired;
-import com.alex_lieu.hanok.validation.ContactNumberConstraint;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -46,7 +45,7 @@ public class CustomerOrder {
     @Column(name = "email")
     private String email;
 
-    @ContactNumberConstraint
+    // NEEDS NUMBER VALIDATOR
     @Column(name = "phone_number")
     private String phoneNumber;
 

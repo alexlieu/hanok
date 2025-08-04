@@ -38,6 +38,7 @@ public class PaymentService {
                 .city(dto.city())
                 .postalCode(dto.postalCode())
                 .countryCode(dto.countryCode())
+                .stateProvinceRegion(dto.stateProvinceRegion())
                 .build();
     }
 

@@ -24,7 +24,7 @@ public class OrderController {
 
     @PostMapping
     private ResponseEntity<OrderSuccessDto> createOrder(@Valid @RequestBody OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.convertToOrderEntity(order));
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }
 
 //    @GetMapping

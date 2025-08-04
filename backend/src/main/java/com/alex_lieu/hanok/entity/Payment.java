@@ -1,7 +1,7 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.enums.PaymentMethod;
-import com.alex_lieu.hanok.validation.ValidPaymentDetails;
+import com.alex_lieu.hanok.validation.payment.ValidPaymentDetails;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;

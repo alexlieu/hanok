@@ -45,7 +45,7 @@ public class OrderProcessingService {
     }
 
     @Transactional
-    public OrderSuccessDto convertToOrderEntity(OrderRequestDto dto) throws PaymentFailedException, OrderPlacementFailedException {
+    public OrderSuccessDto processOrder(OrderRequestDto dto) throws PaymentFailedException, OrderPlacementFailedException {
         Person customer = null;
         if (dto.customerId() != null) {
             customer = personService.findById(Long.parseLong(dto.customerId()));

@@ -10,6 +10,7 @@ import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.service.spi.ServiceException;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,30 +23,16 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolation(
-            ConstraintViolationException ex
-    ) {
-        Map<String, String> errors = new HashMap<>();
-        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            errors.put(violation.getPropertyPath().toString(), violation.getMessage());
-        }
+    private final MessageSource messageSource;
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                errors.toString(),
-                Instant.now()
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -268,30 +255,46 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorReply> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
-        List<String> globalErrors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             if (error instanceof FieldError) {
                 String fieldName = ((FieldError) error).getField();
                 String errorMessage = error.getDefaultMessage();
                 errors.put(fieldName, errorMessage);
-            } else {
-                globalErrors.add(error.getDefaultMessage());
             }
         });
-        String detailedMessage = "Validation failed for these fields: " + errors.toString();
-        if (! globalErrors.isEmpty()) {
-            detailedMessage += ". Global errors: " + String.join(", ", globalErrors);
-        }
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST)
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .error("Validation error")
-                .message(detailedMessage)
+                .validationErrors(errors)
                 .path(request.getDescription(false).replace("uri=", ""))
                 .code("INVALID_INPUT_DATA")
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorReply> handleConstraintViolation(
+            ConstraintViolationException ex, WebRequest request
+    ) {
+        Map<String, String> errors = new HashMap<>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+        }
+        ErrorReply errorResponse = ErrorReply.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .error("Validation error")
+                .message("Constraint violations found")
+                .validationErrors(errors)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .code("CONSTRAINT_VIOLATION")
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 }

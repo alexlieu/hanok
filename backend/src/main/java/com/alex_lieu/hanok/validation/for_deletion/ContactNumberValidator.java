@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.validation;
+package com.alex_lieu.hanok.validation.for_deletion;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;

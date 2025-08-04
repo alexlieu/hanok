@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.validation;
+package com.alex_lieu.hanok.validation.for_deletion;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

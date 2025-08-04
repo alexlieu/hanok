@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.validation;
+package com.alex_lieu.hanok.validation.payment;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE}) // <--- Applies to the Payment class
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPaymentDetails {
-    String message() default "{payment.cardDetails.invalid}";
+    String message() default "{payment.card-details.invalid}";
 
     Class<?>[] groups() default {};
 

@@ -3,6 +3,7 @@ package com.alex_lieu.hanok.entity;
 import com.alex_lieu.hanok.validation.ValidCardExpiration;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -29,29 +30,30 @@ public class CardDetails {
     @JsonBackReference
     private Payment payment;
 
-    @NotBlank(message = "card.lastFour.notBlank")
-    @Size(min = 4, max = 4, message = "card.lastFour.size")
-    @Pattern(regexp = "^[0-9]+$", message = "card.lastFour.digits")
+    @NotBlank(message = "{card.lastFour.notBlank}")
+    @Size(min = 4, max = 4, message = "{card.lastFour.size}")
+    @Pattern(regexp = "^[0-9]+$", message = "{card.lastFour.digits}")
     private String lastFourDigits;
 
-    @NotBlank(message = "card.token.notBlank")
+    @NotBlank(message = "{card.token.notBlank}")
     @Column(unique = true)
-    @Size(min = 10, max = 200, message = "card.token.size")
+    @Size(min = 10, max = 200, message = "{card.token.size}")
     private String token;
 
-    @NotBlank(message = "card.expiry.month.notBlank")
-    @Pattern(regexp = "^(0[1-9]|1[0-2])$", message = "card.expiry.month.format") // MM format (01-12)
+    @NotBlank(message = "{card.expiry.month.notBlank}")
+    @Pattern(regexp = "^(0[1-9]|1[0-2])$", message = "{card.expiry.month.format}") // MM format (01-12)
     private String expiryMonth;
 
-    @NotBlank(message = "card.expiry.year.notBlank")
-    @Pattern(regexp = "^(202[5-9]|20[3-9][0-9]|2040)$", message = "card.expiry.year.format")
+    @NotBlank(message = "{card.expiry.year.notBlank}")
+    @Pattern(regexp = "^(202[5-9]|20[3-9][0-9]|2040)$", message = "{card.expiry.year.format}")
     private String expiryYear;
 
-    @NotBlank(message = "card.holderName.notBlank")
-    @Size(min = 2, max = 100, message = "card.holderName.size")
-    @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "card.holderName.pattern")
+    @NotBlank(message = "{card.holderName.notBlank}")
+    @Size(min = 2, max = 100, message = "{card.holderName.size}")
+    @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "{card.holderName.pattern}")
     private String holderName;
 
+    @Valid
     @Embedded
     private BillingAddress billingAddress;
 

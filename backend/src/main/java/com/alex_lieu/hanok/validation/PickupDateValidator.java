@@ -36,7 +36,7 @@ public class PickupDateValidator implements ConstraintValidator<ValidPickupDate,
     @Override
     public boolean isValid(LocalDate pickupDate, ConstraintValidatorContext constraintValidatorContext) {
         if (pickupDate == null) {
-            return false;
+            return true;
         }
         DateRange validPickupDateRange = pickupService.getValidPickupDateRange();
         LocalDate earliestPickupDate = validPickupDateRange.start();
