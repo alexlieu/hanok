@@ -1,14 +1,16 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.enums.PaymentMethod;
+import com.alex_lieu.hanok.validation.groups.FirstValidationGroup;
+import com.alex_lieu.hanok.validation.groups.SecondValidationGroup;
 import com.alex_lieu.hanok.validation.payment.ValidPaymentDetails;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
+import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.groups.Default;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -26,6 +28,20 @@ import java.util.Objects;
 @Entity
 @ValidPaymentDetails
 public class Payment {
+    public interface CardPayment {
+    }
+
+    public interface TokenizedPayment {
+    }
+
+    @GroupSequence({Default.class, Payment.CardPayment.class, FirstValidationGroup.class, SecondValidationGroup.class})
+    public interface FullCardValidationSequence {
+    }
+
+    @GroupSequence({Default.class, Payment.TokenizedPayment.class, FirstValidationGroup.class, SecondValidationGroup.class})
+    public interface FullTokenizedValidationSequence {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -34,26 +50,26 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private CustomerOrder order;
 
-    @NotNull(message = "payment.total.notNull")
-    @Positive(message = "payment.total.positive")
+    @NotNull(message = "payment.total.notNull", groups = {FirstValidationGroup.class})
+    @Positive(message = "payment.total.positive", groups = {SecondValidationGroup.class})
     private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "payment.method.notNull")
     private PaymentMethod paymentMethod;
 
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "card_details_id", referencedColumnName = "id")
-    @JsonManagedReference
-    @Valid
-    @ToString.Exclude
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "token", column = @Column(name = "cardToken")),
+            @AttributeOverride(name = "lastFour", column = @Column(name = "cardLastFour")),
+    })
     private CardDetails cardDetails;
 
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    @JoinColumn(name = "tokenized_payment_details_id", referencedColumnName = "id")
-    @Valid
-    @ToString.Exclude
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "token", column = @Column(name = "tokenizedToken")),
+            @AttributeOverride(name = "lastFour", column = @Column(name = "tokenizedLastFour")),
+    })
     private TokenizedPaymentDetails tokenizedPaymentDetails;
 
     @Enumerated(EnumType.STRING)
@@ -61,8 +77,8 @@ public class Payment {
 
     private LocalDateTime paymentDateTime;
 
-    @NotBlank(message = "payment.transactionalRef.notBlank")
-    @Size(min = 10, max = 50, message = "payment.transactionalRef.size")
+    @NotBlank(message = "payment.transactionalRef.notBlank", groups = {FirstValidationGroup.class})
+    @Size(min = 10, max = 50, message = "payment.transactionalRef.size", groups = {SecondValidationGroup.class})
     private String transactionReference;
 
     @PrePersist

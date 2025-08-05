@@ -2,19 +2,25 @@ package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.order.OrderRequestDto;
 import com.alex_lieu.hanok.dto.order.OrderSuccessDto;
+import com.alex_lieu.hanok.entity.Payment;
 import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
 import com.alex_lieu.hanok.service.OrderProcessingService;
-import jakarta.validation.Valid;
+import com.alex_lieu.hanok.validation.billing_address.StateProvinceRegionLogic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "http://localhost:5173/")
 public class OrderController {
+    private static final Logger logger = LoggerFactory.getLogger(StateProvinceRegionLogic.class);
+
     private final OrderProcessingService orderProcessingService;
 
     @Autowired
@@ -22,8 +28,17 @@ public class OrderController {
         this.orderProcessingService = orderProcessingService;
     }
 
-    @PostMapping
-    private ResponseEntity<OrderSuccessDto> createOrder(@Valid @RequestBody OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+    @PostMapping(path = "/card-payment")
+    private ResponseEntity<OrderSuccessDto> createOrderWithCardPayment(@RequestBody @Validated(Payment.FullCardValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+        logger.info("before");
+        logger.info("Card Payment endpoint: {}", order.payment().cardDetails().toString());
+        logger.info("Hello");
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
+    }
+
+    @PostMapping(path = "/tokenized-payment")
+    private ResponseEntity<OrderSuccessDto> createOrderWithTokenizedPayment(@RequestBody @Validated(Payment.FullTokenizedValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+        logger.info("tokenized payment endpoint here!");
         return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }
 

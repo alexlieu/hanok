@@ -25,14 +25,18 @@ public class StateProvinceRegionLogic {
         if (! StringUtils.hasText(country)) {
             return ValidationResult.success();
         }
+        logger.info("Validating State/Province/Region");
         switch (country.toUpperCase()) {
             case "US":
+                logger.info("Country is US");
                 if (! StringUtils.hasText(stateProvinceRegion)) {
+                    logger.info("State is required for US");
                     return ValidationResult.failure("State is required for the US");
                 }
                 if (! US_STATES.contains(stateProvinceRegion.toUpperCase())) {
                     return ValidationResult.failure(stateProvinceRegion + " is not a valid US state");
                 }
+                break;
             case "CA":
                 if (! StringUtils.hasText(stateProvinceRegion)) {
                     return ValidationResult.failure("Province is required for CA");

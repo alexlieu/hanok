@@ -73,7 +73,7 @@ public class PaymentService {
                     "GBP"
             );
             persistableCardDetails = CardDetails.builder()
-                    .lastFourDigits(gatewayResponse.lastFourDigits())
+                    .lastFour(gatewayResponse.lastFourDigits())
                     .token(gatewayResponse.token())
                     .expiryMonth(expiryMonth)
                     .expiryYear(expiryYear)
@@ -115,20 +115,12 @@ public class PaymentService {
         }
 
 
-        Payment payment = Payment.builder()
+        return Payment.builder()
                 .total(finalTotal)
                 .paymentMethod(dto.paymentMethod())
                 .transactionReference(gatewayResponse.transactionId())
                 .tokenizedPaymentDetails(persistableTokenizedPaymentDetails)
                 .cardDetails(persistableCardDetails)
                 .build();
-
-        if (persistableTokenizedPaymentDetails != null) {
-            persistableTokenizedPaymentDetails.setPayment(payment);
-        }
-        if (persistableCardDetails != null) {
-            persistableCardDetails.setPayment(payment);
-        }
-        return payment;
     }
 }

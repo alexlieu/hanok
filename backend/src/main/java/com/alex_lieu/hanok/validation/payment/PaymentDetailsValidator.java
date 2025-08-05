@@ -9,7 +9,8 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class PaymentDetailsValidator implements ConstraintValidator<ValidPaymentDetails, Payment> {
     public boolean isValid(Payment payment, ConstraintValidatorContext context) {
-        if (payment == null) {
+
+        if (payment == null || payment.getPaymentMethod() == null) {
             return true;
         }
 
@@ -17,9 +18,7 @@ public class PaymentDetailsValidator implements ConstraintValidator<ValidPayment
         CardDetails cardDetails = payment.getCardDetails();
         TokenizedPaymentDetails tokenizedPaymentDetails = payment.getTokenizedPaymentDetails();
 
-        if (method == null) {
-            return false;
-        }
+        context.disableDefaultConstraintViolation();
 
         switch (method) {
             case CARD:
@@ -62,7 +61,6 @@ public class PaymentDetailsValidator implements ConstraintValidator<ValidPayment
     }
 
     public void addConstraintViolation(ConstraintValidatorContext context, String constraintMessage, String fieldName) {
-        context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(constraintMessage)
                 .addPropertyNode(fieldName)
                 .addConstraintViolation();

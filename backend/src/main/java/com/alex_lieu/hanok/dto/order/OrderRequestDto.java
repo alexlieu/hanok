@@ -5,7 +5,6 @@ import com.alex_lieu.hanok.validation.ValidPhoneNumber;
 import com.alex_lieu.hanok.validation.ValidPickupDate;
 import com.alex_lieu.hanok.validation.groups.FirstValidationGroup;
 import com.alex_lieu.hanok.validation.groups.SecondValidationGroup;
-import jakarta.validation.GroupSequence;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -13,7 +12,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-@GroupSequence({OrderRequestDto.class, FirstValidationGroup.class, SecondValidationGroup.class})
 @AtLeastOneRequired(fields = {"phoneNumber", "email"}, groups = {FirstValidationGroup.class})
 public record OrderRequestDto(
         @NotBlank(message = "{order.request.customer-name.notBlank}", groups = {FirstValidationGroup.class})

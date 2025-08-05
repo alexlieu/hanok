@@ -1,6 +1,7 @@
 package com.alex_lieu.hanok.dto.order;
 
 import com.alex_lieu.hanok.dto.payment.CardDetailsRequestDto;
+import com.alex_lieu.hanok.entity.Payment;
 import com.alex_lieu.hanok.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ public record PaymentRequestDto(
         @NotNull(message = "{payment.method.notNull}")
         PaymentMethod paymentMethod,
 
-        @Size(min = 10, max = 200, message = "{payment.token.size}")
+        @Size(min = 10, max = 200, message = "{payment.token.size}", groups = {Payment.TokenizedPayment.class})
         String paymentToken,
 
         @Valid

@@ -59,7 +59,7 @@ public record OrderSuccessDto(
 
         String maskedCardNo = null;
         if (payment.getCardDetails() != null) {
-            maskedCardNo = "**** **** **** " + payment.getCardDetails().getLastFourDigits();
+            maskedCardNo = "**** **** **** " + payment.getCardDetails().getLastFour();
         }
 
         return new OrderSuccessDto(
