@@ -2,11 +2,11 @@ package com.alex_lieu.hanok.controller;
 
 import com.alex_lieu.hanok.dto.order.OrderRequestDto;
 import com.alex_lieu.hanok.dto.order.OrderSuccessDto;
-import com.alex_lieu.hanok.entity.Payment;
 import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
 import com.alex_lieu.hanok.service.OrderProcessingService;
 import com.alex_lieu.hanok.validation.billing_address.StateProvinceRegionLogic;
+import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +29,12 @@ public class OrderController {
     }
 
     @PostMapping(path = "/card-payment")
-    private ResponseEntity<OrderSuccessDto> createOrderWithCardPayment(@RequestBody @Validated(Payment.FullCardValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
-        logger.info("before");
-        logger.info("Card Payment endpoint: {}", order.payment().cardDetails().toString());
-        logger.info("Hello");
+    private ResponseEntity<OrderSuccessDto> createOrderWithCardPayment(@RequestBody @Validated(ValidationGroups.FullCardValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }
 
     @PostMapping(path = "/tokenized-payment")
-    private ResponseEntity<OrderSuccessDto> createOrderWithTokenizedPayment(@RequestBody @Validated(Payment.FullTokenizedValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+    private ResponseEntity<OrderSuccessDto> createOrderWithTokenizedPayment(@RequestBody @Validated(ValidationGroups.FullTokenizedValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
         logger.info("tokenized payment endpoint here!");
         return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }

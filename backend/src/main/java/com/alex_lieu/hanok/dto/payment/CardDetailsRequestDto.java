@@ -1,8 +1,7 @@
 package com.alex_lieu.hanok.dto.payment;
 
-import com.alex_lieu.hanok.entity.Payment;
-import com.alex_lieu.hanok.validation.groups.FirstValidationGroup;
-import com.alex_lieu.hanok.validation.groups.SecondValidationGroup;
+import com.alex_lieu.hanok.validation.expiry_date.ValidExpiryDate;
+import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,27 +12,27 @@ import java.io.Serializable;
 
 public record CardDetailsRequestDto(
 
-        @NotBlank(message = "{card.number.not-blank}", groups = {Payment.CardPayment.class, FirstValidationGroup.class})
-        @Size(min = 19, max = 19, message = "{card.number.size}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
-        @Pattern(regexp = "^(\\d{4}\\s){3}\\d{4}$", message = "{card.request.number.digits}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
+        @NotBlank(message = "{card.number.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
+        @Size(min = 19, max = 19, message = "{card.number.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        @Pattern(regexp = "^(\\d{4}\\s){3}\\d{4}$", message = "{card.request.number.digits}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String cardNo,
 
-        @NotBlank(message = "{card.holder-name.not-blank}", groups = {Payment.CardPayment.class, FirstValidationGroup.class})
-        @Size(min = 2, max = 100, message = "{card.holder-name.size}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
-        @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "{card.holder-name.pattern}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
+        @NotBlank(message = "{card.holder-name.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
+        @Size(min = 2, max = 100, message = "{card.holder-name.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "{card.holder-name.pattern}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String cardholderName,
 
-        @NotBlank(message = "{card.expiry.year.not-blank}", groups = {Payment.CardPayment.class, FirstValidationGroup.class})
-        @Pattern(regexp = "^(0[1-9]|1[0-2])/([0-9]{2})$", message = "{card.request.expiry.format}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
+        @NotBlank(message = "{card.request.expiry.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
+        @ValidExpiryDate(groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String expiryDate,
 
-        @NotBlank(message = "{card.cvv.not-blank}", groups = {Payment.CardPayment.class, FirstValidationGroup.class})
-        @Size(min = 3, max = 4, message = "{card.cvv.size}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
-        @Pattern(regexp = "^[0-9]+$", message = "{card.cvv.digits}", groups = {Payment.CardPayment.class, SecondValidationGroup.class})
+        @NotBlank(message = "{card.cvv.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
+        @Size(min = 3, max = 4, message = "{card.cvv.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        @Pattern(regexp = "^[0-9]+$", message = "{card.cvv.digits}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String cvv,
 
         @Valid
-        @NotNull(message = "{card.address.not-null}", groups = {Payment.CardPayment.class})
+        @NotNull(message = "{card.address.not-null}", groups = {ValidationGroups.CardChecks.class})
         BillingAddressDto billingAddress
 
 ) implements Serializable {

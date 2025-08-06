@@ -1,6 +1,8 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.validation.AtLeastOneRequired;
+import com.alex_lieu.hanok.validation.ValidPhoneNumber;
+import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -25,7 +27,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@AtLeastOneRequired(fields = {"email", "phoneNumber"}, message = "{customer.contact.required}")
+@AtLeastOneRequired(fields = {"email", "phoneNumber"}, message = "{customer.contact.required}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
 public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,14 +40,14 @@ public class CustomerOrder {
     @ToString.Exclude
     private Person customer;
 
-    @NotBlank(message = "{customer.name.notblank}")
+    @NotBlank(message = "{customer.name.notblank}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.PreConditionChecks.class})
     private String customerName;
 
-    @Email(message = "{email.valid}")
+    @Email(message = "{email.valid}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.PreConditionChecks.class})
     @Column(name = "email")
     private String email;
 
-    // NEEDS NUMBER VALIDATOR
+    @ValidPhoneNumber(groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -91,7 +93,7 @@ public class CustomerOrder {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @Size(max = 500, message = "order.specialInstructions.size")
+    @Size(max = 500, message = "{order.special-instructions.size}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
     private String specialInstructions;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)

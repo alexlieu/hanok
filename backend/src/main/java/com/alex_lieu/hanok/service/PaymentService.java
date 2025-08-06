@@ -11,6 +11,9 @@ import com.alex_lieu.hanok.entity.TokenizedPaymentDetails;
 import com.alex_lieu.hanok.enums.PaymentMethod;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
 import com.alex_lieu.hanok.payment.MockPaymentGatewayClient;
+import com.alex_lieu.hanok.validation.billing_address.StateProvinceRegionLogic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +23,8 @@ import java.time.format.DateTimeParseException;
 
 @Service
 public class PaymentService {
+    private static final Logger logger = LoggerFactory.getLogger(StateProvinceRegionLogic.class);
+
     private final MockPaymentGatewayClient paymentGatewayClient;
 
     public PaymentService(MockPaymentGatewayClient paymentGatewayClient) {
@@ -47,16 +52,8 @@ public class PaymentService {
         CardDetails persistableCardDetails = null;
         TokenizedPaymentDetails persistableTokenizedPaymentDetails = null;
         if (dto.paymentMethod().equals(PaymentMethod.CARD)) {
-            if (dto.cardDetails() == null) {
-                throw new IllegalArgumentException("Card details are missing for CARD payment method.");
-            }
-            CardDetailsRequestDto cardDetailsRequestDto = dto.cardDetails();
-            if (cardDetailsRequestDto.cardNo() == null || cardDetailsRequestDto.cardNo().isBlank() ||
-                    cardDetailsRequestDto.expiryDate() == null || cardDetailsRequestDto.expiryDate().isBlank() ||
-                    cardDetailsRequestDto.cvv() == null || cardDetailsRequestDto.cvv().isBlank()) {
-                throw new IllegalArgumentException("Full card details (number, expiry date or cvv) are required for CARD payment method.");
-            }
             YearMonth expiryMonthYear;
+            CardDetailsRequestDto cardDetailsRequestDto = dto.cardDetails();
             try {
                 expiryMonthYear = YearMonth.parse(cardDetailsRequestDto.expiryDate(), DateTimeFormatter.ofPattern("MM/uu"));
             } catch (DateTimeParseException e) {
@@ -82,12 +79,6 @@ public class PaymentService {
                     .build();
         } else if (dto.paymentMethod().equals(PaymentMethod.APPLE) || dto.paymentMethod()
                 .equals(PaymentMethod.GOOGLE) || dto.paymentMethod().equals(PaymentMethod.PAYPAL)) {
-            if (dto.paymentToken() == null) {
-                throw new IllegalArgumentException("Payment token required for Apple Pay, Google Pay, or PayPal.");
-            }
-            if (dto.cardDetails() != null) {
-                throw new IllegalArgumentException("Card details should not be provided for a tokenized payment method.");
-            }
 
             gatewayResponse = paymentGatewayClient.processTokenPayment(
                     dto.paymentToken(),

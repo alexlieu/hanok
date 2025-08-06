@@ -1,4 +1,4 @@
-package com.alex_lieu.hanok.validation;
+package com.alex_lieu.hanok.validation.expiry_date;
 
 
 import jakarta.validation.Constraint;

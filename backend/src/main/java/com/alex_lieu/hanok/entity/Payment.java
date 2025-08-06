@@ -1,16 +1,14 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.enums.PaymentMethod;
-import com.alex_lieu.hanok.validation.groups.FirstValidationGroup;
-import com.alex_lieu.hanok.validation.groups.SecondValidationGroup;
+import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import com.alex_lieu.hanok.validation.payment.ValidPaymentDetails;
 import jakarta.persistence.*;
-import jakarta.validation.GroupSequence;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.groups.Default;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -26,22 +24,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@ValidPaymentDetails
+@ValidPaymentDetails(groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
 public class Payment {
-    public interface CardPayment {
-    }
-
-    public interface TokenizedPayment {
-    }
-
-    @GroupSequence({Default.class, Payment.CardPayment.class, FirstValidationGroup.class, SecondValidationGroup.class})
-    public interface FullCardValidationSequence {
-    }
-
-    @GroupSequence({Default.class, Payment.TokenizedPayment.class, FirstValidationGroup.class, SecondValidationGroup.class})
-    public interface FullTokenizedValidationSequence {
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -50,14 +34,15 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private CustomerOrder order;
 
-    @NotNull(message = "payment.total.notNull", groups = {FirstValidationGroup.class})
-    @Positive(message = "payment.total.positive", groups = {SecondValidationGroup.class})
+    @NotNull(message = "payment.total.notNull", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.PreConditionChecks.class})
+    @Positive(message = "payment.total.positive", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
     private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "payment.method.notNull")
+    @NotNull(message = "payment.method.notNull", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.PreConditionChecks.class})
     private PaymentMethod paymentMethod;
 
+    @Valid
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "token", column = @Column(name = "cardToken")),
@@ -65,6 +50,7 @@ public class Payment {
     })
     private CardDetails cardDetails;
 
+    @Valid
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "token", column = @Column(name = "tokenizedToken")),
@@ -77,8 +63,8 @@ public class Payment {
 
     private LocalDateTime paymentDateTime;
 
-    @NotBlank(message = "payment.transactionalRef.notBlank", groups = {FirstValidationGroup.class})
-    @Size(min = 10, max = 50, message = "payment.transactionalRef.size", groups = {SecondValidationGroup.class})
+    @NotBlank(message = "payment.transactionalRef.notBlank", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.PreConditionChecks.class})
+    @Size(min = 10, max = 50, message = "payment.transactionalRef.size", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
     private String transactionReference;
 
     @PrePersist
