@@ -35,7 +35,6 @@ public class OrderController {
 
     @PostMapping(path = "/tokenized-payment")
     private ResponseEntity<OrderSuccessDto> createOrderWithTokenizedPayment(@RequestBody @Validated(ValidationGroups.FullTokenizedValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
-        logger.info("tokenized payment endpoint here!");
         return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }
 

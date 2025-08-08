@@ -58,7 +58,6 @@ public class PickupDateValidator implements ConstraintValidator<ValidPickupDate,
         }
 
         boolean isValid = new DateRange(earliestPickupDate, latestPickupDate).isWithinRange(pickupDate);
-//        boolean isValid = pickupDate.isAfter(earliestPickupDate) && pickupDate.isBefore(latestPickupDate);
 
         if (! isValid) {
             constraintValidatorContext.disableDefaultConstraintViolation();

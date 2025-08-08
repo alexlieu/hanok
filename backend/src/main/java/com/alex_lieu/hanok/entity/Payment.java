@@ -1,7 +1,6 @@
 package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.enums.PaymentMethod;
-import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import com.alex_lieu.hanok.validation.payment.ValidPaymentDetails;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -24,7 +23,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@ValidPaymentDetails(groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+@ValidPaymentDetails
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,12 +33,12 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private CustomerOrder order;
 
-    @NotNull(message = "payment.total.notNull", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.PreConditionChecks.class})
-    @Positive(message = "payment.total.positive", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+    @NotNull(message = "payment.total.notNull")
+    @Positive(message = "payment.total.positive")
     private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "payment.method.notNull", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.PreConditionChecks.class})
+    @NotNull(message = "payment.method.notNull")
     private PaymentMethod paymentMethod;
 
     @Valid
@@ -63,8 +62,8 @@ public class Payment {
 
     private LocalDateTime paymentDateTime;
 
-    @NotBlank(message = "payment.transactionalRef.notBlank", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.PreConditionChecks.class})
-    @Size(min = 10, max = 50, message = "payment.transactionalRef.size", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+    @NotBlank(message = "payment.transactional-ref.not-blank")
+    @Size(min = 10, max = 50, message = "payment.transactional-ref.size")
     private String transactionReference;
 
     @PrePersist

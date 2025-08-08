@@ -21,7 +21,7 @@ public record PaymentRequestDto(
         @NotNull(message = "{payment.method.notNull}", groups = {ValidationGroups.PaymentChecks.class})
         PaymentMethod paymentMethod,
 
-        @Size(min = 10, max = 200, message = "{payment.token.size}", groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        @Size(min = 10, max = 200, message = "{payment.token.size}", groups = {ValidationGroups.TokenChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String paymentToken,
 
         @Valid

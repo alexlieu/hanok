@@ -1,6 +1,5 @@
 package com.alex_lieu.hanok.entity;
 
-import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
@@ -17,13 +16,13 @@ import lombok.*;
 @EqualsAndHashCode
 @Embeddable
 public class TokenizedPaymentDetails {
-    @NotBlank(message = "tokenized.payment.token.notBlank", groups = {ValidationGroups.TokenChecks.class})
-    @Size(min = 10, max = 100, message = "tokenized.payment.token.size", groups = {ValidationGroups.TokenChecks.class})
+    @NotBlank(message = "tokenized.payment.token.notBlank")
+    @Size(min = 10, max = 100, message = "tokenized.payment.token.size")
     @Column(unique = true, nullable = false)
     private String token;
 
-    @Size(min = 4, max = 4, message = "tokenized.payment.lastFour.size", groups = {ValidationGroups.TokenChecks.class})
-    @Pattern(regexp = "^[0-9]+$", message = "tokenized.payment.lastFour.digits", groups = {ValidationGroups.TokenChecks.class})
+    @Size(min = 4, max = 4, message = "tokenized.payment.lastFour.size")
+    @Pattern(regexp = "^[0-9]+$", message = "tokenized.payment.lastFour.digits")
     private String lastFour;
 
 //    @Override

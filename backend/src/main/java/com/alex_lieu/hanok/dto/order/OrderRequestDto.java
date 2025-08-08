@@ -38,7 +38,7 @@ public record OrderRequestDto(
         @NotNull(message = "{order.payment.not-null}", groups = {ValidationGroups.OrderChecks.class})
         PaymentRequestDto payment,
 
-        @NotNull(message = "{order.pickup-date.notNull}", groups = {ValidationGroups.OrderChecks.class})
+        @NotNull(message = "{order.pickup-date.not-null}", groups = {ValidationGroups.OrderChecks.class})
         @ValidPickupDate(groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         LocalDate pickupDate
 

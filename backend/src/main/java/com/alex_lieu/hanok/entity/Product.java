@@ -38,6 +38,7 @@ public class Product {
     @Size(min = 3, max = 50, message = "{product.name.size}")
     private String name;
 
+    @Builder.Default
     @Column(length = 1000)
     private String description = "";
 
@@ -52,9 +53,11 @@ public class Product {
     @Column(unique = true, nullable = true)
     private String imageUrl;
 
+    @Builder.Default
     @Column(columnDefinition = "boolean default true")
     private Boolean active = true;
 
+    @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // Serializes this side normally.
     @NotNull(message = "{product.variant.notBlank}")

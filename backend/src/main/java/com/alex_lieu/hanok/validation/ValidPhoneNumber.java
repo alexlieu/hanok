@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPhoneNumber {
-    String message() default "Phone number is invalid";
+    String message() default "The provided phone number is not valid for {country}. Please check the number and try again.";
 
     Class<?>[] groups() default {};
 

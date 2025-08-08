@@ -11,7 +11,6 @@ import com.alex_lieu.hanok.entity.TokenizedPaymentDetails;
 import com.alex_lieu.hanok.enums.PaymentMethod;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
 import com.alex_lieu.hanok.payment.MockPaymentGatewayClient;
-import com.alex_lieu.hanok.validation.billing_address.StateProvinceRegionLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ import java.time.format.DateTimeParseException;
 
 @Service
 public class PaymentService {
-    private static final Logger logger = LoggerFactory.getLogger(StateProvinceRegionLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final MockPaymentGatewayClient paymentGatewayClient;
 

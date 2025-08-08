@@ -2,7 +2,6 @@ package com.alex_lieu.hanok.entity;
 
 import com.alex_lieu.hanok.validation.AtLeastOneRequired;
 import com.alex_lieu.hanok.validation.ValidPhoneNumber;
-import com.alex_lieu.hanok.validation.groups.ValidationGroups;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -15,7 +14,6 @@ import org.hibernate.proxy.HibernateProxy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -27,7 +25,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@AtLeastOneRequired(fields = {"email", "phoneNumber"}, message = "{customer.contact.required}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+@AtLeastOneRequired(fields = {"email", "phoneNumber"}, message = "{customer.contact.required}")
 public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,14 +38,14 @@ public class CustomerOrder {
     @ToString.Exclude
     private Person customer;
 
-    @NotBlank(message = "{customer.name.notblank}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.PreConditionChecks.class})
+    @NotBlank(message = "{customer.name.notblank}")
     private String customerName;
 
-    @Email(message = "{email.valid}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.PreConditionChecks.class})
+    @Email(message = "{email.valid}")
     @Column(name = "email")
     private String email;
 
-    @ValidPhoneNumber(groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+    @ValidPhoneNumber
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -63,7 +61,7 @@ public class CustomerOrder {
     //          It tries to create a new instance of the validator by calling its default no-argument constructor <init>()
     //          but since the validator only has a constructor that requires parameter for dependency injection, this fails with a
     //          NoSuchMethodException.
-    @NotNull(message = "order.pickup-date.notNull")
+    @NotNull(message = "order.pickup-date.not-null")
     private LocalDate pickupDate;
 
     private LocalDateTime updatedAt;
@@ -93,7 +91,7 @@ public class CustomerOrder {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @Size(max = 500, message = "{order.special-instructions.size}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+    @Size(max = 500, message = "{order.special-instructions.size}")
     private String specialInstructions;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
@@ -102,7 +100,7 @@ public class CustomerOrder {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @ToString.Exclude
-    private List<OrderItem> orderItems = new ArrayList<>();
+    private List<OrderItem> orderItems;
 
     public BigDecimal getTotal() {
         return orderItems.stream().map(OrderItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -5,7 +5,6 @@ import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
 import com.alex_lieu.hanok.exceptions.product.ProductNotFoundException;
 import com.alex_lieu.hanok.exceptions.product.ProductVariantNotFoundException;
-import com.alex_lieu.hanok.service.OrderExceptions;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -18,7 +17,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
@@ -83,17 +81,6 @@ public class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST.value(),
             ex.getMessage(),
             Instant.now()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(OrderExceptions.InvalidOrderDataException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleInvalidOrderDataException(OrderExceptions.InvalidOrderDataException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                Instant.now()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

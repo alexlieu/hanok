@@ -52,6 +52,7 @@ public class ProductVariant {
     @Enumerated(EnumType.STRING)
     private Size size;
 
+    @Builder.Default
     @Column(columnDefinition = "boolean default true")
     private Boolean active = true;
 

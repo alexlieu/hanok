@@ -10,6 +10,9 @@ import com.alex_lieu.hanok.repository.CustomerOrderRepository;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +21,11 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class OrderProcessingService {
+    private static final Logger logger = LoggerFactory.getLogger(OrderProcessingService.class);
+
     private final ProductService productService;
     private final PersonService personService;
     private final CustomerOrderRepository customerOrderRepository;
@@ -44,7 +50,6 @@ public class OrderProcessingService {
                 .build();
     }
 
-    @Transactional
     public OrderSuccessDto processOrder(OrderRequestDto dto) throws PaymentFailedException, OrderPlacementFailedException {
         Person customer = null;
         if (dto.customerId() != null) {
@@ -82,10 +87,14 @@ public class OrderProcessingService {
             throw new OrderPlacementFailedException(
                     0, dto.customerId(), "Order could not be placed due to a data integrity issue (e.g., duplicate entry)",
                     "DATABASE_CONSTRAINT_VIOLATION", total, "GBP", e);
+        } catch (ConstraintViolationException e) {
+            throw new ConstraintViolationException(e.getConstraintViolations());
         } catch (RuntimeException e) {
             throw new OrderPlacementFailedException(
                     0, dto.customerId(), "An unexpected occured while saving order to the database", "PERSISTENCE_GENERIC_ERROR", total, "GBP", e
             );
         }
+
     }
+
 }
