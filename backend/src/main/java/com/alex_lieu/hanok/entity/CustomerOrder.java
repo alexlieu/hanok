@@ -38,7 +38,7 @@ public class CustomerOrder {
     @ToString.Exclude
     private Person customer;
 
-    @NotBlank(message = "{customer.name.notblank}")
+    @NotBlank(message = "{customer.name.not-blank}")
     private String customerName;
 
     @Email(message = "{email.valid}")

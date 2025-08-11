@@ -34,7 +34,7 @@ public class Product {
     private long id;
 
     @Column(unique=true)
-    @NotNull(message = "{product.name.notBlank}")
+    @NotNull(message = "{product.name.not-blank}")
     @Size(min = 3, max = 50, message = "{product.name.size}")
     private String name;
 
@@ -43,10 +43,10 @@ public class Product {
     private String description = "";
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "{product.category.notBlank}")
+    @NotNull(message = "{product.category.not-blank}")
     private Category category;
 
-    @NotNull(message = "{product.basePrice.notBlank}")
+    @NotNull(message = "{product.basePrice.not-blank}")
     @Min(value = 0, message = "{product.basePrice.min}")
     private BigDecimal basePrice;
 
@@ -60,7 +60,7 @@ public class Product {
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // Serializes this side normally.
-    @NotNull(message = "{product.variant.notBlank}")
+    @NotNull(message = "{product.variant.not-blank}")
     @ToString.Exclude
     private List<ProductVariant> variations = new ArrayList<>();
 

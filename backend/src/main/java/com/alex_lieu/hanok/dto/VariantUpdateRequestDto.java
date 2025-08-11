@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public record VariantUpdateDto(
+public record VariantUpdateRequestDto(
         @Positive(message = "{variant.price.positive}") BigDecimal price,
         @NotNull(message = "{variant.flavour.notnull}") ProductVariant.Flavour flavour,
         @NotNull(message = "{variant.size.notnull}") ProductVariant.Size size,

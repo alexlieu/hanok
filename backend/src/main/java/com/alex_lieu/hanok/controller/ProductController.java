@@ -1,8 +1,8 @@
 package com.alex_lieu.hanok.controller;
 
-import com.alex_lieu.hanok.dto.CategoryCountDto;
-import com.alex_lieu.hanok.dto.ProductListDto;
-import com.alex_lieu.hanok.dto.ProductUpdateDto;
+import com.alex_lieu.hanok.dto.CategoryWithCountDto;
+import com.alex_lieu.hanok.dto.ProductUpdateRequestDto;
+import com.alex_lieu.hanok.dto.ResponseProductDto;
 import com.alex_lieu.hanok.entity.Product;
 import com.alex_lieu.hanok.enums.Category;
 import com.alex_lieu.hanok.enums.FilterPriceRange;
@@ -31,7 +31,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductListDto>> getProducts(
+    public ResponseEntity<List<ResponseProductDto>> getProducts(
             @RequestParam(
                     value = "name",
                     required = false
@@ -70,14 +70,14 @@ public class ProductController {
             FilterPriceRange priceRange = FilterPriceRange.fromString(priceRangeInput);
             BigDecimal effectiveMin = priceRange != null ? priceRange.getMin() : min;
             BigDecimal effectiveMax = priceRange != null ? priceRange.getMax() : max;
-            Comparator<ProductListDto> comparator = searchProductComparator(sortBy, sortDir);
-            List<ProductListDto> productListDtos = productService.searchProducts(category, name, effectiveMin, effectiveMax, available)
-                    .stream().map(ProductListDto::fromProduct).sorted(comparator).toList();
-            return ResponseEntity.ok(productListDtos);
+        Comparator<ResponseProductDto> comparator = searchProductComparator(sortBy, sortDir);
+        List<ResponseProductDto> responseProductsDto = productService.searchProducts(category, name, effectiveMin, effectiveMax, available)
+                .stream().map(ResponseProductDto::fromProduct).sorted(comparator).toList();
+        return ResponseEntity.ok(responseProductsDto);
     }
 
     @GetMapping({"/categories"})
-    public ResponseEntity<List<CategoryCountDto>> getCategories() {
+    public ResponseEntity<List<CategoryWithCountDto>> getCategories() {
         return ResponseEntity.ok(productService.getCategoryCounts());
     }
 
@@ -98,19 +98,19 @@ public class ProductController {
     }
 
     @PatchMapping({"/{id}"})
-    public ResponseEntity<Product> updateProduct(@PathVariable long id, @RequestBody ProductUpdateDto productUpdateDto) {
-        return ResponseEntity.ok(productService.updateProduct(id, productUpdateDto));
+    public ResponseEntity<Product> updateProduct(@PathVariable long id, @RequestBody ProductUpdateRequestDto productUpdateRequestDto) {
+        return ResponseEntity.ok(productService.updateProduct(id, productUpdateRequestDto));
     }
 
-    private Comparator<ProductListDto> searchProductComparator(String sortBy, String sortDir) {
-        Comparator<ProductListDto> comparator = switch (sortBy.toLowerCase()) {
-            case "name" -> Comparator.comparing(ProductListDto::name);
-            case "category" -> Comparator.comparing(ProductListDto::category);
+    private Comparator<ResponseProductDto> searchProductComparator(String sortBy, String sortDir) {
+        Comparator<ResponseProductDto> comparator = switch (sortBy.toLowerCase()) {
+            case "name" -> Comparator.comparing(ResponseProductDto::name);
+            case "category" -> Comparator.comparing(ResponseProductDto::category);
             case "price" -> Comparator.comparing(
                     dto -> dto.priceRange().min(),
                     Comparator.nullsLast(BigDecimal::compareTo)
             );
-            case "newest" -> Comparator.comparingLong(ProductListDto::id).reversed();
+            case "newest" -> Comparator.comparingLong(ResponseProductDto::id).reversed();
             default -> throw new IllegalArgumentException("Invalid sortBy parameter: " + sortBy.toLowerCase());
         };
 

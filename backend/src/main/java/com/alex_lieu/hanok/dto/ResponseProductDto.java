@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * DTO for {@link com.alex_lieu.hanok.entity.Product}
  */
-public record ProductListDto(
+public record ResponseProductDto(
         long id,
         String name,
         String category,
@@ -23,7 +23,7 @@ public record ProductListDto(
             BigDecimal max
     ) implements Serializable {}
 
-    public static ProductListDto fromProduct(Product product) {
+    public static ResponseProductDto fromProduct(Product product) {
         List<BigDecimal> variantPrices = product.getVariations().stream()
                 .map(ProductVariant::getPrice)
                 .toList();
@@ -36,7 +36,7 @@ public record ProductListDto(
                 .max(BigDecimal::compareTo)
                 .orElse(product.getBasePrice());
 
-        return new ProductListDto(
+        return new ResponseProductDto(
                 product.getId(),
                 product.getName(),
                 product.getCategory().getDisplayName(),

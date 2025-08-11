@@ -14,11 +14,11 @@ import java.math.BigDecimal;
 
 @ValidPaymentDetailsDto(groups = {ValidationGroups.PaymentChecks.class, ValidationGroups.FormatAndLogicChecks.class})
 public record PaymentRequestDto(
-        @NotNull(message = "{payment.total.notNull}", groups = {ValidationGroups.PaymentChecks.class})
+        @NotNull(message = "{payment.total.not-null}", groups = {ValidationGroups.PaymentChecks.class})
         @PositiveOrZero(message = "{payment.total.positive}", groups = {ValidationGroups.PaymentChecks.class})
         BigDecimal total,
 
-        @NotNull(message = "{payment.method.notNull}", groups = {ValidationGroups.PaymentChecks.class})
+        @NotNull(message = "{payment.method.not-null}", groups = {ValidationGroups.PaymentChecks.class})
         PaymentMethod paymentMethod,
 
         @Size(min = 10, max = 200, message = "{payment.token.size}", groups = {ValidationGroups.TokenChecks.class, ValidationGroups.FormatAndLogicChecks.class})

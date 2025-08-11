@@ -33,12 +33,12 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private CustomerOrder order;
 
-    @NotNull(message = "payment.total.notNull")
+    @NotNull(message = "payment.total.not-null")
     @Positive(message = "payment.total.positive")
     private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "payment.method.notNull")
+    @NotNull(message = "payment.method.not-null")
     private PaymentMethod paymentMethod;
 
     @Valid

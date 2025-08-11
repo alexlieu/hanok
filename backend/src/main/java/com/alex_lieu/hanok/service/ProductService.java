@@ -1,21 +1,20 @@
 package com.alex_lieu.hanok.service;
 
-import com.alex_lieu.hanok.dto.CategoryCountDto;
-import com.alex_lieu.hanok.dto.ProductUpdateDto;
-import com.alex_lieu.hanok.dto.VariantUpdateDto;
+import com.alex_lieu.hanok.dto.CategoryWithCountDto;
+import com.alex_lieu.hanok.dto.ProductUpdateRequestDto;
+import com.alex_lieu.hanok.dto.VariantUpdateRequestDto;
 import com.alex_lieu.hanok.entity.Product;
 import com.alex_lieu.hanok.entity.ProductVariant;
 import com.alex_lieu.hanok.enums.Category;
+import com.alex_lieu.hanok.exceptions.product.ProductCreateFailedException;
 import com.alex_lieu.hanok.exceptions.product.ProductNotFoundException;
+import com.alex_lieu.hanok.exceptions.product.ProductUpdateFailedException;
 import com.alex_lieu.hanok.exceptions.product.ProductVariantNotFoundException;
 import com.alex_lieu.hanok.repository.ProductRepository;
 import com.alex_lieu.hanok.repository.ProductVariantRepository;
-import jakarta.persistence.PersistenceException;
-import jakarta.validation.ConstraintViolationException;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,14 +80,12 @@ public class ProductService {
             }
             return productRepository.save(product);
         } catch (DataAccessException e) {
-            throw new RuntimeException("Error while saving product: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid product data: " + e.getMessage());
+            throw new ProductCreateFailedException("Failed to create product", e);
         }
     }
 
     @Transactional
-    public Product updateProduct(long id, ProductUpdateDto updateDto) {
+    public Product updateProduct(long id, ProductUpdateRequestDto updateDto) {
         Product product = getProductById(id);
 
         if (updateDto.name() != null) product.setName(updateDto.name());
@@ -108,20 +105,12 @@ public class ProductService {
 
         try {
             return productRepository.save(product);
-        } catch (DataIntegrityViolationException ex) {
-           throw new IllegalStateException("Database integrity violation: " + ex.getMessage(), ex);
-        } catch (ConstraintViolationException ex) {
-            throw new IllegalStateException("Constraint violation occured: " + ex.getMessage(), ex);
-        } catch (PersistenceException ex) {
-            Throwable cause = ex.getCause();
-            if (cause != null && cause.getMessage().contains("unique")) {
-                throw new IllegalStateException("Duplicate entry detected", ex);
-            }
-            throw new IllegalStateException("An unexpected persistence error occurred", ex);
+        } catch (DataAccessException ex) {
+            throw new ProductUpdateFailedException(String.valueOf(id));
         }
     }
 
-    public void updateVariants(Product product, List<VariantUpdateDto> variantUpdateDtos) {
+    public void updateVariants(Product product, List<VariantUpdateRequestDto> variantUpdateRequestsDto) {
         // Create a map of existing variants using a composite key of size and flavour
         Map<VariantKey, ProductVariant> existingVariants = product.getVariations().stream()
                 .collect(Collectors.toMap(
@@ -132,20 +121,20 @@ public class ProductService {
 
         Set<VariantKey> processedVariants = new HashSet<>();
 
-        for (VariantUpdateDto variantUpdateDto : variantUpdateDtos) {
-            if (variantUpdateDto.size() == null || variantUpdateDto.flavour() == null) {
+        for (VariantUpdateRequestDto variantUpdateRequestDto : variantUpdateRequestsDto) {
+            if (variantUpdateRequestDto.size() == null || variantUpdateRequestDto.flavour() == null) {
                 throw new IllegalArgumentException
                         ("Product Variants cannot be updated or created with null values for flavour and size.");
             };
-            VariantKey key = new VariantKey(variantUpdateDto.size(), variantUpdateDto.flavour());
+            VariantKey key = new VariantKey(variantUpdateRequestDto.size(), variantUpdateRequestDto.flavour());
             ProductVariant variant = existingVariants.get(key);
 
             if (variant != null) {
                 // Update existing variant
-                updateVariantFromDto(variant, variantUpdateDto);
+                updateVariantFromDto(variant, variantUpdateRequestDto);
             } else {
                 // Create new variant
-                ProductVariant newVariant = createVariantFromDto(product, variantUpdateDto);
+                ProductVariant newVariant = createVariantFromDto(product, variantUpdateRequestDto);
                 product.getVariations().add(newVariant);
             }
             processedVariants.add(key);
@@ -162,14 +151,14 @@ public class ProductService {
 
     private record VariantKey(ProductVariant.Size size, ProductVariant.Flavour flavour) {}
 
-    private void updateVariantFromDto(ProductVariant variant, VariantUpdateDto dto) {
+    private void updateVariantFromDto(ProductVariant variant, VariantUpdateRequestDto dto) {
         // Use current Product Variant value if no value is given for a field
         if (dto.price() != null) variant.setPrice(dto.price());
         if (dto.active() != null) variant.setActive(dto.active());
         if (dto.available() != null) variant.setAvailable(dto.available());
     }
 
-    private ProductVariant createVariantFromDto(Product product, VariantUpdateDto dto) {
+    private ProductVariant createVariantFromDto(Product product, VariantUpdateRequestDto dto) {
         if (dto.price() == null) throw new IllegalArgumentException("Price is required when creating a new product variant.");
         return ProductVariant.builder()
                 .product(product)
@@ -195,7 +184,7 @@ public class ProductService {
         return productRepository.searchProducts(category, name, minPrice, maxPrice, available, true);
     }
 
-    public List<CategoryCountDto> getCategoryCounts() {
+    public List<CategoryWithCountDto> getCategoryCounts() {
         try {
             long activeProductsTotal = productRepository.countAllActiveProducts();
             Map<Category, Long> counts = productRepository.countProductsGroupByCategory()
@@ -216,9 +205,9 @@ public class ProductService {
 //            }
 
             return Stream.concat(
-                Stream.of(new CategoryCountDto(null, "All", activeProductsTotal)),
+                    Stream.of(new CategoryWithCountDto(null, "All", activeProductsTotal)),
                 Arrays.stream(Category.values())
-                .map(category -> new CategoryCountDto(
+                        .map(category -> new CategoryWithCountDto(
                         category,
                         category.getDisplayName(),
                         counts.getOrDefault(category, 0L)
