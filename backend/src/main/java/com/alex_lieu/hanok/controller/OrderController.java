@@ -1,9 +1,11 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.dto.basket.GetBasketResponseDto;
 import com.alex_lieu.hanok.dto.order.OrderRequestDto;
 import com.alex_lieu.hanok.dto.order.OrderSuccessDto;
 import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
+import com.alex_lieu.hanok.service.BasketService;
 import com.alex_lieu.hanok.service.OrderProcessingService;
 import com.alex_lieu.hanok.validation.billing_address.StateProvinceRegionLogic;
 import com.alex_lieu.hanok.validation.groups.ValidationGroups;
@@ -15,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "http://localhost:5173/")
@@ -22,10 +26,12 @@ public class OrderController {
     private static final Logger logger = LoggerFactory.getLogger(StateProvinceRegionLogic.class);
 
     private final OrderProcessingService orderProcessingService;
+    private final BasketService basketService;
 
     @Autowired
-    public OrderController(OrderProcessingService orderProcessingService) {
+    public OrderController(OrderProcessingService orderProcessingService, BasketService basketService) {
         this.orderProcessingService = orderProcessingService;
+        this.basketService = basketService;
     }
 
     @PostMapping(path = "/card-payment")
@@ -36,6 +42,14 @@ public class OrderController {
     @PostMapping(path = "/tokenized-payment")
     private ResponseEntity<OrderSuccessDto> createOrderWithTokenizedPayment(@RequestBody @Validated(ValidationGroups.FullTokenizedValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
+    }
+
+    @GetMapping(path = "/basket")
+    private ResponseEntity<GetBasketResponseDto> getBasket(
+            @RequestParam("itemIds") List<Long> itemIds,
+            @RequestParam("quantities") List<Integer> quantities
+    ) {
+        return ResponseEntity.ok(basketService.getBasket(itemIds, quantities));
     }
 
 //    @GetMapping
@@ -75,13 +89,6 @@ public class OrderController {
 //        return comparator;
 //    }
 //
-//    @GetMapping(path = "/basket")
-//    private ResponseEntity<BasketResponseDto> getBasket(
-//            @RequestParam("itemIds") List<Long> itemIds,
-//            @RequestParam("quantities") List<Integer> quantities
-//    ) {
-//        return ResponseEntity.ok(orderService.getBasket(itemIds, quantities));
-//    }
 
 //    @PostMapping
 //    private ResponseEntity<?> placeOrder(@Valid @RequestBody OrderCreateDto order) {
