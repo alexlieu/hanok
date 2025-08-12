@@ -10,6 +10,7 @@ import {
   productsByCategoryLoader,
   productLoader,
   basketLoader,
+  checkoutLoader,
 } from "./utils/loader";
 import "./App.css";
 import BasketPage from "./pages/Basket";
@@ -51,7 +52,7 @@ const router = createBrowserRouter([
       {
         path: "checkout",
         element: <CheckoutPage />,
-        loader: basketLoader,
+        loader: checkoutLoader,
       },
     ],
   },

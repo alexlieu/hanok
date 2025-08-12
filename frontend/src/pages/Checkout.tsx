@@ -1,14 +1,18 @@
 import { Navigate, useLoaderData } from "react-router-dom";
-import { BasketResponse } from "../types/BasketTypes";
+// import { BasketResponse } from "../types/BasketTypes";
 import OrderSummary from "../components/checkout/OrderSummary";
 import PickupMap from "../components/checkout/PickupMap";
 import CheckoutForm from "../components/checkout/CheckoutForm";
 import { useMediaQuery } from "../utils/hooks/useWindowDimensions";
 import { AccordianItem } from "../components/ui/AccordianItem";
 import { useState } from "react";
+import { CheckoutRequiredData } from "../types/CheckoutType";
 
 const CheckoutPage: React.FC = () => {
-  const { items, total }: BasketResponse = useLoaderData();
+  const {
+    basketContent: { items, total },
+  } = useLoaderData() as CheckoutRequiredData;
+  // const { items, total }: BasketResponse = useLoaderData();
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   if (items.length <= 0 && total <= 0) {

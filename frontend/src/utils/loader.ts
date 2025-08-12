@@ -3,7 +3,10 @@ import { LoaderData } from "../types/ProductListView";
 import { ProductView } from "../types/ProductListView";
 import { productInfo } from "../types/ProductDetailView";
 import { BasketResponse, BasketItem } from "../types/BasketTypes";
+import { CheckoutRequiredData } from "../types/CheckoutType";
+import getBasketFromLocalStorage from "./getBasketFromLocalStorage";
 import getBasketResponse from "./api/basketApi";
+import getPickupRules from "./api/checkoutApi";
 
 export const productsLoader = async (): Promise<LoaderData> => {
   try {
@@ -72,23 +75,7 @@ export const productLoader = async ({
 };
 
 export const basketLoader = async (): Promise<BasketResponse> => {
-  let basketItems: BasketItem[] = [];
-
-  try {
-    const storedBasket = localStorage.getItem("guestBasket");
-    if (storedBasket) {
-      const parsedState = JSON.parse(storedBasket);
-      if (parsedState && Array.isArray(parsedState.items)) {
-        basketItems = parsedState.items;
-      }
-    }
-  } catch (error) {
-    console.error(
-      "Failed to parse basket items from localStorage in loader",
-      error
-    );
-    localStorage.removeItem("guestBasket");
-  }
+  const basketItems: BasketItem[] = getBasketFromLocalStorage();
 
   if (basketItems.length === 0) {
     return { items: [], total: 0 };
@@ -103,6 +90,34 @@ export const basketLoader = async (): Promise<BasketResponse> => {
     return response;
   } catch (error) {
     console.error("Error loading basket items from backend in loader", error);
+    throw error;
+  }
+};
+
+export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
+  const basketItems = getBasketFromLocalStorage();
+
+  if (basketItems.length === 0) {
+    return {
+      pickupRules: null,
+      basketContent: { items: [], total: 0 },
+    };
+  }
+
+  const ids = basketItems.map((item) => item.variantId);
+  const quantities = basketItems.map((item) => item.quantity);
+
+  try {
+    const [basketResponse, pickupRulesResponse] = await Promise.all([
+      await getBasketResponse(ids, quantities),
+      await getPickupRules(),
+    ]);
+    return {
+      pickupRules: pickupRulesResponse,
+      basketContent: basketResponse,
+    };
+  } catch (error) {
+    console.error("Error fetching checkout data: ", error);
     throw error;
   }
 };
