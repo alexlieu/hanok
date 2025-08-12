@@ -11,6 +11,8 @@ import useProductVariationDetails from "../utils/hooks/features/product/useProdu
 import useOrderSelection from "../utils/hooks/features/product/useOrderSelection";
 import useAddToBasket from "../utils/hooks/useAddToBasket";
 
+const divideStyle = "border-t-2 pt-1";
+
 const ProductPage: React.FC = () => {
   const info = useLoaderData<productInfo>();
   const { sizes, flavours, getPrice } = useProductVariationDetails(
@@ -19,15 +21,67 @@ const ProductPage: React.FC = () => {
   const { price, selectedOptions, handleOptionSelect } =
     useOrderSelection(getPrice);
 
-  const { addToBasket, handleAddToBasket } = useAddToBasket(
+  const { handleAddToBasket } = useAddToBasket(
     selectedOptions,
+    info.name,
     info.variations
   );
 
   return (
-    <>
-      <ProductBreadcrumb category={info.category} />
-      <div className="grid grid-cols-2">
+    <div className="flex flex-col m-auto md:flex-row max-w-7xl">
+      <div className="pt-5 md:w-[50vw]">
+        <ProductBreadcrumb
+          product={info.name}
+          category={info.category}
+          className="pl-10 pb-3 md:pl-0 font-semibold uppercase flex flex-row"
+        />
+        <ProductImage className="mx-10" image={info.imageUrl} />
+      </div>
+      <div className="mx-5 p-5 md:pt-5 md:w-[50vw] md:mt-10">
+        <ProductHeader
+          name={info.name}
+          which={"title"}
+          titleClass="text-4xl font-semibold"
+        />
+        {price !== null && price !== undefined && (
+          <p className="text-4xl w-fit pt-1">{formatPrice(price)}</p>
+        )}
+        <div className="space-y-2 mt-5">
+          <OptionSelector
+            type="flavour"
+            options={flavours}
+            selected={selectedOptions.flavour}
+            onSelect={handleOptionSelect("flavour")}
+            className={`${divideStyle}`}
+          />
+          <OptionSelector
+            type="size"
+            options={sizes}
+            selected={selectedOptions.size}
+            onSelect={handleOptionSelect("size")}
+            className={`${divideStyle}`}
+          />
+          <QuantitySelector
+            max={10}
+            selected={selectedOptions.quantity}
+            onSelect={handleOptionSelect("quantity")}
+            className={`${divideStyle}`}
+          />
+        </div>
+
+        <AddToBasketButton
+          onClick={handleAddToBasket}
+          selection={selectedOptions}
+          product={info.name}
+        />
+        <ProductHeader
+          name={info.name}
+          description={info.description}
+          which={"description"}
+          descriptionClass={`text-[1.2em]`}
+        />
+      </div>
+      {/* <div className="flex flex-col md:flex-row">
         <ProductImage image={info.imageUrl} />
         <div className={`grid grid-rows-7`}>
           <div>
@@ -57,15 +111,18 @@ const ProductPage: React.FC = () => {
             />
           </div>
           <div>
-            <AddToBasketButton onClick={handleAddToBasket} />
+            <AddToBasketButton
+              onClick={handleAddToBasket}
+              selection={selectedOptions}
+              product={info.name}
+            />
           </div>
           {price !== null && price !== undefined && (
             <p className="text-xl">{formatPrice(price)}</p>
           )}
-          {addToBasket && <p>{`${addToBasket.id}*${addToBasket.quantity}`}</p>}
         </div>
-      </div>
-    </>
+      </div> */}
+    </div>
   );
 };
 

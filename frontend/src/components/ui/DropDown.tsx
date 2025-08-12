@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { easeInOutExpo } from "../../utils/ease";
 
 type DropDownProps = {
   options: string[];
   handleSelect: (option: string) => void;
   currentSort: string;
+  className?: string;
 };
 const DropDown: React.FC<DropDownProps> = ({
   options,
   handleSelect,
   currentSort,
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options[0]);
@@ -31,44 +35,54 @@ const DropDown: React.FC<DropDownProps> = ({
   }, []);
 
   return (
-    <div>
+    <div className="relative">
       <button
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className={`text-[1.1em]`}
+        className={`text-[1em] min-w-50 w-auto text-right`}
       >
-        Sort by: {selectedOption}
+        Sort
       </button>
-      {isOpen && (
-        <ul
-          ref={dropdownRef}
-          role="listbox"
-          tabIndex={-1}
-          aria-activedescendant={selectedOption}
-          className={`absolute gap-3`}
-        >
-          {options.map((option) => (
-            <li
-              key={option}
-              role="option"
-              tabIndex={0}
-              aria-selected={option === selectedOption}
-              onClick={() => {
-                setSelectedOption(option);
-                setIsOpen(false);
-                handleSelect(option);
-              }}
-              className={`text-[1.1em] ${
-                currentSort === option && `bg-gray-200`
-              }`}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className={`absolute -left-[16px] w-[calc(100%+32px)] pr-[16px] overflow-hidden ${className}`}
+          >
+            <motion.ul
+              ref={dropdownRef}
+              role="listbox"
+              tabIndex={-1}
+              aria-activedescendant={selectedOption}
+              className={`flex flex-col gap-2 py-2 bg-white`}
+              initial={{ y: "-100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "-100%" }}
+              transition={{ ease: easeInOutExpo }}
             >
-              {option}
-            </li>
-          ))}
-        </ul>
-      )}
+              {options.map((option) => (
+                <li
+                  key={option}
+                  role="option"
+                  tabIndex={0}
+                  aria-selected={option === selectedOption}
+                  onClick={() => {
+                    setSelectedOption(option);
+                    setIsOpen(false);
+                    handleSelect(option);
+                  }}
+                  className={`text-[.7em] text-right ${
+                    currentSort === option && `text-blue-600 opacity-80`
+                  }`}
+                >
+                  {option}
+                </li>
+              ))}
+            </motion.ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

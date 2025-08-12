@@ -1,14 +1,18 @@
 export const formatPrice = (value: number): string => {
-    const roundedValue = Math.round(value * 100) / 100;
-    const formattedValue = roundedValue.toFixed(2);
-    return `£${formattedValue}`;
+  // const roundedValue = Math.round(value * 100) / 100;
+  // const formattedValue = roundedValue.toFixed(2);
+  // return `£${formattedValue}`;
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(value);
 };
 
 export const formatNameToSlug = (name: string) => {
-    return Array.from(name.toLowerCase().split(' ')).join('-');
-}
+  return Array.from(name.toLowerCase().split(" ")).join("-");
+};
 
 export const formatPriceRange = (min: number, max: number) => {
-    if (min === max)  return formatPrice(min); 
-    return `${formatPrice(min)} - ${formatPrice(max)}`
-}
+  if (min === max) return formatPrice(min);
+  return `${formatPrice(min)} - ${formatPrice(max)}`;
+};

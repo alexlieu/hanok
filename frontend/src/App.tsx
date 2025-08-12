@@ -9,9 +9,11 @@ import {
   productsLoader,
   productsByCategoryLoader,
   productLoader,
+  basketLoader,
 } from "./utils/loader";
 import "./App.css";
-
+import BasketPage from "./pages/Basket";
+import CheckoutPage from "./pages/Checkout";
 
 const router = createBrowserRouter([
   {
@@ -21,26 +23,35 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       {
-        path: 'products', 
-        id: 'all-products',
+        path: "products",
+        id: "all-products",
         loader: productsLoader,
         children: [
           {
             index: true,
-            element: < ProductsPage />,
+            element: <ProductsPage />,
           },
           {
-            path: ':categorySlug',
-            element: < ProductsPage />,
+            path: ":categorySlug",
+            element: <ProductsPage />,
             loader: productsByCategoryLoader,
-
           },
           {
-            path: ':categorySlug/:productSlug',
-            element: < ProductPage />,
+            path: ":categorySlug/:productSlug",
+            element: <ProductPage />,
             loader: productLoader,
           },
-        ]
+        ],
+      },
+      {
+        path: "basket",
+        element: <BasketPage />,
+        loader: basketLoader,
+      },
+      {
+        path: "checkout",
+        element: <CheckoutPage />,
+        loader: basketLoader,
       },
     ],
   },

@@ -1,1 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dongle:wght@300;400;700&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap');
 @import "tailwindcss";
+
+:root {
+    --focus-border-color: rgba(72, 142, 254, 0.763);
+    --focus-glow-color: #bbdafa;
+}
+
+@theme {
+    --font-m-plus: "M PLUS Rounded 1c", "sans-serif";
+    --font-dongle: Dongle, "sans-serif";
+    --font-outfit: Outfit, "sans-serif";
+    --font-dm-sans: DM Sans, "sans-serif";
+    --font-quicksand: Quicksand, "sans-serif";
+    --font-jost: Jost, "sans-serif";
+    --font-wix-madefor: Wix Madefor, "sans-serif";
+    --color-error-red: #c03d1a;
+    --color-default-bg: #F7F8F4;
+    --color-brand-focus: #8ba888;
+    --color-brand-colour-1: #D0A49E;
+    --color-brand-colour-2: #987998;
+}
+
+.form-error {
+    @apply text-red-500;
+}
+
+.input-focus-base {
+    @apply focus:outline-none focus:relative focus:z-10;
+    transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.form-input-base {
+    @apply px-2 py-1 border-2 focus:outline-none focus:relative focus:z-100;
+    transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.form-input-base:focus, .input-focus-base:focus {
+    /* border-color: var(--color-brand-focus-border);
+    box-shadow: 0 0 3px 3px #bddbba; */
+    @apply ring-3 ring-brand-focus/50 ring-offset-1
+}
+
+.noninput-focus-styling {
+    /* border-color: var(--focus-border-color);
+    box-shadow: 0 0 3px 3px var(--focus-glow-color); */
+    @apply outline-none ring-3 ring-brand-focus/50 ring-offset-1
+}

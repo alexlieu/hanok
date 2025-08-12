@@ -1,72 +1,105 @@
 package com.alex_lieu.hanok.controller;
 
-import com.alex_lieu.hanok.dto.OrderCreateDto;
-import com.alex_lieu.hanok.dto.OrderUpdateDto;
-import com.alex_lieu.hanok.dto.OrderViewDto;
-import com.alex_lieu.hanok.entity.CustomerOrder;
-import com.alex_lieu.hanok.service.OrderService;
+import com.alex_lieu.hanok.dto.basket.GetBasketResponseDto;
+import com.alex_lieu.hanok.dto.order.OrderRequestDto;
+import com.alex_lieu.hanok.dto.order.OrderSuccessDto;
+import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
+import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
+import com.alex_lieu.hanok.service.BasketService;
+import com.alex_lieu.hanok.service.OrderProcessingService;
+import com.alex_lieu.hanok.validation.billing_address.StateProvinceRegionLogic;
+import com.alex_lieu.hanok.validation.groups.ValidationGroups;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.*;
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class OrderController {
-    private final OrderService orderService;
+    private static final Logger logger = LoggerFactory.getLogger(StateProvinceRegionLogic.class);
+
+    private final OrderProcessingService orderProcessingService;
+    private final BasketService basketService;
 
     @Autowired
-    public OrderController(OrderService orderService) { this.orderService = orderService; }
-
-    @GetMapping
-    public ResponseEntity<List<OrderViewDto>> filterOrders(
-            @RequestParam(value = "CID", required = false) Long customerId,
-            @RequestParam(value = "OS", required = false) CustomerOrder.OrderStatus orderStatus,
-            @RequestParam(value = "OTS", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime orderStart,
-            @RequestParam(value = "OTE", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime orderEnd,
-            @RequestParam(value = "PTS", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime pickupStart,
-            @RequestParam(value = "PTE", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime pickupEnd,
-            @RequestParam(value = "sortBy", defaultValue = "pt", required = false) String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
-            ) {
-        List<OrderViewDto> orderDtos = orderService.filterAll(customerId, orderStatus, orderStart, orderEnd, pickupStart, pickupEnd);
-        return ResponseEntity.ok(orderDtos.stream().sorted(sortOrderComparator(sortBy, sortDir)).toList());
+    public OrderController(OrderProcessingService orderProcessingService, BasketService basketService) {
+        this.orderProcessingService = orderProcessingService;
+        this.basketService = basketService;
     }
 
-    private Comparator<OrderViewDto> sortOrderComparator(String sortBy, String sortDir) {
-        Comparator<OrderViewDto> comparator = switch (sortBy.toLowerCase()) {
-            case "cid" -> Comparator.comparing(o -> o.customerDto().id());
-            case "os" -> Comparator.comparing(OrderViewDto::orderStatus);
-            case "pt" -> Comparator.comparing(OrderViewDto::pickupDateTime);
-            case "ot" -> Comparator.comparing(OrderViewDto::orderDateTime);
-            default -> throw new IllegalArgumentException( "Invalid sortBy parameter: " + sortBy.toLowerCase());
-        };
-
-        if (sortDir.equalsIgnoreCase("desc")) comparator = comparator.reversed();
-
-        return comparator;
+    @PostMapping(path = "/card-payment")
+    private ResponseEntity<OrderSuccessDto> createOrderWithCardPayment(@RequestBody @Validated(ValidationGroups.FullCardValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }
 
-    @PostMapping
-    private ResponseEntity<OrderViewDto> placeOrder(@RequestBody OrderCreateDto order) {
-        return ResponseEntity.ok(orderService.placeOrder(order));
+    @PostMapping(path = "/tokenized-payment")
+    private ResponseEntity<OrderSuccessDto> createOrderWithTokenizedPayment(@RequestBody @Validated(ValidationGroups.FullTokenizedValidationSequence.class) OrderRequestDto order) throws OrderPlacementFailedException, PaymentFailedException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderProcessingService.processOrder(order));
     }
 
-    @PatchMapping("/{id}")
-    private ResponseEntity<OrderViewDto> updateOrder(@PathVariable long id, @RequestBody OrderUpdateDto updateDto) {
-        return ResponseEntity.ok(orderService.updateOrder(id, updateDto));
+    @GetMapping(path = "/basket")
+    private ResponseEntity<GetBasketResponseDto> getBasket(
+            @RequestParam("itemIds") List<Long> itemIds,
+            @RequestParam("quantities") List<Integer> quantities
+    ) {
+        return ResponseEntity.ok(basketService.getBasket(itemIds, quantities));
     }
+
+//    @GetMapping
+//    public ResponseEntity<List<OrderViewDto>> filterOrders(
+//            @RequestParam(value = "CID", required = false) Long customerId,
+//            @RequestParam(value = "OS", required = false) CustomerOrder.OrderStatus orderStatus,
+//            @RequestParam(value = "OTS", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+//            LocalDateTime orderStart,
+//            @RequestParam(value = "OTE", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+//            LocalDateTime orderEnd,
+//            @RequestParam(value = "PTS", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+//            LocalDateTime pickupStart,
+//            @RequestParam(value = "PTE", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+//            LocalDateTime pickupEnd,
+//            @RequestParam(value = "sortBy", defaultValue = "pt", required = false) String sortBy,
+//            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir
+//            ) {
+//        List<OrderViewDto> orderDtos = orderService.filterAll(customerId, orderStatus, orderStart, orderEnd, pickupStart, pickupEnd);
+//        return ResponseEntity.ok(orderDtos.stream().sorted(sortOrderComparator(sortBy, sortDir)).toList());
+//    }
+
+//    private Comparator<OrderViewDto> sortOrderComparator(String sortBy, String sortDir) {
+//        Comparator<OrderViewDto> comparator = switch (sortBy.toLowerCase()) {
+//            case "cid" -> Comparator.comparing(o -> o.customerDto().id());
+//            case "os" -> Comparator.comparing(OrderViewDto::orderStatus);
+//            case "pt" -> Comparator.comparing(OrderViewDto::pickupDate);
+//            case "ot" -> Comparator.comparing(OrderViewDto::orderDateTime);
+//            default -> throw new IllegalArgumentException( "Invalid sortBy parameter: " + sortBy.toLowerCase());
+//        };
+//
+//        if (sortDir.equalsIgnoreCase("desc")) comparator = comparator.reversed();
+//
+//        return comparator;
+//    }
+//
+
+//    @PostMapping
+//    private ResponseEntity<?> placeOrder(@Valid @RequestBody OrderCreateDto order) {
+//        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(order));
+//    }
+
+
+//
+//    @PatchMapping("/{id}")
+//    private ResponseEntity<OrderViewDto> updateOrder(@PathVariable long id, @RequestBody OrderUpdateDto updateDto) {
+//        return ResponseEntity.ok(orderService.updateOrder(id, updateDto));
+//    }
 
 }

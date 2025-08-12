@@ -36,10 +36,10 @@ INSERT INTO product_variant (product_id, price, size, flavour, active, available
     (6, 16, 'REGULAR', 'PLAIN', false, false);
 
 -- Populate CustomerOrder table
-INSERT INTO customer_order (customer_id, order_status, order_date_time, pickup_date_time) VALUES
-    (1, 'PENDING', '2025-03-08T10:00:00', '2025-03-08T14:00:00'),
-    (1, 'PREPARING', '2025-03-09T10:00:00', '2025-03-10T14:00:00'),
-    (2, 'COMPLETED', '2025-03-07T11:00:00', '2025-03-07T15:00:00');
+INSERT INTO customer_order (customer_id, customer_name, order_status, order_date_time, pickup_date)
+VALUES (1, 'Irving B.', 'PENDING', '2025-03-08T10:00:00', '2025-03-08'),
+       (1, 'Irving B.', 'PREPARING', '2025-03-09T10:00:00', '2025-03-10'),
+       (2, 'Dylan G.', 'COMPLETED', '2025-03-07T11:00:00', '2025-03-07');
 
 -- Populate OrderItem table
 INSERT INTO order_item (order_id, variant_id, quantity, unit_price) VALUES

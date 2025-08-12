@@ -37,21 +37,22 @@ public class ProductVariant {
     @JsonBackReference // Omits this side from serialization.
     private Product product;
 
-    @NotNull(message = "{variant.price.notblank}")
+    @NotNull(message = "{variant.price.not-blank}")
     @Min(value = 0, message = "{variant.price.min}")
     private BigDecimal price;
 
     @Column(columnDefinition = "boolean default true")
     private boolean available;
 
-    @NotNull(message = "{variant.flavour.notblank}")
+    @NotNull(message = "{variant.flavour.not-null}")
     @Enumerated(EnumType.STRING)
     private Flavour flavour;
 
-    @NotNull(message = "{variant.size.notblank}")
+    @NotNull(message = "{variant.size.not-null}")
     @Enumerated(EnumType.STRING)
     private Size size;
 
+    @Builder.Default
     @Column(columnDefinition = "boolean default true")
     private Boolean active = true;
 
