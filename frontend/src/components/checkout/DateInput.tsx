@@ -1,11 +1,13 @@
 import { UseFormRegister, Path, FieldErrors } from "react-hook-form";
 import { FormData } from "../../schemas/CheckoutFormSchema";
 import {
-  formatDateString,
   getFirstValidDate,
   getLastValidDate,
 } from "../../validator/PickupDateValidator";
 import FormError from "./ErrorMessage";
+import { useLoaderData } from "react-router-dom";
+import { CheckoutRequiredData } from "../../types/CheckoutType";
+import { format } from "date-fns";
 
 type DateInputProps = {
   name: Path<FormData>;
@@ -20,6 +22,29 @@ const DateInput: React.FC<DateInputProps> = ({
   displayLabel,
   errors,
 }) => {
+  const {
+    pickupRules: {
+      requiredLeadDays,
+      maxMonth,
+      cutOffHour,
+      cutOffMin,
+      holidayRanges,
+      timezone,
+    },
+  } = useLoaderData() as CheckoutRequiredData;
+  console.log(holidayRanges);
+  const firstValidDate = getFirstValidDate(
+    requiredLeadDays,
+    cutOffHour,
+    cutOffMin,
+    timezone
+  );
+  const lastValidDate = getLastValidDate(
+    maxMonth,
+    cutOffHour,
+    cutOffMin,
+    timezone
+  );
   return (
     <div className="flex flex-col">
       <label htmlFor={name}>{displayLabel}</label>
@@ -37,8 +62,8 @@ const DateInput: React.FC<DateInputProps> = ({
             return date.toISOString();
           },
         })}
-        min={formatDateString(getFirstValidDate())}
-        max={formatDateString(getLastValidDate())}
+        min={format(firstValidDate, "yyyy-MM-dd")}
+        max={format(lastValidDate, "yyyy-MM-dd")}
       />
       <FormError name="pickup" errors={errors} />
     </div>

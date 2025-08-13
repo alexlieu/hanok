@@ -2,17 +2,12 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { AiOutlineShop } from "react-icons/ai";
 import { useEffect, useState } from "react";
-import { useLoaderData } from "react-router-dom";
-import { CheckoutRequiredData } from "../../types/CheckoutType";
 
 const position: [number, number] = [51.40313097396538, -0.2730678337183401];
 const maxZoom = 18;
 const minZoom = 10;
 
 const PickupMap: React.FC = () => {
-  const { pickupRules } = useLoaderData() as CheckoutRequiredData;
-  console.log(pickupRules);
-
   function MapControls() {
     const map = useMap();
     const [currentZoom, setCurrentZoom] = useState(map.getZoom());

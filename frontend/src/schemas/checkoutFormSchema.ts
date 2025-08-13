@@ -30,7 +30,9 @@ export const CheckoutSchema = z
     }),
     pickup: z.iso
       .datetime("Please select your preferred pickup date.")
-      .refine((val) => isPickupValid(val), { error: "Invalid pickup date." }),
+      .refine((val) => isPickupValid(val, 3, 3, 14, 0, "Europe/London"), {
+        error: "Invalid pickup date.",
+      }),
     smsUpdate: z.boolean().optional(),
     emailUpdate: z.boolean().optional(),
     specialInstructions: z.string().nullable(),

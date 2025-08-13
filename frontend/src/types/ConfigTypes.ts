@@ -5,4 +5,5 @@ export type PickupRules = {
   maxMonth: number;
   timezone: string;
   holidayRanges: { start: Date; end: Date }[];
+  receivedAt: Date;
 };

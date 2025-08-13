@@ -27,6 +27,7 @@ const getPickupRules = async (): Promise<PickupRules> => {
     const convertedRules: PickupRules = {
       ...data,
       holidayRanges: convertedHolidayRanges,
+      receivedAt: new Date(),
     };
     return convertedRules;
   } catch (error) {

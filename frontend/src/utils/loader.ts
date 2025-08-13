@@ -99,7 +99,15 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
 
   if (basketItems.length === 0) {
     return {
-      pickupRules: null,
+      pickupRules: {
+        requiredLeadDays: 0,
+        cutOffHour: 0,
+        cutOffMin: 0,
+        maxMonth: 0,
+        timezone: "",
+        holidayRanges: [],
+        receivedAt: new Date(),
+      },
       basketContent: { items: [], total: 0 },
     };
   }
