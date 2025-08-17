@@ -50,7 +50,7 @@ const segmentStyles = tv({
       true: "text-gray-200",
     },
     isFocused: {
-      true: "bg-blue-600 text-white",
+      true: "bg-brand-colour-1 text-white outline-none",
     },
   },
 });

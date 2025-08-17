@@ -37,8 +37,8 @@ export function DatePicker<T extends DateValue>({
       {label && <Label>{label}</Label>}
       <FieldGroup className="min-w-[208px] w-auto">
         <DateInput className="flex-1 min-w-[150px] px-2 py-1.5 text-sm" />
-        <Button variant="icon" className="w-6 mr-1 outline-offset-0">
-          <LuCalendarDays aria-hidden className="s-4" />
+        <Button variant="icon" className="w-6 mr-1 outline-offset-0 group">
+          <LuCalendarDays aria-hidden className="w-4 h-4" />
         </Button>
       </FieldGroup>
       {description && <Description>{description}</Description>}

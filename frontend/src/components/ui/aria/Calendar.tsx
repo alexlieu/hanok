@@ -14,20 +14,19 @@ import {
 } from "react-aria-components";
 import { tv } from "tailwind-variants";
 import { Button } from "./Button";
-import { focusRing } from "./utils";
 
 const cellStyles = tv({
-  extend: focusRing,
-  base: "w-9 h-9 m-px text-sm cursor-default flex items-center justify-center focus:outline-none",
+  base: "w-9 h-9 m-px text-sm cursor-default flex items-center justify-center transition-all focus:outline-none ",
   variants: {
     isSelected: {
-      false: "hover:bg-gray-100 pressed:bg-gray-200",
-      true: "bg-brand-colour-2 invalid:bg-red-600 text-white",
+      false: "pressed:bg-gray-200 focus:bg-brand-colour-3 hover:bg-stone-200",
+      true: "bg-brand-colour-1 invalid:bg-red-600 text-white",
     },
     isDisabled: {
-      true: "text-gray-300",
+      true: "text-gray-300/90",
     },
   },
+  compoundVariants: [],
 });
 
 export interface CalendarProps<T extends DateValue>
@@ -44,7 +43,7 @@ export function Calendar<T extends DateValue>({
       <CalendarHeader />
       <CalendarGrid>
         <CalendarGridHeader />
-        <CalendarGridBody>
+        <CalendarGridBody className="overflow-visible">
           {(date) => <CalendarCell date={date} className={cellStyles} />}
         </CalendarGridBody>
       </CalendarGrid>
@@ -61,7 +60,11 @@ export function CalendarHeader() {
   let { direction } = useLocale();
   return (
     <header className="flex items-center gap-1 pb-4 px-2 w-full">
-      <Button variant="icon" slot="previous">
+      <Button
+        variant="icon"
+        slot="previous"
+        className="hover:bg-stone-200 transition-colors"
+      >
         {direction === "rtl" ? (
           <FaChevronRight aria-hidden />
         ) : (
@@ -72,7 +75,11 @@ export function CalendarHeader() {
         level={4}
         className="flex-1 tracking-wide font-medium text-xl text-center mx-2"
       />
-      <Button variant="icon" slot="next">
+      <Button
+        variant="icon"
+        slot="next"
+        className="hover:bg-stone-200 transition-colors"
+      >
         {direction === "rtl" ? (
           <FaChevronLeft aria-hidden />
         ) : (
