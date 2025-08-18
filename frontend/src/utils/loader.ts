@@ -7,6 +7,14 @@ import { CheckoutRequiredData } from "../types/CheckoutType";
 import getBasketFromLocalStorage from "./getBasketFromLocalStorage";
 import getBasketResponse from "./api/basketApi";
 import getPickupRules from "./api/checkoutApi";
+import {
+  CalendarDate,
+  getLocalTimeZone,
+  now,
+  today,
+} from "@internationalized/date";
+import { DateValue } from "react-aria-components";
+import { ConfiguredPickupRules } from "../types/ConfigTypes";
 
 export const productsLoader = async (): Promise<LoaderData> => {
   try {
@@ -100,15 +108,13 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
   if (basketItems.length === 0) {
     return {
       pickupRules: {
-        requiredLeadDays: 0,
-        cutOffHour: 0,
-        cutOffMin: 0,
-        maxMonth: 0,
-        timezone: "",
-        holidayRanges: [],
-        receivedAt: new Date(),
-      },
-      basketContent: { items: [], total: 0 },
+        firstValidDate: today(getLocalTimeZone()).add({ days: 3 }),
+        lastValidDate: today(getLocalTimeZone()).add({ days: 3, months: 3 }),
+        isHoliday: (dateToCheck: DateValue) => false,
+        receivedAt: now(getLocalTimeZone()),
+        unavailableDates: [],
+      } as ConfiguredPickupRules,
+      basketContent: { items: [], total: 0 } as BasketResponse,
     };
   }
 
@@ -120,6 +126,7 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
       await getBasketResponse(ids, quantities),
       await getPickupRules(),
     ]);
+    console.log(pickupRulesResponse);
     return {
       pickupRules: pickupRulesResponse,
       basketContent: basketResponse,

@@ -1,13 +1,16 @@
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckoutSchema, FormData } from "../../schemas/CheckoutFormSchema";
-import DateInput from "./DateInput";
 import Checkbox from "../ui/Checkbox";
 import FormError from "./ErrorMessage";
 import { useEffect } from "react";
 import PhoneInput from "./PhoneInput";
 import { PhoneData } from "../../schemas/PhoneSchema";
 import ToolTip from "../ui/ToolTip";
+import { DatePicker } from "../ui/aria/DatePicker";
+import { I18nProvider } from "react-aria-components";
+import { useLoaderData } from "react-router-dom";
+import { CheckoutRequiredData } from "../../types/CheckoutType";
 
 const DEFAULT_VALUES = {
   fullName: "",
@@ -50,6 +53,12 @@ const CustomerForm: React.FC = () => {
   }, [isSubmitSuccessful, reset]);
 
   const legendStyling = "text-xl font-medium tracking-wide";
+
+  const {
+    pickupRules: { firstValidDate, lastValidDate, isHoliday, unavailableDates },
+  } = useLoaderData() as CheckoutRequiredData;
+
+  console.log("unavailable date: ", unavailableDates);
 
   return (
     <div className="mx-auto">
@@ -109,12 +118,25 @@ const CustomerForm: React.FC = () => {
         </fieldset>
         <fieldset className="flex flex-col">
           <legend className={`${legendStyling}`}>Order preferences</legend>
-          <DateInput
+          {/* <DateInput
             name="pickup"
             register={register}
             displayLabel="What is your preferred pickup date?"
             errors={errors}
-          />
+          /> */}
+          <I18nProvider locale="en-GB">
+            <DatePicker
+              defaultValue={firstValidDate}
+              minValue={firstValidDate}
+              maxValue={lastValidDate}
+              isDateUnavailable={(date) => isHoliday(date)}
+              isRequired
+              unavailableDates={unavailableDates}
+              fieldClassName="border-2 border-gray-300"
+              // necessity indicator
+              label="What is your preferred pickup date?"
+            />
+          </I18nProvider>
           <div>
             <p>How would you like to receive updates?</p>
             <FormError name="update" errors={errors} />

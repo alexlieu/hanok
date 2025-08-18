@@ -1,5 +1,4 @@
 import { z } from "zod/v4";
-import { isPickupValid } from "../validator/PickupDateValidator";
 import { PhoneSchema } from "./PhoneSchema";
 
 export const CheckoutSchema = z
@@ -28,11 +27,11 @@ export const CheckoutSchema = z
       }
       return;
     }),
-    pickup: z.iso
-      .datetime("Please select your preferred pickup date.")
-      .refine((val) => isPickupValid(val, 3, 3, 14, 0, "Europe/London"), {
-        error: "Invalid pickup date.",
-      }),
+    // pickup: z.iso
+    //   .datetime("Please select your preferred pickup date.")
+    //   .refine((val) => isPickupValid(val, 3, 3, 14, 0, "Europe/London"), {
+    //     error: "Invalid pickup date.",
+    //   }),
     smsUpdate: z.boolean().optional(),
     emailUpdate: z.boolean().optional(),
     specialInstructions: z.string().nullable(),

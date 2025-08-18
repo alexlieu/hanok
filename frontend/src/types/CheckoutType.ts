@@ -1,7 +1,7 @@
 import { BasketResponse } from "./BasketTypes";
-import { PickupRules } from "./ConfigTypes";
+import { ConfiguredPickupRules } from "./ConfigTypes";
 
 export type CheckoutRequiredData = {
-  pickupRules: PickupRules;
+  pickupRules: ConfiguredPickupRules;
   basketContent: BasketResponse;
 };

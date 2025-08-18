@@ -7,7 +7,7 @@ export const focusRing = tv({
   variants: {
     isFocusVisible: {
       false: "ring-0",
-      true: "ring-3",
+      true: "ring-[2px] transition-shadow",
     },
   },
 });
