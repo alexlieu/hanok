@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { PhoneSchema } from "./PhoneSchema";
+import { CalendarDate, parseDate } from "@internationalized/date";
 
 export const CheckoutSchema = z
   .object({
@@ -32,6 +33,18 @@ export const CheckoutSchema = z
     //   .refine((val) => isPickupValid(val, 3, 3, 14, 0, "Europe/London"), {
     //     error: "Invalid pickup date.",
     //   }),
+    pickupDate: z
+      .instanceof(CalendarDate, { message: "Invalid date value" })
+      .refine(
+        (val) => {
+          if (val.month === 8) {
+            return false;
+          } else {
+            return true;
+          }
+        },
+        { error: "Sorry pickup on that date is unavailable." }
+      ),
     smsUpdate: z.boolean().optional(),
     emailUpdate: z.boolean().optional(),
     specialInstructions: z.string().nullable(),

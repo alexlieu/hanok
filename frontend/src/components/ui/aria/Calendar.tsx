@@ -17,19 +17,20 @@ import { Button } from "./Button";
 import { CalendarDate } from "@internationalized/date";
 
 const cellStyles = tv({
-  base: "h-9 text-sm cursor-default flex items-center justify-center focus:outline-none rounded-xs",
+  base: "h-9 text-sm cursor-default flex items-center justify-center focus:outline-none",
   variants: {
     state: {
       default:
-        "w-9 m-px focus:bg-brand-colour-3 focus:transition-colors hover:bg-gray-200",
-      selected: "w-9 m-px bg-brand-colour-1 invalid:bg-red-600 text-white",
-      disabled: "w-9 m-px text-gray-300/90 transition-none",
+        "w-9 m-px focus:border-2 focus:border-brand-colour-2 hover:bg-unavailable/50 rounded-xs",
+      selected:
+        "w-9 m-px bg-brand-colour-2 text-default-bg font-medium transition-all rounded-xs invalid:bg-default-bg invalid:border-2 invalid:border-error-red invalid:text-error-red invalid:line-through invalid:decoration-2",
+      disabled: "w-9 m-px text-unavailable-text transition-none rounded-xs",
       unavailable:
-        "bg-gray-100 text-gray-300 line-through decoration-2 focus:bg-gray-300 focus:text-gray-100 focus:transition-colors hover:bg-gray-300 hover:text-gray-100 hover:transition-colors",
-      unavailable_start: "ml-px",
+        "bg-unavailable text-unavailable-text line-through decoration-2 focus:bg-unavailable-text focus:text-unavailable focus:transition-colors hover:bg-unavailable-text hover:text-unavailable hover:transition-colors",
+      unavailable_start: "ml-px rounded-l-xs",
       unavailable_middle: "w-full",
-      unavailable_end: "mr-px",
-      unavailable_single: "",
+      unavailable_end: "mr-px rounded-r-xs",
+      unavailable_single: "rounded-xs",
     },
   },
 });

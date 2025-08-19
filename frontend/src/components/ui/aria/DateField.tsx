@@ -10,6 +10,7 @@ import {
 import { tv } from "tailwind-variants";
 import { Description, FieldError, Label, fieldGroupStyles } from "./Field";
 import { composeTailwindRenderProps } from "./utils";
+import { forwardRef } from "react";
 
 export interface DateFieldProps<T extends DateValue>
   extends AriaDateFieldProps<T> {
@@ -50,14 +51,18 @@ const segmentStyles = tv({
       true: "text-gray-200",
     },
     isFocused: {
-      true: "bg-brand-colour-1 text-white outline-none",
+      true: "bg-brand-colour-2 text-default-bg outline-none",
     },
   },
 });
 
-export function DateInput(props: Omit<DateInputProps, "children">) {
+export const DateInput = forwardRef<
+  HTMLDivElement,
+  Omit<DateInputProps, "children">
+>((props, ref) => {
   return (
     <AriaDateInput
+      ref={ref}
       className={(renderProps) =>
         fieldGroupStyles({
           ...renderProps,
@@ -69,4 +74,4 @@ export function DateInput(props: Omit<DateInputProps, "children">) {
       {(segment) => <DateSegment segment={segment} className={segmentStyles} />}
     </AriaDateInput>
   );
-}
+});

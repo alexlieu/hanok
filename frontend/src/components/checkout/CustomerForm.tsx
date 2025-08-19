@@ -12,16 +12,21 @@ import { I18nProvider } from "react-aria-components";
 import { useLoaderData } from "react-router-dom";
 import { CheckoutRequiredData } from "../../types/CheckoutType";
 
-const DEFAULT_VALUES = {
-  fullName: "",
-  email: "",
-  phoneNumber: { countryCode: "GB", phoneNumber: undefined },
-  emailUpdate: false,
-  smsUpdate: false,
-  specialInstructions: "",
-};
-
 const CustomerForm: React.FC = () => {
+  const {
+    pickupRules: { firstValidDate, lastValidDate, isHoliday, unavailableDates },
+  } = useLoaderData() as CheckoutRequiredData;
+
+  const DEFAULT_VALUES = {
+    fullName: "",
+    email: "",
+    phoneNumber: { countryCode: "GB", phoneNumber: undefined },
+    emailUpdate: false,
+    smsUpdate: false,
+    pickupDate: firstValidDate,
+    specialInstructions: "",
+  };
+
   const methods = useForm<FormData>({
     resolver: zodResolver(CheckoutSchema),
     defaultValues: DEFAULT_VALUES,
@@ -53,10 +58,6 @@ const CustomerForm: React.FC = () => {
   }, [isSubmitSuccessful, reset]);
 
   const legendStyling = "text-xl font-medium tracking-wide";
-
-  const {
-    pickupRules: { firstValidDate, lastValidDate, isHoliday, unavailableDates },
-  } = useLoaderData() as CheckoutRequiredData;
 
   console.log("unavailable date: ", unavailableDates);
 
@@ -118,23 +119,30 @@ const CustomerForm: React.FC = () => {
         </fieldset>
         <fieldset className="flex flex-col">
           <legend className={`${legendStyling}`}>Order preferences</legend>
-          {/* <DateInput
-            name="pickup"
-            register={register}
-            displayLabel="What is your preferred pickup date?"
-            errors={errors}
-          /> */}
           <I18nProvider locale="en-GB">
-            <DatePicker
-              defaultValue={firstValidDate}
-              minValue={firstValidDate}
-              maxValue={lastValidDate}
-              isDateUnavailable={(date) => isHoliday(date)}
-              isRequired
-              unavailableDates={unavailableDates}
-              fieldClassName="border-2 border-gray-300"
-              // necessity indicator
-              label="What is your preferred pickup date?"
+            <Controller
+              name="pickupDate"
+              control={control}
+              render={({
+                field: { onChange, onBlur, value, ref },
+                fieldState: { invalid, error },
+              }) => (
+                <DatePicker
+                  isInvalid={invalid}
+                  value={value}
+                  onChange={onChange}
+                  ref={ref}
+                  onBlur={onBlur}
+                  errorMessage={error?.message}
+                  minValue={firstValidDate}
+                  maxValue={lastValidDate}
+                  isDateUnavailable={(date) => isHoliday(date)}
+                  unavailableDates={unavailableDates}
+                  isRequired
+                  fieldClassName="border-2 border-gray-300 invalid:border-error-red ring-offset-[2px]"
+                  label="What is your preferred pickup date?"
+                />
+              )}
             />
           </I18nProvider>
           <div>
