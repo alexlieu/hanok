@@ -1,5 +1,4 @@
-import { UseFormRegister, Path, FieldValues } from "react-hook-form";
-import { FormData } from "../../schemas/CheckoutFormSchema";
+import { UseFormRegister, FieldValues } from "react-hook-form";
 
 interface CheckboxProps<T extends FieldValues> {
   name: keyof T;

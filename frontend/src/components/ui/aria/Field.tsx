@@ -14,6 +14,7 @@ import {
 import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
+import { forwardRef } from "react";
 
 export function Label(props: LabelProps) {
   return (
@@ -53,13 +54,13 @@ export const fieldBorderStyles = tv({
   variants: {
     isFocusWithin: {
       false: "",
-      true: "",
+      true: "border-brand-colour-3",
     },
     isInvalid: {
-      true: "",
+      true: "border-error-red",
     },
     isDisabled: {
-      true: "",
+      true: "bg-unavailable",
     },
   },
 });
@@ -81,11 +82,12 @@ export function FieldGroup(props: GroupProps) {
   );
 }
 
-export function Input(props: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   return (
     <RACInput
       {...props}
+      ref={ref}
       className={composeTailwindRenderProps(props.className, "px-2 py-1.5")}
     />
   );
-}
+});

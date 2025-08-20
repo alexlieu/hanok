@@ -13,6 +13,10 @@ import { CheckoutRequiredData } from "../../types/CheckoutType";
 import createCustomerFormSchema from "../../schemas/createCustomerFormSchema";
 import { z } from "zod/v4";
 
+// Compile-time VS Runtime
+// TS needs the type definition when it needs compile the code, BEFORE the component renders.
+// So we it needs to be defined outside of the component, deriving it statically from the return type of the schema creation function.
+
 type CustomerFormSchemaType = ReturnType<typeof createCustomerFormSchema>;
 
 type FormData = z.infer<CustomerFormSchemaType["schema"]>;
