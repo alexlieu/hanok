@@ -1,9 +1,8 @@
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckoutSchema, FormData } from "../../schemas/CheckoutFormSchema";
 import Checkbox from "../ui/Checkbox";
 import FormError from "./ErrorMessage";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import PhoneInput from "./PhoneInput";
 import { PhoneData } from "../../schemas/PhoneSchema";
 import ToolTip from "../ui/ToolTip";
@@ -11,6 +10,12 @@ import { DatePicker } from "../ui/aria/DatePicker";
 import { I18nProvider } from "react-aria-components";
 import { useLoaderData } from "react-router-dom";
 import { CheckoutRequiredData } from "../../types/CheckoutType";
+import createCustomerFormSchema from "../../schemas/createCustomerFormSchema";
+import { z } from "zod/v4";
+
+type CustomerFormSchemaType = ReturnType<typeof createCustomerFormSchema>;
+
+type FormData = z.infer<CustomerFormSchemaType["schema"]>;
 
 const CustomerForm: React.FC = () => {
   const {
@@ -27,8 +32,15 @@ const CustomerForm: React.FC = () => {
     specialInstructions: "",
   };
 
+  const { schema } = useMemo(() => {
+    return createCustomerFormSchema(isHoliday, {
+      start: firstValidDate,
+      end: lastValidDate,
+    });
+  }, [isHoliday, firstValidDate, lastValidDate]);
+
   const methods = useForm<FormData>({
-    resolver: zodResolver(CheckoutSchema),
+    resolver: zodResolver(schema),
     defaultValues: DEFAULT_VALUES,
     mode: "onTouched",
     reValidateMode: "onChange",
@@ -58,8 +70,6 @@ const CustomerForm: React.FC = () => {
   }, [isSubmitSuccessful, reset]);
 
   const legendStyling = "text-xl font-medium tracking-wide";
-
-  console.log("unavailable date: ", unavailableDates);
 
   return (
     <div className="mx-auto">

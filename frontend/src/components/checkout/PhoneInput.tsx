@@ -1,38 +1,37 @@
 import { useEffect, useState } from "react";
-import { UseFormWatch } from "react-hook-form";
+import { FieldValues, Path, UseFormWatch } from "react-hook-form";
 import {
   Country,
   CountryCodeUnion,
   countries,
   PhoneData,
 } from "../../schemas/PhoneSchema";
-import { FormData } from "../../schemas/CheckoutFormSchema";
 import * as Flags from "country-flag-icons/react/3x2";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 
 const DEFAULT_COUNTRY = { name: "United Kingdom", code: "GB" };
 
-type PhoneInputProps = {
+type PhoneInputProps<T extends FieldValues> = {
   phoneData: PhoneData | null; // The entire phoneNumber object from Controller's value
   onPhoneDataChange: (data: PhoneData) => void; // Controller's onChange for the entire object
   onBlur: () => void; // Controller's onBlur
   inputRef: React.Ref<HTMLInputElement>; // Controller's ref for the input
-  watch: UseFormWatch<FormData>; // Pass watch down for internal logic
+  watch: UseFormWatch<T>; // Pass watch down for internal logic
   errors: boolean;
 };
 
-const PhoneInput: React.FC<PhoneInputProps> = ({
+const PhoneInput = <T extends FieldValues>({
   phoneData,
   onPhoneDataChange,
   onBlur,
   inputRef,
   watch,
   errors,
-}) => {
+}: PhoneInputProps<T>) => {
   //   const { register, watch, setValue } = useFormContext<FormData>();
 
   const selectedCountryCode = watch(
-    "phoneNumber.countryCode"
+    "phoneNumber.countryCode" as Path<T>
   ) as CountryCodeUnion;
 
   const [selectedCountry, setSelectedCountry] = useState<Country>(
