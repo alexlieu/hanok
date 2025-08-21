@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import {
   TextField as AriaTextField,
   TextFieldProps as AriaTextFieldProps,
@@ -44,6 +44,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     },
     ref
   ) => {
+    const [isFocused, setIsFocused] = useState(false);
     return (
       <AriaTextField
         {...props}
@@ -58,15 +59,23 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       >
         {label && (
           <Label>
-            {label}
-            <span className="text-error-red pl-1/2">
-              {props.isRequired ? "*" : ""}
+            <span
+              className={`${
+                isFocused && "overline decoration-3 decoration-brand-colour-3"
+              }`}
+            >
+              {label}
             </span>
+            {props.isRequired && (
+              <span className="ml-0.5 text-error-red">*</span>
+            )}
           </Label>
         )}
         <Input
           ref={ref}
-          className={composeTailwindRenderProps(inputStyles, "peer")}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className={inputStyles}
         />
         {description && <Description>{description}</Description>}
         <FieldError>{errorMessage}</FieldError>
