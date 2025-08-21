@@ -16,15 +16,6 @@ import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 import { forwardRef } from "react";
 
-const labelStyles = tv({
-  base: "text-sm text-black font-light cursor-default w-fit",
-  variants: {
-    isFocused:
-      "peer-focus:underline peer-focus:underline-offset-2 peer-focus:decoration-3 peer-focus:decoration-brand-colour-3",
-    isInvalid: "peer-focus:shadow-[0_2px_0_var(--color-brand-colour-3)]",
-  },
-});
-
 export function Label(props: LabelProps) {
   return (
     <RACLabel

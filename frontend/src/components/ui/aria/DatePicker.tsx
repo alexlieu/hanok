@@ -13,8 +13,14 @@ import { Description, FieldError, FieldGroup, Label } from "./Field";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
 import { CalendarDate } from "@internationalized/date";
-import { twMerge } from "tailwind-merge";
 import { forwardRef } from "react";
+import { inputStyles } from "./TextField";
+import { tv } from "tailwind-variants";
+
+const fieldStyles = tv({
+  extend: inputStyles,
+  base: "min-w-[208px] w-auto focus-within:ring-offset-[2px]",
+});
 
 export interface DatePickerProps<T extends DateValue>
   extends AriaDatePickerProps<T> {
@@ -22,7 +28,6 @@ export interface DatePickerProps<T extends DateValue>
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
   unavailableDates?: { start: CalendarDate; end: CalendarDate }[];
-  fieldClassName?: string;
 }
 
 export const DatePicker = forwardRef<
@@ -35,7 +40,6 @@ export const DatePicker = forwardRef<
       description,
       errorMessage,
       unavailableDates,
-      fieldClassName,
       isInvalid,
       value,
       onChange,
@@ -53,23 +57,20 @@ export const DatePicker = forwardRef<
         {...props}
         className={composeTailwindRenderProps(
           props.className,
-          "group flex flex-col gap-1"
+          "flex flex-col gap-1"
         )}
       >
         {label && (
           <Label>
             {label}
-            <span className="text-error-red pl-1/2">
+            <span className="text-error-red ml-0.5">
               {props.isRequired ? "*" : ""}
             </span>
           </Label>
         )}
-        <FieldGroup className={twMerge("min-w-[208px] w-auto", fieldClassName)}>
-          <DateInput
-            ref={ref}
-            className="flex-1 min-w-[150px] px-2 py-1.5 text-sm"
-          />
-          <Button variant="icon" className="w-6 mr-1 outline-offset-0 group">
+        <FieldGroup className={fieldStyles}>
+          <DateInput ref={ref} className="flex-1 min-w-[150px] px-2 py-1.5" />
+          <Button variant="icon" className="w-6 mr-1 focus:ring-offset-0">
             <LuCalendar aria-hidden className="w-4 h-4" />
           </Button>
         </FieldGroup>

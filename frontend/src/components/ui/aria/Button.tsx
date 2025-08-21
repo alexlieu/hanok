@@ -18,7 +18,7 @@ let button = tv({
     variant: {
       primary: "",
       secondary: "text-black bg-white hover:bg-black hover:text-white",
-      icon: "border-0 p-1 flex items-center justify-center text-gray-600 pressed:bg-black/10 disabled:bg-transparent",
+      icon: "border-0 p-1 flex items-center justify-center text-gray-600 hover:bg-black/10 pressed:bg-black/15 disabled:bg-transparent",
     },
     isDisabled: {
       true: "bg-stone-700",

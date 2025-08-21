@@ -14,9 +14,9 @@ import {
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 
-const inputStyles = tv({
+export const inputStyles = tv({
   extend: focusRing,
-  base: "border-2 border-brand-colour-5 focus:ring-offset-[2px] outline-none",
+  base: "border-2 border-brand-colour-5 focus:ring-offset-[2px] outline-none text-sm",
   variants: {
     isFocused: fieldBorderStyles.variants.isFocusWithin,
     isInvalid: fieldBorderStyles.variants.isInvalid,

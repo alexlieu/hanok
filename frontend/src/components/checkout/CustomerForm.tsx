@@ -12,6 +12,7 @@ import { useLoaderData } from "react-router-dom";
 import { CheckoutRequiredData } from "../../types/CheckoutType";
 import createCustomerFormSchema from "../../schemas/createCustomerFormSchema";
 import { z } from "zod/v4";
+import { TextField } from "../ui/aria/TextField";
 
 // Compile-time VS Runtime
 // TS needs the type definition when it needs compile the code, BEFORE the component renders.
@@ -73,41 +74,55 @@ const CustomerForm: React.FC = () => {
     }
   }, [isSubmitSuccessful, reset]);
 
-  const legendStyling = "text-xl font-medium tracking-wide";
+  const legendStyling = "text-xl font-medium tracking-wide mb-5";
 
   return (
     <div className="mx-auto">
       <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-        <fieldset className="">
+        <fieldset className="flex flex-col gap-4">
           <legend className={`${legendStyling}`}>Contact details</legend>
-          <div className="flex flex-col">
-            <label htmlFor="fullName">Full name</label>
-            <input
-              id="fullName"
-              {...register("fullName")}
-              className={`form-input-base ${
-                errors.fullName ? "border-error-red" : "border-gray-300"
-              }`}
-            />
-            <FormError name="fullName" errors={errors} />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex justify-between">
-              <label htmlFor="email">Email</label>
-              <ToolTip message="We need either your email or phone number so we can send you updates on your order." />
-            </div>
-            <input
-              id="email"
-              {...register("email", { onChange: () => trigger("contact") })}
-              className={`form-input-base ${
-                errors.contact || errors.email
-                  ? "border-error-red"
-                  : "border-gray-300"
-              }`}
-              placeholder="email@example.com"
-            />
-            <FormError name="email" errors={errors} />
-          </div>
+          <Controller
+            name="fullName"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => (
+              <TextField
+                ref={ref}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                label="Full name"
+                maxLength={50}
+                isRequired
+                isInvalid={invalid}
+                errorMessage={error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="email"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => (
+              <TextField
+                ref={ref}
+                value={value}
+                onChange={(e) => {
+                  onChange(e);
+                  trigger("contact");
+                }}
+                onBlur={onBlur}
+                label="Email"
+                maxLength={50}
+                isInvalid={!!(invalid || errors.contact)}
+                errorMessage={error?.message || errors.contact?.message}
+              />
+            )}
+          />
           <div className="flex flex-col">
             <label htmlFor="">Phone number</label>
             <Controller
@@ -129,7 +144,7 @@ const CustomerForm: React.FC = () => {
             />
             <FormError name="phoneNumber" errors={errors} />
           </div>
-          <FormError name="contact" errors={errors} />
+          {/* <FormError name="contact" errors={errors} /> */}
         </fieldset>
         <fieldset className="flex flex-col">
           <legend className={`${legendStyling}`}>Order preferences</legend>
@@ -153,7 +168,6 @@ const CustomerForm: React.FC = () => {
                   isDateUnavailable={(date) => isHoliday(date)}
                   unavailableDates={unavailableDates}
                   isRequired
-                  fieldClassName="border-2 border-gray-300 invalid:border-error-red ring-offset-[2px]"
                   label="What is your preferred pickup date?"
                 />
               )}
