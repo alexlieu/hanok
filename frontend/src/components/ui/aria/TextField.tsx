@@ -54,8 +54,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           props.className,
           "flex flex-col gap-1"
         )}
-        onBlur={onBlur}
-        onChange={onChange}
+        onFocusChange={(isFocused) => setIsFocused(isFocused)}
         value={value}
         isInvalid={isInvalid}
       >

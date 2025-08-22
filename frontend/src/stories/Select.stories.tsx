@@ -21,7 +21,7 @@ const meta: Meta<typeof Select> = {
 export default meta;
 
 export const Example = (args: any) => (
-  <Select {...args}>
+  <Select {...args} placeholder="Ice cream">
     <SelectItem>Chocolate</SelectItem>
     <SelectItem id="mint">Mint</SelectItem>
     <SelectItem>Strawberry</SelectItem>

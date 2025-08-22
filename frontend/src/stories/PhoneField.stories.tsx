@@ -26,7 +26,10 @@ export const Example = () => {
       phoneNumber={phoneNumber}
       countryCode={countryCode}
       onPhoneNumberChange={setPhoneNumber}
-      onCountryCodeChange={setCountryCode}
+      onCountryCodeChange={(newCountryCode) => {
+        setCountryCode(newCountryCode);
+        setPhoneNumber("");
+      }}
     />
   );
 };

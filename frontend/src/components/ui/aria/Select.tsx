@@ -13,6 +13,8 @@ import { Description, FieldError, Label } from "./Field";
 import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps, focusRing } from "./utils";
+import { twMerge } from "tailwind-merge";
+import { ReactNode, RefObject } from "react";
 
 const styles = tv({
   extend: focusRing,
@@ -30,14 +32,23 @@ export interface SelectProps<T extends object>
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
+  listBoxRef?: RefObject<HTMLDivElement | null>;
+  listBoxClassNames?: string;
+  buttonClassNames?: () => string;
+  customSelectValue?: ReactNode;
   items?: Iterable<T>;
-  children: React.ReactNode | ((item: T) => React.ReactNode);
+  children: ReactNode | ((item: T) => ReactNode);
 }
 
 export function Select<T extends Object>({
   label,
   description,
   errorMessage,
+  listBoxRef,
+  listBoxClassNames = "max-h-[inherit]",
+  buttonClassNames,
+  customSelectValue,
+  placeholder,
   children,
   items,
   ...props
@@ -51,16 +62,36 @@ export function Select<T extends Object>({
       )}
     >
       {label && <Label>{label}</Label>}
-      <Button className={styles}>
-        <SelectValue className="flex-1 text-sm placeholder-shown:italic" />
+      <Button className={buttonClassNames ? buttonClassNames : styles}>
+        <SelectValue className="flex-1 text-sm placeholder-shown:italic">
+          {({ defaultChildren, isPlaceholder }) => {
+            return isPlaceholder ? (
+              <>
+                {placeholder ? (
+                  <>
+                    <b>{placeholder}</b> selection
+                  </>
+                ) : (
+                  <>Select...</>
+                )}
+              </>
+            ) : (
+              <>{customSelectValue ? customSelectValue : defaultChildren}</>
+            );
+          }}
+        </SelectValue>
         <LuChevronDown className="w-4 h-4 text-gray-600 group-disabled:text-gray-200" />
       </Button>
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
       <Popover className="min-w-(--trigger-width)">
         <ListBox
+          ref={listBoxRef}
           items={items}
-          className="outline-hidden p-1 max-h-[inherit] overflow-auto"
+          className={twMerge(
+            "outline-hidden p-1 overflow-auto",
+            listBoxClassNames
+          )}
           // It ensures that the ListBox is clipped with a .75rem radius, even if the underlying content extends beyond that.
           // Cleanly hides any overflow, preventing visual glitches.
           // [clip-path:insert(0_0_0_0_round_.75rem)]

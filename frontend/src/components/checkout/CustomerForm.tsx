@@ -21,6 +21,8 @@ type CustomerFormSchemaType = ReturnType<typeof createCustomerFormSchema>;
 
 type FormData = z.infer<CustomerFormSchemaType["schema"]>;
 
+const defaultCountryCode = "GB" as CountryCodeUnion;
+
 const CustomerForm: React.FC = () => {
   const {
     pickupRules: { firstValidDate, lastValidDate, isHoliday, unavailableDates },
@@ -29,7 +31,7 @@ const CustomerForm: React.FC = () => {
   const DEFAULT_VALUES = {
     fullName: "",
     email: "",
-    phoneNumber: { countryCode: "GB" as CountryCodeUnion, phoneNumber: "" },
+    phoneNumber: { countryCode: defaultCountryCode, phoneNumber: "" },
     emailUpdate: false,
     smsUpdate: false,
     pickupDate: firstValidDate,
@@ -142,9 +144,9 @@ const CustomerForm: React.FC = () => {
                 onBlur={onBlur}
                 ref={ref}
                 phoneNumber={value?.phoneNumber}
-                countryCode={value?.countryCode || "GB"}
+                countryCode={value?.countryCode || defaultCountryCode}
                 onCountryCodeChange={(newCountryCode: CountryCodeUnion) => {
-                  onChange({ ...value, countryCode: newCountryCode });
+                  onChange({ phoneNumber: "", countryCode: newCountryCode });
                 }}
                 onPhoneNumberChange={(newPhoneNumber: string) => {
                   onChange({ ...value, phoneNumber: newPhoneNumber });
