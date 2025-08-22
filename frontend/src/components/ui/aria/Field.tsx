@@ -88,6 +88,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       {...props}
       ref={ref}
       className={composeTailwindRenderProps(props.className, "px-2 py-1.5")}
+      placeholder={props.placeholder}
     />
   );
 });

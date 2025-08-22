@@ -74,7 +74,7 @@ export const dropDownItemStyles = tv({
       true: "",
     },
     isFocused: {
-      true: "bg-brand-colour-1 text-white",
+      true: "bg-brand-colour-2 text-white",
     },
   },
   compoundVariants: [
@@ -120,7 +120,7 @@ export function DropdownSection<T extends object>(
 ) {
   return (
     <ListBoxSection className="first:-mt-[5px] after:content-[''] after:block after:h-[5px]">
-      <Header className="text-sm font-semibold text-gray-500 truncate sticky z-100 -top-[5px] -mt-px -mx-1 bg-gray-100/60 backdrop-blur-md border-y border-y-gray-200">
+      <Header className="text-sm font-semibold text-gray-500 truncate sticky z-100 -top-[5px] -mt-px mx-0.5 bg-gray-100/60 backdrop-blur-md border-y border-y-gray-200">
         {props.title}
       </Header>
       <Collection items={props.items}>{props.children}</Collection>

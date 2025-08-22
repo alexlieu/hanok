@@ -28,6 +28,7 @@ export interface TextFieldProps extends AriaTextFieldProps {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
+  placeholder?: string;
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -36,6 +37,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       label,
       description,
       errorMessage,
+      placeholder,
       isInvalid,
       value,
       onBlur,
@@ -75,6 +77,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           ref={ref}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
           className={inputStyles}
         />
         {description && <Description>{description}</Description>}

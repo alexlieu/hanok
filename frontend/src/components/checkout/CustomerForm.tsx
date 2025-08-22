@@ -1,11 +1,9 @@
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useForm, SubmitHandler, Controller, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Checkbox from "../ui/Checkbox";
 import FormError from "./ErrorMessage";
 import { useEffect, useMemo } from "react";
-import PhoneInput from "./PhoneInput";
-import { PhoneData } from "../../schemas/PhoneSchema";
-import ToolTip from "../ui/ToolTip";
+import { CountryCodeUnion } from "../../schemas/PhoneSchema";
 import { DatePicker } from "../ui/aria/DatePicker";
 import { I18nProvider } from "react-aria-components";
 import { useLoaderData } from "react-router-dom";
@@ -13,6 +11,7 @@ import { CheckoutRequiredData } from "../../types/CheckoutType";
 import createCustomerFormSchema from "../../schemas/createCustomerFormSchema";
 import { z } from "zod/v4";
 import { TextField } from "../ui/aria/TextField";
+import { PhoneField } from "../ui/aria/PhoneField";
 
 // Compile-time VS Runtime
 // TS needs the type definition when it needs compile the code, BEFORE the component renders.
@@ -30,7 +29,7 @@ const CustomerForm: React.FC = () => {
   const DEFAULT_VALUES = {
     fullName: "",
     email: "",
-    phoneNumber: { countryCode: "GB", phoneNumber: undefined },
+    phoneNumber: { countryCode: "GB" as CountryCodeUnion, phoneNumber: "" },
     emailUpdate: false,
     smsUpdate: false,
     pickupDate: firstValidDate,
@@ -45,7 +44,13 @@ const CustomerForm: React.FC = () => {
   }, [isHoliday, firstValidDate, lastValidDate]);
 
   const methods = useForm<FormData>({
-    resolver: zodResolver(schema),
+    // A problem arises when the schema is passed to useForm
+    // useForm uses a generic type TFieldValues that it uses for validation.
+    // Somtimes with the way types are inferred and passed, the expected type can become slightly more general
+    // e.g. {countryCode: string}
+    // So we cast the resolver to match the FormData type
+    // We cast to unknown first as this is the safest way to perform a type assertion that breaks the direct type compatibility check.
+    resolver: zodResolver(schema) as unknown as Resolver<FormData>,
     defaultValues: DEFAULT_VALUES,
     mode: "onTouched",
     reValidateMode: "onChange",
@@ -55,7 +60,6 @@ const CustomerForm: React.FC = () => {
   const {
     register,
     handleSubmit,
-    watch,
     control,
     trigger,
     reset,
@@ -117,33 +121,38 @@ const CustomerForm: React.FC = () => {
                 }}
                 onBlur={onBlur}
                 label="Email"
+                placeholder="name@email.com"
                 maxLength={50}
                 isInvalid={!!(invalid || errors.contact)}
                 errorMessage={error?.message || errors.contact?.message}
               />
             )}
           />
-          <div className="flex flex-col">
-            <label htmlFor="">Phone number</label>
-            <Controller
-              name="phoneNumber"
-              control={control}
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <PhoneInput
-                  phoneData={value}
-                  onPhoneDataChange={(data: PhoneData) => {
-                    onChange(data);
-                    trigger("contact");
-                  }}
-                  onBlur={onBlur}
-                  inputRef={ref}
-                  watch={watch}
-                  errors={!!(errors.contact || errors.phoneNumber)}
-                />
-              )}
-            />
-            <FormError name="phoneNumber" errors={errors} />
-          </div>
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => (
+              <PhoneField
+                label="Phone Number"
+                isInvalid={!!(invalid || errors.contact)}
+                errorMessage={error?.message}
+                onBlur={onBlur}
+                ref={ref}
+                phoneNumber={value?.phoneNumber}
+                countryCode={value?.countryCode || "GB"}
+                onCountryCodeChange={(newCountryCode: CountryCodeUnion) => {
+                  onChange({ ...value, countryCode: newCountryCode });
+                }}
+                onPhoneNumberChange={(newPhoneNumber: string) => {
+                  onChange({ ...value, phoneNumber: newPhoneNumber });
+                  trigger("contact");
+                }}
+              />
+            )}
+          />
           {/* <FormError name="contact" errors={errors} /> */}
         </fieldset>
         <fieldset className="flex flex-col">

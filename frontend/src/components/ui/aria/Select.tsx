@@ -16,9 +16,9 @@ import { composeTailwindRenderProps, focusRing } from "./utils";
 
 const styles = tv({
   extend: focusRing,
-  base: "flex items-center text-start gap-4 w-full cursor-default border px-2 py-1 focus:ring-offset-[2px]",
+  base: "flex items-center text-start gap-4 w-full cursor-default px-2 py-1 focus:ring-offset-[2px]",
   variants: {
-    isDisables: {
+    isDisabled: {
       false: "text-gray-800 hover:bg-gray-100 group-invalid:border-error-red",
       true: "text-gray-200",
     },
