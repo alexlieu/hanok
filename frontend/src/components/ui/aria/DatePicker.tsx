@@ -19,7 +19,7 @@ import { tv } from "tailwind-variants";
 
 const fieldStyles = tv({
   extend: inputStyles,
-  base: "min-w-[208px] w-auto focus-within:ring-offset-[2px]",
+  base: "min-w-[208px] w-auto",
 });
 
 export interface DatePickerProps<T extends DateValue>
@@ -70,7 +70,10 @@ export const DatePicker = forwardRef<
         )}
         <FieldGroup className={fieldStyles}>
           <DateInput ref={ref} className="flex-1 min-w-[150px] px-2 py-1.5" />
-          <Button variant="icon" className="w-6 mr-1 focus:ring-offset-0">
+          <Button
+            variant="icon"
+            className="w-6 mr-1 focus:ring-2 focus:ring-offset-0 focus:ring-brand-focus"
+          >
             <LuCalendar aria-hidden className="w-4 h-4" />
           </Button>
         </FieldGroup>

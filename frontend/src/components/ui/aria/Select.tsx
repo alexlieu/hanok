@@ -12,17 +12,19 @@ import { tv } from "tailwind-variants";
 import { Description, FieldError, Label } from "./Field";
 import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
 import { Popover } from "./Popover";
-import { composeTailwindRenderProps, focusRing } from "./utils";
+import { composeTailwindRenderProps } from "./utils";
 import { twMerge } from "tailwind-merge";
 import { ReactNode, RefObject } from "react";
 
 const styles = tv({
-  extend: focusRing,
-  base: "flex items-center text-start gap-4 w-full cursor-default px-2 py-1 focus:ring-offset-[2px]",
+  base: "flex items-center text-start gap-4 w-full cursor-default px-2 py-1",
   variants: {
     isDisabled: {
       false: "text-gray-800 hover:bg-gray-100 group-invalid:border-error-red",
       true: "text-gray-200",
+    },
+    isFocused: {
+      true: "ring-[2px] ring-brand-focus outline-none transition-shadow",
     },
   },
 });

@@ -1,11 +1,11 @@
 import { tv } from "tailwind-variants";
 import {
-  TextField as AriaTextField,
-  TextFieldProps as AriaTextFieldProps,
   ValidationResult,
+  GroupProps,
+  composeRenderProps,
 } from "react-aria-components";
 import { inputStyles } from "./TextField";
-import { forwardRef, memo, useEffect, useRef, useState } from "react";
+import { forwardRef, memo, useEffect, useId, useRef, useState } from "react";
 import { Description, FieldError, FieldGroup, Input, Label } from "./Field";
 import { Select, SelectItem, SelectSection } from "./Select";
 import {
@@ -15,7 +15,7 @@ import {
   SingleCountryType,
 } from "../../../schemas/PhoneSchema";
 import * as Flags from "country-flag-icons/react/3x2";
-import { composeTailwindRenderProps } from "./utils";
+import { twMerge } from "tailwind-merge";
 
 function getCountryFromCode(code: CountryCodeUnion) {
   return countries.find((c) => c.code === code) || countries[0];
@@ -51,23 +51,24 @@ function cleanPhoneNumber(input: string, countryDetails: SingleCountryType) {
 
 const fieldStyles = tv({
   extend: inputStyles,
-  base: "min-w-[208px] w-auto focus-within:ring-offset-[2px]",
+  base: "min-w-[208px] w-auto",
 });
 
 const buttonStyles = tv({
-  base: "flex items-center text-start w-full cursor-default px-1 mx-1 py-1 focus:outline-none",
+  base: "flex items-center text-start w-full cursor-default px-1 mx-1 py-1 focus:outline-none inset-ring-brand-focus",
   variants: {
     isDisabled: {
       true: "bg-stone-300",
     },
-    isFocusVisible: {
-      true: "inset-ring-2 inset-ring-brand-focus transition-[shadow]",
+    isFocused: {
+      false: "inset-ring-0",
+      true: "inset-ring-2 transition-shadow",
     },
   },
 });
 
 export interface PhoneFieldProps
-  extends Omit<AriaTextFieldProps, "value" | "onChange"> {
+  extends Omit<GroupProps, "value" | "onChange"> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
@@ -75,6 +76,7 @@ export interface PhoneFieldProps
   countryCode: CountryCodeUnion; // this needs to be initialized before runtime
   onPhoneNumberChange: (value: string) => void;
   onCountryCodeChange: (code: CountryCodeUnion) => void;
+  containerClassNames?: string;
 }
 
 export const PhoneField = memo(
@@ -85,11 +87,11 @@ export const PhoneField = memo(
         description,
         errorMessage,
         isInvalid,
-        isRequired,
         phoneNumber,
         countryCode,
         onPhoneNumberChange,
         onCountryCodeChange,
+        containerClassNames,
         ...props
       },
       ref
@@ -112,6 +114,7 @@ export const PhoneField = memo(
       }
 
       const [selectOpen, setSelectOpen] = useState(false);
+
       const [isFocused, setIsFocused] = useState(false);
 
       // React guarantees that all DOM updates have been flushed and the DOM is ready before it runs useEffect.
@@ -130,19 +133,16 @@ export const PhoneField = memo(
         }
       }, [selectOpen]);
 
+      const inputId = useId();
+      const labelId = useId();
+
       return (
-        <AriaTextField
-          {...props}
-          className={composeTailwindRenderProps(
-            props.className,
-            "flex flex-col gap-1"
-          )}
-          isInvalid={isInvalid}
-          onFocusChange={(isFocused) => {
-            setIsFocused(isFocused);
-          }}
+        <div
+          className={twMerge(containerClassNames, "flex flex-col gap-1")}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         >
-          <Label>
+          <Label id={labelId} htmlFor={inputId}>
             <span
               className={`${
                 isFocused && "overline decoration-3 decoration-brand-colour-3"
@@ -151,52 +151,62 @@ export const PhoneField = memo(
               {label}
             </span>
           </Label>
-          <FieldGroup className={fieldStyles}>
-            <>
-              <Select
-                onFocusChange={(isFocused) => setIsFocused(isFocused)}
-                listBoxRef={listBoxRef}
-                aria-label="Country select for phone number"
-                placeholder="Country"
-                selectedKey={countryCode}
-                listBoxClassNames="max-h-[300px]"
-                buttonClassNames={buttonStyles}
-                onSelectionChange={(key) => {
-                  onCountryCodeChange(key as CountryCodeUnion);
-                }}
-                onOpenChange={setSelectOpen}
-                customSelectValue={getCountryFlag()}
-              >
-                {Object.entries(groupedCountries).map(([letter, countries]) => (
-                  <SelectSection title={letter} key={letter}>
-                    {countries.map(({ name, phone, code }) => (
-                      <SelectItem
-                        id={code}
-                        key={code}
-                        textValue={`${name} ${code}`}
-                      >
-                        {name} (+{phone})
-                      </SelectItem>
-                    ))}
-                  </SelectSection>
-                ))}
-              </Select>
-              <Input
-                value={phoneNumber}
-                ref={ref}
-                className="focus:outline-0 flex-1"
-                placeholder={getCountryFromCode(countryCode).example}
-                onChange={(e) =>
-                  onPhoneNumberChange(
-                    cleanPhoneNumber(e.target.value, countryDetails)
-                  )
-                }
-              />
-            </>
+          <FieldGroup
+            className={composeRenderProps(
+              props.className,
+              (className, renderProps) =>
+                fieldStyles({
+                  ...renderProps,
+                  className,
+                })
+            )}
+            isInvalid={isInvalid}
+            aria-labelledby={labelId}
+          >
+            <Select
+              listBoxRef={listBoxRef}
+              aria-label="Country select for phone number"
+              placeholder="Country"
+              selectedKey={countryCode}
+              listBoxClassNames="max-h-[300px]"
+              buttonClassNames={buttonStyles}
+              onSelectionChange={(key) => {
+                onCountryCodeChange(key as CountryCodeUnion);
+              }}
+              onOpenChange={setSelectOpen}
+              customSelectValue={getCountryFlag()}
+            >
+              {Object.entries(groupedCountries).map(([letter, countries]) => (
+                <SelectSection title={letter} key={letter}>
+                  {countries.map(({ name, phone, code }) => (
+                    <SelectItem
+                      id={code}
+                      key={code}
+                      textValue={`${name} ${code}`}
+                    >
+                      {name} (+{phone})
+                    </SelectItem>
+                  ))}
+                </SelectSection>
+              ))}
+            </Select>
+            <Input
+              id={inputId}
+              value={phoneNumber}
+              ref={ref}
+              className="focus:outline-0 flex-1"
+              placeholder={getCountryFromCode(countryCode).example}
+              onChange={(e) =>
+                onPhoneNumberChange(
+                  cleanPhoneNumber(e.target.value, countryDetails)
+                )
+              }
+            />
           </FieldGroup>
           {description && <Description>{description}</Description>}
           <FieldError>{errorMessage}</FieldError>
-        </AriaTextField>
+        </div>
+        // </AriaTextField>
       );
     }
   )
