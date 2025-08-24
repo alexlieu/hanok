@@ -34,7 +34,7 @@ const CustomerForm: React.FC = () => {
     phoneNumber: { countryCode: defaultCountryCode, phoneNumber: "" },
     emailUpdate: false,
     smsUpdate: false,
-    pickupDate: firstValidDate,
+    pickupDate: undefined,
     specialInstructions: "",
   };
 
@@ -95,7 +95,7 @@ const CustomerForm: React.FC = () => {
               fieldState: { invalid, error },
             }) => (
               <TextField
-                ref={ref}
+                inputRef={ref}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -115,7 +115,7 @@ const CustomerForm: React.FC = () => {
               fieldState: { invalid, error },
             }) => (
               <TextField
-                ref={ref}
+                inputRef={ref}
                 value={value}
                 onChange={(e) => {
                   onChange(e);
@@ -142,7 +142,7 @@ const CustomerForm: React.FC = () => {
                 isInvalid={!!(invalid || errors.contact)}
                 errorMessage={error?.message}
                 onBlur={onBlur}
-                ref={ref}
+                inputRef={ref}
                 phoneNumber={value?.phoneNumber}
                 countryCode={value?.countryCode || defaultCountryCode}
                 onCountryCodeChange={(newCountryCode: CountryCodeUnion) => {
@@ -171,7 +171,7 @@ const CustomerForm: React.FC = () => {
                   isInvalid={invalid}
                   value={value}
                   onChange={onChange}
-                  ref={ref}
+                  inputRef={ref}
                   onBlur={onBlur}
                   errorMessage={error?.message}
                   minValue={firstValidDate}

@@ -2,15 +2,16 @@ import {
   DateField as AriaDateField,
   DateFieldProps as AriaDateFieldProps,
   DateInput as AriaDateInput,
-  DateInputProps,
+  DateInputProps as AriaDateInputProps,
   DateSegment,
   DateValue,
   ValidationResult,
 } from "react-aria-components";
 import { tv } from "tailwind-variants";
-import { Description, FieldError, Label, fieldGroupStyles } from "./Field";
+import { Description, FieldError, Label } from "./Field";
+import { fieldGroupStyles } from "./styles/fieldGroupStyles";
 import { composeTailwindRenderProps } from "./utils";
-import { forwardRef } from "react";
+import { RefCallBack } from "react-hook-form";
 
 export interface DateFieldProps<T extends DateValue>
   extends AriaDateFieldProps<T> {
@@ -56,13 +57,14 @@ const segmentStyles = tv({
   },
 });
 
-export const DateInput = forwardRef<
-  HTMLDivElement,
-  Omit<DateInputProps, "children">
->((props, ref) => {
+export interface DateInputProps extends Omit<AriaDateInputProps, "children"> {
+  inputRef?: RefCallBack;
+}
+
+export const DateInput = (props: DateInputProps) => {
   return (
     <AriaDateInput
-      ref={ref}
+      ref={props.inputRef}
       className={(renderProps) =>
         fieldGroupStyles({
           ...renderProps,
@@ -74,4 +76,4 @@ export const DateInput = forwardRef<
       {(segment) => <DateSegment segment={segment} className={segmentStyles} />}
     </AriaDateInput>
   );
-});
+};

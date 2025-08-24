@@ -2,7 +2,7 @@ import {
   FieldErrorProps,
   Group,
   GroupProps,
-  InputProps,
+  InputProps as AriaInputProps,
   LabelProps,
   FieldError as RACFieldError,
   Input as RACInput,
@@ -12,9 +12,9 @@ import {
   composeRenderProps,
 } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
-import { tv } from "tailwind-variants";
-import { composeTailwindRenderProps, focusRing } from "./utils";
-import { forwardRef } from "react";
+import { composeTailwindRenderProps } from "./utils";
+import { RefCallBack } from "react-hook-form";
+import { fieldGroupStyles } from "./styles/fieldGroupStyles";
 
 export function Label(props: LabelProps) {
   return (
@@ -50,27 +50,6 @@ export function FieldError(props: FieldErrorProps) {
   );
 }
 
-export const fieldBorderStyles = tv({
-  variants: {
-    isFocusWithin: {
-      false: "",
-      true: "",
-    },
-    isInvalid: {
-      true: "border-error-red",
-    },
-    isDisabled: {
-      true: "bg-unavailable",
-    },
-  },
-});
-
-export const fieldGroupStyles = tv({
-  extend: focusRing,
-  base: "group flex items-center overflow-hidden",
-  variants: fieldBorderStyles.variants,
-});
-
 export function FieldGroup(props: GroupProps) {
   return (
     <Group
@@ -82,13 +61,17 @@ export function FieldGroup(props: GroupProps) {
   );
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+export interface InputProps extends AriaInputProps {
+  inputRef?: RefCallBack;
+}
+
+export const Input = (props: InputProps) => {
   return (
     <RACInput
       {...props}
-      ref={ref}
+      ref={props.inputRef}
       className={composeTailwindRenderProps(props.className, "px-2 py-1.5")}
       placeholder={props.placeholder}
     />
   );
-});
+};

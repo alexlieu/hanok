@@ -33,7 +33,7 @@ const createCustomerFormSchema = (
         return;
       }),
       pickupDate: z
-        .instanceof(CalendarDate, { message: "Invalid date value" })
+        .instanceof(CalendarDate, { message: "Please enter a valid date." })
         .refine((d) => !isHoliday(d), {
           message:
             "Sorry, we are closed on that day. Please choose another date.",
