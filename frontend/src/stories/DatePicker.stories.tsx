@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Form } from "react-aria-components";
 import { Button } from "../components/ui/aria/Button";
 import { DatePicker } from "../components/ui/aria/DatePicker";
