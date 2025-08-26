@@ -6,7 +6,7 @@ import {
 } from "react-aria-components";
 import { inputStyles } from "./styles/inputStyles";
 import { memo, useEffect, useId, useRef, useState } from "react";
-import { Description, FieldError, FieldGroup, Input, Label } from "./Field";
+import { Description, FieldError, FieldGroup, Input } from "./Field";
 import { Select, SelectItem, SelectSection } from "./Select";
 import {
   countries,
@@ -17,6 +17,7 @@ import {
 import * as Flags from "country-flag-icons/react/3x2";
 import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
+import { createLabel } from "./utils/createLabel";
 
 function getCountryFromCode(code: CountryCodeUnion) {
   return countries.find((c) => c.code === code) || countries[0];
@@ -142,15 +143,7 @@ export const PhoneField = memo(function PhoneField({
       isInvalid={isInvalid}
       onFocusChange={setIsFocused}
     >
-      <Label id={labelId} htmlFor={inputId}>
-        <span
-          className={`${
-            isFocused && "overline decoration-3 decoration-brand-colour-3"
-          }`}
-        >
-          {label}
-        </span>
-      </Label>
+      {createLabel({ label, isFocused, id: labelId, htmlFor: inputId })}
       <FieldGroup className={fieldStyles} aria-labelledby={labelId}>
         <Select
           listBoxRef={listBoxRef}

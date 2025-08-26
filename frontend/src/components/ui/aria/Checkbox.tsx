@@ -9,13 +9,10 @@ import {
 import { tv } from "tailwind-variants";
 import { Description, FieldError } from "./Field";
 import { composeTailwindRenderProps, focusRing } from "./utils";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { ReactNode } from "react";
 import { createLabel } from "./utils/createLabel";
 import { LuMinus as Minus, LuCheck as Check } from "react-icons/lu";
-
-const CheckboxGroupContext = createContext<{
-  setIsPressed: (isPressed: boolean) => void;
-}>({ setIsPressed: () => {} });
+import { RefCallBack } from "react-hook-form";
 
 export interface CheckboxGroupProps
   extends Omit<AriaCheckboxGroupProps, "children"> {
@@ -23,6 +20,7 @@ export interface CheckboxGroupProps
   children?: ReactNode;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
+  inputRef?: RefCallBack;
 }
 
 export function CheckboxGroup({
@@ -32,24 +30,23 @@ export function CheckboxGroup({
   children,
   description,
   errorMessage,
+  value,
+  onChange,
+  onBlur,
+  inputRef,
   ...props
 }: CheckboxGroupProps) {
-  const [isFocused, setIsFocused] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
   return (
     <AriaCheckboxGroup
       {...props}
       className={composeTailwindRenderProps(className, "flex flex-col gap-2")}
-      onFocusChange={setIsFocused}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      ref={inputRef}
     >
-      {createLabel({
-        label,
-        isRequired,
-        isFocused: !!(isFocused || isPressed),
-      })}
-      <CheckboxGroupContext.Provider value={{ setIsPressed }}>
-        {children}
-      </CheckboxGroupContext.Provider>
+      {createLabel({ label, isRequired })}
+      {children}
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
     </AriaCheckboxGroup>
@@ -68,7 +65,7 @@ const checkboxStyles = tv({
 
 const boxStyles = tv({
   extend: focusRing,
-  base: "w-5 h-5 shrink-0 flex items-center justify-center border-2 transition",
+  base: "w-5 h-5 shrink-0 flex items-center justify-center border-2 border-brand-colour-5 transition",
   variants: {
     isSelected: {
       false: "bg-transparent",
@@ -83,17 +80,16 @@ const boxStyles = tv({
   },
 });
 
-const iconStyles = "w-4 h-4 text-black group-disabled:text-unavailable-text";
+const iconStyles =
+  "w-4 h-4 text-brand-colour-5 group-disabled:text-unavailable-text";
 
 export function Checkbox(props: CheckboxProps) {
-  const { setIsPressed } = useContext(CheckboxGroupContext);
   return (
     <AriaCheckbox
       {...props}
       className={composeRenderProps(props.className, (className, renderProps) =>
         checkboxStyles({ ...renderProps, className })
       )}
-      onPressChange={setIsPressed}
     >
       {({ isSelected, isIndeterminate, ...renderProps }) => (
         <>

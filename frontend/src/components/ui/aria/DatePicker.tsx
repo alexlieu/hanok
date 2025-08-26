@@ -9,7 +9,7 @@ import { Button } from "./Button";
 import { Calendar } from "./Calendar";
 import { DateInput } from "./DateField";
 import { Dialog } from "./Dialog";
-import { Description, FieldError, FieldGroup, Label } from "./Field";
+import { Description, FieldError, FieldGroup } from "./Field";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
 import { CalendarDate } from "@internationalized/date";
@@ -17,6 +17,7 @@ import { inputStyles } from "./styles/inputStyles";
 import { tv } from "tailwind-variants";
 import { RefCallBack } from "react-hook-form";
 import { useState } from "react";
+import { createLabel } from "./utils/createLabel";
 
 const fieldStyles = tv({
   extend: inputStyles,
@@ -59,20 +60,7 @@ export const DatePicker = ({
       )}
       onFocusChange={setIsFocused}
     >
-      {label && (
-        <Label>
-          <span
-            className={`${
-              isFocused && "overline decoration-3 decoration-brand-colour-3"
-            }`}
-          >
-            {label}
-          </span>
-          <span className="text-error-red ml-0.5">
-            {props.isRequired ? "*" : ""}
-          </span>
-        </Label>
-      )}
+      {createLabel({ label, isFocused })}
       <FieldGroup className={fieldStyles}>
         <DateInput
           inputRef={inputRef}

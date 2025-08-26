@@ -4,10 +4,11 @@ import {
   TextFieldProps as AriaTextFieldProps,
   ValidationResult,
 } from "react-aria-components";
-import { Description, FieldError, Input, Label } from "./Field";
+import { Description, FieldError, Input } from "./Field";
 import { composeTailwindRenderProps } from "./utils";
 import { inputStyles } from "./styles/inputStyles";
 import { RefCallBack } from "react-hook-form";
+import { createLabel } from "./utils/createLabel";
 
 export interface TextFieldProps extends AriaTextFieldProps {
   label?: string;
@@ -19,6 +20,7 @@ export interface TextFieldProps extends AriaTextFieldProps {
 
 export const TextField = ({
   label,
+  isRequired,
   description,
   errorMessage,
   placeholder,
@@ -43,18 +45,7 @@ export const TextField = ({
       value={value}
       isInvalid={isInvalid}
     >
-      {label && (
-        <Label>
-          <span
-            className={`${
-              isFocused && "overline decoration-3 decoration-brand-colour-3"
-            }`}
-          >
-            {label}
-          </span>
-          {props.isRequired && <span className="ml-0.5 text-error-red">*</span>}
-        </Label>
-      )}
+      {createLabel({ label, isRequired, isFocused })}
       <Input
         inputRef={inputRef}
         onFocus={() => setIsFocused(true)}

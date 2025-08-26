@@ -1,8 +1,12 @@
-import { useForm, SubmitHandler, Controller, Resolver } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  Controller,
+  Resolver,
+  Form,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Checkbox from "../ui/Checkbox";
-import FormError from "./ErrorMessage";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { CountryCodeUnion } from "../../schemas/PhoneSchema";
 import { DatePicker } from "../ui/aria/DatePicker";
 import { I18nProvider } from "react-aria-components";
@@ -12,6 +16,7 @@ import createCustomerFormSchema from "../../schemas/createCustomerFormSchema";
 import { z } from "zod/v4";
 import { TextField } from "../ui/aria/TextField";
 import { PhoneField } from "../ui/aria/PhoneField";
+import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
 
 // Compile-time VS Runtime
 // TS needs the type definition when it needs compile the code, BEFORE the component renders.
@@ -32,8 +37,7 @@ const CustomerForm: React.FC = () => {
     fullName: "",
     email: "",
     phoneNumber: { countryCode: defaultCountryCode, phoneNumber: "" },
-    emailUpdate: false,
-    smsUpdate: false,
+    defaultValue: [],
     pickupDate: undefined,
     specialInstructions: "",
   };
@@ -60,12 +64,12 @@ const CustomerForm: React.FC = () => {
   });
 
   const {
-    register,
-    handleSubmit,
+    // register,
+    // handleSubmit,
     control,
     trigger,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors },
   } = methods;
 
   console.log(errors);
@@ -74,17 +78,15 @@ const CustomerForm: React.FC = () => {
     console.log(data);
   };
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-  }, [isSubmitSuccessful, reset]);
-
   const legendStyling = "text-xl font-medium tracking-wide mb-5";
 
   return (
     <div className="mx-auto">
-      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+      <Form
+        className="flex flex-col"
+        control={control}
+        onSubmit={({ data }) => onSubmit(data)}
+      >
         <fieldset className="flex flex-col gap-4">
           <legend className={`${legendStyling}`}>Contact details</legend>
           <Controller
@@ -120,6 +122,7 @@ const CustomerForm: React.FC = () => {
                 onChange={(e) => {
                   onChange(e);
                   trigger("contact");
+                  trigger("updatePreference");
                 }}
                 onBlur={onBlur}
                 label="Email"
@@ -150,14 +153,14 @@ const CustomerForm: React.FC = () => {
                 }}
                 onPhoneNumberChange={(newPhoneNumber: string) => {
                   onChange({ ...value, phoneNumber: newPhoneNumber });
+                  trigger("updatePreference");
                   trigger("contact");
                 }}
               />
             )}
           />
-          {/* <FormError name="contact" errors={errors} /> */}
         </fieldset>
-        <fieldset className="flex flex-col">
+        <fieldset className="flex flex-col gap-4">
           <legend className={`${legendStyling}`}>Order preferences</legend>
           <I18nProvider locale="en-GB">
             <Controller
@@ -184,24 +187,32 @@ const CustomerForm: React.FC = () => {
               )}
             />
           </I18nProvider>
-          <div>
-            <p>How would you like to receive updates?</p>
-            <FormError name="update" errors={errors} />
-            <Checkbox
-              register={register}
-              name="emailUpdate"
-              displayLabel="Email Update"
-              onChange={() => trigger("update")}
-            />
-            <FormError name="emailUpdate" errors={errors} />
-            <Checkbox
-              register={register}
-              name="smsUpdate"
-              displayLabel="SMS Update"
-              onChange={() => trigger("update")}
-            />
-          </div>
-          <FormError name="smsUpdate" errors={errors} />
+          <Controller
+            name="updatePreference"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => (
+              <CheckboxGroup
+                isInvalid={invalid}
+                value={value}
+                onChange={onChange}
+                inputRef={ref}
+                onBlur={onBlur}
+                errorMessage={error?.message}
+                isRequired
+                label="How should we update you on your order?"
+              >
+                <Checkbox value="sms" className="w-fit">
+                  SMS
+                </Checkbox>
+                <Checkbox value="email" className="w-fit">
+                  Email
+                </Checkbox>
+              </CheckboxGroup>
+            )}
+          />
           <div className="flex flex-col">
             <label htmlFor="special-instructions">
               Special instructions (optional)
@@ -222,7 +233,7 @@ const CustomerForm: React.FC = () => {
         >
           Clear form
         </button>
-      </form>
+      </Form>
     </div>
   );
 };

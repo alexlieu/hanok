@@ -48,34 +48,60 @@ const createCustomerFormSchema = (
               "Sorry, this pickup date is unavailable. Please choose another date within the allowed range.",
           }
         ),
-      smsUpdate: z.boolean().optional(),
-      emailUpdate: z.boolean().optional(),
+      updatePreference: z
+        .array(z.enum(["sms", "email"]), {
+          message: "Please select at least one update preference.",
+        })
+        .min(1, "Please select at least one update preference."),
       specialInstructions: z
         .string()
         .max(500, { error: "You've exceeded the character limit of 500." })
         .nullable(),
       contact: z.string().optional(),
-      update: z.string().optional(),
     })
-    .refine(
-      (data) => {
-        const { email, phoneNumber } = data;
-        return (
-          (email && email.trim() !== "") ||
-          (phoneNumber !== undefined &&
-            phoneNumber?.phoneNumber !== undefined &&
-            phoneNumber?.phoneNumber.trim() !== "")
-        );
-      },
-      {
-        message: "Please provide either your email or phone number.",
-        path: ["contact"],
+    .superRefine(({ email, phoneNumber, updatePreference }, ctx) => {
+      const hasEmail = email && email.trim().length !== 0;
+      const hasPhoneNumber =
+        phoneNumber?.phoneNumber &&
+        phoneNumber?.phoneNumber.trim().length !== 0;
+
+      if (!hasEmail && !hasPhoneNumber) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please provide either your email or phone number.",
+          path: ["contact"],
+        });
       }
-    )
-    .refine(({ smsUpdate, emailUpdate }) => smsUpdate || emailUpdate, {
-      message:
-        "Please select your preferred method for receiving your order updates.",
-      path: ["update"],
+
+      if (
+        updatePreference.includes("email") &&
+        !hasEmail &&
+        updatePreference.includes("sms") &&
+        !hasPhoneNumber
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Please provide an email and a phone number to receive both email and SMS updates.",
+          path: ["updatePreference"],
+        });
+      }
+
+      if (updatePreference.includes("email") && !hasEmail) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please provide an email to receive email updates.",
+          path: ["updatePreference"],
+        });
+      }
+
+      if (updatePreference.includes("sms") && !hasPhoneNumber) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please provide a phone number to receive SMS updates.",
+          path: ["updatePreference"],
+        });
+      }
     });
   const keys = schema.keyof();
   return { schema, keys };

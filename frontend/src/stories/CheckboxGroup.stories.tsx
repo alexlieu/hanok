@@ -1,19 +1,16 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { Checkbox, CheckboxGroup } from "../components/ui/aria/Checkbox";
 import { Form } from "react-aria-components";
 import { Button } from "../components/ui/aria/Button";
-import { Checkbox, CheckboxGroup } from "../components/ui/aria/Checkbox";
-import { Meta } from "@storybook/react-vite";
 
-const meta: Meta<typeof CheckboxGroup> = {
+const meta = {
   component: CheckboxGroup,
   parameters: {
     layout: "centered",
   },
-  tags: ["autodocs"],
   args: {
     label: "Cities",
-    isDisabled: false,
-    isRequired: false,
-    description: "",
     children: (
       <>
         <Checkbox value="sf">San Francisco</Checkbox>
@@ -24,26 +21,36 @@ const meta: Meta<typeof CheckboxGroup> = {
       </>
     ),
   },
-};
+} satisfies Meta<typeof CheckboxGroup>;
 
 export default meta;
 
-export const Default = {
-  args: {},
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    description: "Cities of the world.",
+  },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Validation = (args: any) => {
-  return (
+export const Invalid: Story = {
+  args: {
+    isRequired: true,
+    isInvalid: true,
+    errorMessage: "Invalid input.",
+  },
+  render: (args) => (
     <Form className="flex flex-col gap-2 items-start">
       <CheckboxGroup {...args} />
       <Button type="submit" variant="secondary">
         Submit
       </Button>
     </Form>
-  );
+  ),
 };
 
-Validation.args = {
-  isRequired: true,
+export const Disabled: Story = {
+  args: {
+    isDisabled: true,
+  },
 };

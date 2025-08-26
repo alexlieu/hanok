@@ -1,19 +1,16 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { RadioGroup, Radio } from "../components/ui/aria/RadioGroup";
 import { Form } from "react-aria-components";
 import { Button } from "../components/ui/aria/Button";
-import { Radio, RadioGroup } from "../components/ui/aria/RadioGroup";
-import { Meta } from "@storybook/react-vite";
 
-const meta: Meta<typeof RadioGroup> = {
+const meta = {
   component: RadioGroup,
   parameters: {
     layout: "centered",
   },
-  tags: ["autodocs"],
   args: {
     label: "Favorite Sport",
-    isDisabled: false,
-    isRequired: false,
-    description: "",
     children: (
       <>
         <Radio value="soccer">Soccer</Radio>
@@ -22,20 +19,26 @@ const meta: Meta<typeof RadioGroup> = {
       </>
     ),
   },
-};
+} satisfies Meta<typeof RadioGroup>;
 
 export default meta;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Validation = (args: any) => {
-  return (
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};
+
+export const Invalid: Story = {
+  args: {
+    isRequired: true,
+    isInvalid: true,
+    errorMessage: "Invalid input",
+  },
+  render: (args) => (
     <Form className="flex flex-col gap-2 items-start">
       <RadioGroup {...args} />
       <Button type="submit" variant="secondary">
         Submit
       </Button>
     </Form>
-  );
+  ),
 };
-
-Validation.args = { isRequired: true };
