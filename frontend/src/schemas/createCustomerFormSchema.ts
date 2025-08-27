@@ -53,10 +53,11 @@ const createCustomerFormSchema = (
           message: "Please select at least one update preference.",
         })
         .min(1, "Please select at least one update preference."),
-      specialInstructions: z
-        .string()
-        .max(500, { error: "You've exceeded the character limit of 500." })
-        .nullable(),
+      specialInstructions: z.optional(
+        z
+          .string()
+          .max(500, { error: "You've exceeded the character limit of 500." })
+      ),
       contact: z.string().optional(),
     })
     .superRefine(({ email, phoneNumber, updatePreference }, ctx) => {

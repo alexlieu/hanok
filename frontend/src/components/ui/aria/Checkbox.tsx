@@ -46,7 +46,15 @@ export function CheckboxGroup({
       ref={inputRef}
     >
       {createLabel({ label, isRequired })}
-      {children}
+      {Array.isArray(children) ? (
+        children.length <= 4 ? (
+          <span className="flex flex-row gap-5">{children}</span>
+        ) : (
+          children
+        )
+      ) : (
+        children
+      )}
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
     </AriaCheckboxGroup>

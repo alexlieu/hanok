@@ -17,6 +17,7 @@ import { z } from "zod/v4";
 import { TextField } from "../ui/aria/TextField";
 import { PhoneField } from "../ui/aria/PhoneField";
 import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
+import { TextArea } from "../ui/aria/TextArea";
 
 // Compile-time VS Runtime
 // TS needs the type definition when it needs compile the code, BEFORE the component renders.
@@ -39,7 +40,7 @@ const CustomerForm: React.FC = () => {
     phoneNumber: { countryCode: defaultCountryCode, phoneNumber: "" },
     defaultValue: [],
     pickupDate: undefined,
-    specialInstructions: "",
+    specialInstructions: undefined,
   };
 
   const { schema } = useMemo(() => {
@@ -160,7 +161,7 @@ const CustomerForm: React.FC = () => {
             )}
           />
         </fieldset>
-        <fieldset className="flex flex-col gap-4">
+        <fieldset className="flex flex-col gap-4 pb-4">
           <legend className={`${legendStyling}`}>Order preferences</legend>
           <I18nProvider locale="en-GB">
             <Controller
@@ -213,16 +214,25 @@ const CustomerForm: React.FC = () => {
               </CheckboxGroup>
             )}
           />
-          <div className="flex flex-col">
-            <label htmlFor="special-instructions">
-              Special instructions (optional)
-            </label>
-            <input
-              type="text"
-              name="special-instructions"
-              className="form-input-base border-gray-300"
-            />
-          </div>
+          <Controller
+            name="specialInstructions"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => (
+              <TextArea
+                label="Special instructions"
+                isInvalid={invalid}
+                value={value}
+                onChange={onChange}
+                inputRef={ref}
+                onBlur={onBlur}
+                maxLength={500}
+                errorMessage={error?.message}
+              />
+            )}
+          />
         </fieldset>
         <button type="submit">Place Order</button>
         <button
