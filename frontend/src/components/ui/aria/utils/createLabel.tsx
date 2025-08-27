@@ -1,4 +1,5 @@
 import { Label } from "../Field";
+import { LuAsterisk } from "react-icons/lu";
 
 export interface CreateLabelProps {
   label?: string | undefined;
@@ -23,10 +24,18 @@ export function createLabel({
     isFocused && "overline decoration-3 decoration-brand-colour-3"
   }`;
   return (
-    <Label id={id} htmlFor={htmlFor}>
-      <span className={focusStyling}>{firstWord}</span>
-      {restOfString && <span>{" " + restOfString}</span>}
-      {isRequired && <span className="ml-0.5 text-error-red">*</span>}
+    <Label
+      id={id}
+      htmlFor={htmlFor}
+      className="flex flex-row gap-[3px] justify-center items-center"
+    >
+      <span className={focusStyling}>
+        {firstWord}
+        {restOfString && " " + restOfString}
+      </span>
+      {isRequired && (
+        <LuAsterisk className="h-[0.8lh] w-[0.8lh] text-error-red" />
+      )}
     </Label>
   );
 }

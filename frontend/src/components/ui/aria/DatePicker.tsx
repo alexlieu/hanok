@@ -37,6 +37,7 @@ export const DatePicker = ({
   label,
   description,
   errorMessage,
+  isRequired,
   inputRef,
   unavailableDates,
   isInvalid,
@@ -60,7 +61,7 @@ export const DatePicker = ({
       )}
       onFocusChange={setIsFocused}
     >
-      {createLabel({ label, isFocused })}
+      {createLabel({ label, isRequired, isFocused })}
       <FieldGroup className={fieldStyles}>
         <DateInput
           inputRef={inputRef}

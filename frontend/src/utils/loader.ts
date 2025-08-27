@@ -7,12 +7,7 @@ import { CheckoutRequiredData } from "../types/CheckoutType";
 import getBasketFromLocalStorage from "./getBasketFromLocalStorage";
 import getBasketResponse from "./api/basketApi";
 import getPickupRules from "./api/checkoutApi";
-import {
-  CalendarDate,
-  getLocalTimeZone,
-  now,
-  today,
-} from "@internationalized/date";
+import { getLocalTimeZone, now, today } from "@internationalized/date";
 import { DateValue } from "react-aria-components";
 import { ConfiguredPickupRules } from "../types/ConfigTypes";
 

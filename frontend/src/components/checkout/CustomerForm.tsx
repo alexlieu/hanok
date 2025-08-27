@@ -38,8 +38,8 @@ const CustomerForm: React.FC = () => {
     fullName: "",
     email: "",
     phoneNumber: { countryCode: defaultCountryCode, phoneNumber: "" },
-    defaultValue: [],
-    pickupDate: undefined,
+    updatePreference: [],
+    pickupDate: null,
     specialInstructions: undefined,
   };
 
@@ -70,7 +70,7 @@ const CustomerForm: React.FC = () => {
     control,
     trigger,
     reset,
-    formState: { errors },
+    formState: { errors, touchedFields },
   } = methods;
 
   console.log(errors);
@@ -86,7 +86,10 @@ const CustomerForm: React.FC = () => {
       <Form
         className="flex flex-col"
         control={control}
-        onSubmit={({ data }) => onSubmit(data)}
+        onSubmit={({ data }) => {
+          onSubmit(data);
+          reset();
+        }}
       >
         <fieldset className="flex flex-col gap-4">
           <legend className={`${legendStyling}`}>Contact details</legend>
@@ -122,8 +125,8 @@ const CustomerForm: React.FC = () => {
                 value={value}
                 onChange={(e) => {
                   onChange(e);
+                  if (touchedFields.email) trigger("updatePreference");
                   trigger("contact");
-                  trigger("updatePreference");
                 }}
                 onBlur={onBlur}
                 label="Email"
@@ -154,7 +157,7 @@ const CustomerForm: React.FC = () => {
                 }}
                 onPhoneNumberChange={(newPhoneNumber: string) => {
                   onChange({ ...value, phoneNumber: newPhoneNumber });
-                  trigger("updatePreference");
+                  if (touchedFields.phoneNumber) trigger("updatePreference");
                   trigger("contact");
                 }}
               />
@@ -174,8 +177,8 @@ const CustomerForm: React.FC = () => {
                 <DatePicker
                   isInvalid={invalid}
                   value={value}
-                  onChange={onChange}
                   inputRef={ref}
+                  onChange={onChange}
                   onBlur={onBlur}
                   errorMessage={error?.message}
                   minValue={firstValidDate}
@@ -198,7 +201,10 @@ const CustomerForm: React.FC = () => {
               <CheckboxGroup
                 isInvalid={invalid}
                 value={value}
-                onChange={onChange}
+                onChange={(pref) => {
+                  onChange(pref);
+                  trigger("updatePreference");
+                }}
                 inputRef={ref}
                 onBlur={onBlur}
                 errorMessage={error?.message}
