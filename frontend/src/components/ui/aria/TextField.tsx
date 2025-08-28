@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { isValidElement, ReactNode, useState } from "react";
 import {
   TextField as AriaTextField,
   TextFieldProps as AriaTextFieldProps,
@@ -9,12 +9,14 @@ import { composeTailwindRenderProps } from "./utils";
 import { inputStyles } from "./styles/inputStyles";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
+import Tooltip from "../Tooltip";
 
 export interface TextFieldProps extends AriaTextFieldProps {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
   placeholder?: string;
+  tooltip?: ReactNode;
   inputRef?: RefCallBack;
 }
 
@@ -24,6 +26,7 @@ export const TextField = ({
   description,
   errorMessage,
   placeholder,
+  tooltip,
   inputRef,
   isInvalid,
   value,
@@ -37,7 +40,7 @@ export const TextField = ({
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        "flex flex-col gap-1"
+        "relative flex flex-col gap-1"
       )}
       onFocusChange={(isFocused) => setIsFocused(isFocused)}
       onBlur={onBlur}
@@ -45,6 +48,7 @@ export const TextField = ({
       value={value}
       isInvalid={isInvalid}
     >
+      {isValidElement(tooltip) && tooltip.type === Tooltip && tooltip}
       {createLabel({ label, isRequired, isFocused })}
       <Input
         inputRef={inputRef}

@@ -18,6 +18,7 @@ import { TextField } from "../ui/aria/TextField";
 import { PhoneField } from "../ui/aria/PhoneField";
 import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
 import { TextArea } from "../ui/aria/TextArea";
+import Tooltip from "../ui/Tooltip";
 
 // Compile-time VS Runtime
 // TS needs the type definition when it needs compile the code, BEFORE the component renders.
@@ -130,6 +131,14 @@ const CustomerForm: React.FC = () => {
                 }}
                 onBlur={onBlur}
                 label="Email"
+                tooltip={
+                  <Tooltip className="absolute top-0 right-0">
+                    <p>
+                      We need either your email or phone number so we can keep
+                      you up to date on your order.
+                    </p>
+                  </Tooltip>
+                }
                 placeholder="name@email.com"
                 maxLength={50}
                 isInvalid={!!(invalid || errors.contact)}

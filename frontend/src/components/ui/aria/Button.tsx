@@ -5,13 +5,15 @@ import {
   ButtonProps as RACButtonProps,
 } from "react-aria-components";
 import { focusRing } from "./utils";
+import { Ref } from "react";
 
 export interface ButtonProps extends RACButtonProps {
   /** @default 'primary' */
   variant?: "primary" | "secondary" | "icon";
+  ref?: Ref<HTMLButtonElement>;
 }
 
-let button = tv({
+const button = tv({
   extend: focusRing,
   base: "px-5 py-2 text-sm text-center focus:ring-offset-[2px] focus:outline-none focus:relative focus:z-100 transition border border-2 border-black/10",
   variants: {
@@ -36,6 +38,7 @@ export const Button = (props: ButtonProps) => {
       className={composeRenderProps(props.className, (className, renderProps) =>
         button({ ...renderProps, variant: props.variant, className })
       )}
+      ref={props.ref}
     />
   );
 };
