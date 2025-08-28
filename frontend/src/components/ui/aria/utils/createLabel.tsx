@@ -29,8 +29,8 @@ export function createLabel({
       htmlFor={htmlFor}
       className="flex flex-row gap-[3px] justify-center items-center"
     >
-      <span className={focusStyling}>
-        {firstWord}
+      <span>
+        <span className={focusStyling}>{firstWord}</span>
         {restOfString && " " + restOfString}
       </span>
       {isRequired && (

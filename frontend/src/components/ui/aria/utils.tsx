@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
 
 export const focusRing = tv({
-  base: "ring-brand-focus focus:outline-none ring-0 ring-offset-[2px] focus-within:ring-[2px] transition-shadow",
+  base: "ring-brand-focus focus:outline-none ring-offset-[2px] ring-offset-default-bg focus-within:ring-[2px] transition-shadow",
   variants: {
     isFocusVisible: {
       true: "ring-[2px]",
