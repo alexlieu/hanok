@@ -132,7 +132,10 @@ const CustomerForm: React.FC = () => {
                 onBlur={onBlur}
                 label="Email"
                 tooltip={
-                  <Tooltip className="absolute top-0 right-0">
+                  <Tooltip
+                    className="absolute top-0 right-0 focus:ring-offset-0"
+                    buttonAriaLabel="More information on why we need your contact details"
+                  >
                     <p>
                       We need either your email or phone number so we can keep
                       you up to date on your order.

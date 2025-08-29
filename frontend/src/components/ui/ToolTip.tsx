@@ -25,24 +25,30 @@ import { twMerge } from "tailwind-merge";
 
 type ToolTipProps = {
   children: ReactNode;
-  toolTipIcon?: ReactNode;
+  toolTipIcon?: (isOpen: boolean) => ReactNode;
   placement?: Placement;
   arrowWidth?: number;
   arrowHeight?: number;
   gap?: number;
   className?: string;
+  buttonAriaLabel?: string;
 };
 
 const Tooltip: React.FC<ToolTipProps> = ({
   children,
   className,
-  toolTipIcon = (
-    <IoMdInformationCircleOutline className="w-[1lh] h-[1lh] text-brand-colour-2" />
+  toolTipIcon = (isOpen) => (
+    <IoMdInformationCircleOutline
+      className={`w-[1lh] h-[1lh] text-brand-colour-2 transition-colors ${
+        isOpen && "text-brand-colour-5"
+      }`}
+    />
   ),
   placement = "top",
-  arrowWidth = 10,
-  arrowHeight = 7,
-  gap = 0,
+  arrowWidth = 20,
+  arrowHeight = 4,
+  gap = 2,
+  buttonAriaLabel = "More information",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -108,13 +114,13 @@ const Tooltip: React.FC<ToolTipProps> = ({
   const hover = useHover(context, {
     move: false,
     mouseOnly: true,
-    delay: { close: 230 },
+    delay: { close: 450 },
   });
   const click = useClick(context, { ignoreMouse: true });
-  const focus = useFocus(context);
+  const focus = useFocus(context, { visibleOnly: true });
   const dismiss = useDismiss(context);
   const role = useRole(context, {
-    role: "label",
+    role: "tooltip",
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
@@ -131,13 +137,14 @@ const Tooltip: React.FC<ToolTipProps> = ({
         type="button"
         variant="icon"
         ref={refs.setReference}
-        {...getReferenceProps}
+        {...getReferenceProps()}
         className={twMerge(
           className,
           "w-fit h-fit hover:bg-transparent pressed:bg-transparent p-0"
         )}
+        aria-label={buttonAriaLabel}
       >
-        {toolTipIcon}
+        {toolTipIcon(isOpen)}
       </Button>
       <FloatingPortal>
         {isMounted && (
@@ -149,7 +156,7 @@ const Tooltip: React.FC<ToolTipProps> = ({
           >
             <div
               style={{ ...styles }}
-              className="p-3 text-sm transition-opacity bg-brand-colour-5 max-w-[250px]"
+              className="p-3 rounded-sm text-sm bg-tooltip-bg text-default-bg max-w-[250px] drop-shadow-md"
             >
               {children}
               <FloatingArrow
@@ -157,8 +164,8 @@ const Tooltip: React.FC<ToolTipProps> = ({
                 context={context}
                 width={arrowWidth}
                 height={arrowHeight}
-                tipRadius={2}
-                className="fill-brand-colour-5"
+                fill={"var(--color-tooltip-bg)"}
+                d="M0 20C1.3 20 3.051 19.709 4.246 18.943 5.547 18.009 6.175 17.075 7.492 15.436 8.151 14.563 8.916 14 10 14 11.084 14 11.849 14.563 12.508 15.436 13.825 17.075 14.463 18.009 15.754 18.943 16.949 19.709 18.7 20 20 20H0Z"
               />
             </div>
           </div>

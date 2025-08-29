@@ -15,7 +15,7 @@ export interface ButtonProps extends RACButtonProps {
 
 const button = tv({
   extend: focusRing,
-  base: "px-5 py-2 text-sm text-center focus:ring-offset-[2px] focus:outline-none focus:relative focus:z-100 transition border border-2 border-black/10",
+  base: "px-5 py-2 text-sm text-center border border-2 border-black/10",
   variants: {
     variant: {
       primary: "",
