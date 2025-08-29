@@ -15,11 +15,12 @@ export interface ButtonProps extends RACButtonProps {
 
 const button = tv({
   extend: focusRing,
-  base: "px-5 py-2 text-sm text-center border border-2 border-black/10",
+  base: "px-5 py-2 text-sm text-center border border-2 border-brand-colour-5",
   variants: {
     variant: {
       primary: "",
-      secondary: "text-black bg-white hover:bg-black hover:text-white",
+      secondary:
+        "text-black bg-transparent hover:bg-black hover:text-default-bg hover:border-black",
       icon: "border-0 p-1 flex items-center justify-center text-gray-600 hover:bg-black/10 pressed:bg-black/15 disabled:bg-transparent",
     },
     isDisabled: {

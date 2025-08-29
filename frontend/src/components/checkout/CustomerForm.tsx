@@ -19,6 +19,7 @@ import { PhoneField } from "../ui/aria/PhoneField";
 import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
 import { TextArea } from "../ui/aria/TextArea";
 import Tooltip from "../ui/Tooltip";
+import { Button } from "../ui/aria/Button";
 
 // Compile-time VS Runtime
 // TS needs the type definition when it needs compile the code, BEFORE the component renders.
@@ -80,7 +81,7 @@ const CustomerForm: React.FC = () => {
     console.log(data);
   };
 
-  const legendStyling = "text-xl font-medium tracking-wide mb-5";
+  const legendStyling = "text-xl uppercase tracking-wide mb-2";
 
   return (
     <div className="mx-auto">
@@ -92,7 +93,7 @@ const CustomerForm: React.FC = () => {
           reset();
         }}
       >
-        <fieldset className="flex flex-col gap-4">
+        <fieldset className="flex flex-col gap-4 mb-5">
           <legend className={`${legendStyling}`}>Contact details</legend>
           <Controller
             name="fullName"
@@ -252,15 +253,19 @@ const CustomerForm: React.FC = () => {
             )}
           />
         </fieldset>
-        <button type="submit">Place Order</button>
-        <button
-          type="reset"
-          onClick={() => {
-            reset();
-          }}
-        >
-          Clear form
-        </button>
+        <div className="mt-3 mb-7 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+          <Button type="submit" className="w-full h-full" variant="secondary">
+            Place Order
+          </Button>
+          <Button
+            type="reset"
+            onClick={() => reset()}
+            className="w-full h-full"
+            variant="secondary"
+          >
+            Clear Form
+          </Button>
+        </div>
       </Form>
     </div>
   );

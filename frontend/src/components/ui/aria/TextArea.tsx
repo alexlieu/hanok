@@ -14,7 +14,7 @@ import { tv } from "tailwind-variants";
 
 const textAreaStyles = tv({
   extend: inputStyles,
-  base: "overflow-y-hidden text-start field-sizing-content min-h-[1lh] max-h-[8lh] px-2 py-1.5 ",
+  base: "resize-none h-[8lh] px-2 py-1.5 w-full",
 });
 
 export interface TextAreaProps extends TextFieldProps {
@@ -56,7 +56,7 @@ export function TextArea({
       {createLabel({ label, isRequired, isFocused })}
       <AriaTextArea
         ref={inputRef}
-        rows={2}
+        rows={1}
         maxLength={maxLength}
         className={textAreaStyles}
       />
