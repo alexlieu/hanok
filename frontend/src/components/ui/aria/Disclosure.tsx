@@ -1,11 +1,9 @@
-import { ReactNode, useContext } from "react";
+import { HTMLAttributes, ReactNode, useContext, useEffect } from "react";
 import {
   Disclosure as AriaDisclosure,
   DisclosureGroup as AriaDisclosureGroup,
   DisclosureProps as AriaDisclosureProps,
   DisclosureGroupProps as AriaDisclosureGroupProps,
-  DisclosurePanel as AriaDisclosurePanel,
-  DisclosurePanelProps as AriaDisclosurePanelProps,
   composeRenderProps,
   Heading,
   Button,
@@ -15,6 +13,8 @@ import {
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 import { LuPlus } from "react-icons/lu";
+import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { twMerge } from "tailwind-merge";
 
 const disclosure = tv({
   base: "group min-w-64",
@@ -79,9 +79,35 @@ export interface DisclosureHeaderProps {
   children: ReactNode;
 }
 
+const MotionPlus = motion.create(LuPlus);
+
 export function DisclosureHeader({ children }: DisclosureHeaderProps) {
   const { isExpanded } = useContext(DisclosureStateContext)!;
   const isInGroup = useContext(DisclosureGroupStateContext) !== null;
+  const controls = useAnimationControls();
+
+  const handleHoverStart = () => {
+    controls.start({ scale: 1.1 });
+  };
+  const handleHoverEnd = () => {
+    controls.start({ scale: 1 });
+  };
+  const handleTap = () => {
+    controls.start({ scale: 0.9 });
+  };
+
+  useEffect(() => {
+    controls.start(
+      {
+        rotate: isExpanded ? 45 : 0,
+        color: isExpanded
+          ? "var(--color-brand-colour-1)"
+          : "var(--color-tooltip-bg)",
+      },
+      { duration: 0.1, ease: "easeInOut" }
+    );
+  }, [isExpanded, controls]);
+
   return (
     <Heading className="text-lg font-semibold">
       <Button
@@ -89,13 +115,20 @@ export function DisclosureHeader({ children }: DisclosureHeaderProps) {
         className={(renderProps) =>
           disclosureButton({ ...renderProps, isInGroup })
         }
+        onHoverStart={handleHoverStart}
+        onHoverEnd={handleHoverEnd}
+        onPressStart={handleTap}
+        onPressEnd={handleHoverEnd}
       >
         {({ isDisabled }) => (
           <>
-            <LuPlus
+            <MotionPlus
               aria-hidden
-              className={chevron({ isExpanded, isDisabled })}
-              strokeWidth={3}
+              className={chevron({ isDisabled })}
+              strokeWidth={3.5}
+              initial={{ rotate: 0, color: "var(--color-tooltip-bg)" }}
+              animate={controls}
+              transition={{ duration: 0.05 }}
             />
             {children}
           </>
@@ -105,21 +138,43 @@ export function DisclosureHeader({ children }: DisclosureHeaderProps) {
   );
 }
 
-export interface DisclosurePanelProps extends AriaDisclosurePanelProps {
+export interface DisclosurePanelProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
 }
 
 export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
+  const { isExpanded } = useContext(DisclosureStateContext)!;
+
   return (
-    <AriaDisclosurePanel
-      {...props}
-      className={composeTailwindRenderProps(
-        props.className,
-        "group-data-[expanded]:px-4 group-data-[expanded]:py-2"
-      )}
-    >
-      {children}
-    </AriaDisclosurePanel>
+    <AnimatePresence initial={false}>
+      {isExpanded ? (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{
+            height: "fit-content",
+            opacity: 1,
+            transition: {
+              height: { duration: 0.35, ease: "easeInOut" },
+              opacity: { duration: 0.45, ease: "easeInOut", delay: 0.1 },
+            },
+          }}
+          exit={{
+            height: 0,
+            opacity: 0,
+            transition: {
+              height: { duration: 0.3, ease: "easeInOut", delay: 0.1 },
+              opacity: { duration: 0.3, ease: "easeInOut" },
+            },
+          }}
+          className="overflow-hidden"
+          role="region"
+        >
+          <div {...props} className={twMerge(props.className, "py-2 px-4")}>
+            {children}
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
