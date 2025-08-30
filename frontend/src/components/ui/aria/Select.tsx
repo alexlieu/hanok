@@ -42,7 +42,7 @@ export interface SelectProps<T extends object>
   children: ReactNode | ((item: T) => ReactNode);
 }
 
-export function Select<T extends Object>({
+export function Select<T extends object>({
   label,
   description,
   errorMessage,
