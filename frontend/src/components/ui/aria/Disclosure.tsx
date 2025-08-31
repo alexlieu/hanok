@@ -31,7 +31,7 @@ const disclosure = tv({
 
 const disclosureButton = tv({
   extend: focusRing,
-  base: "flex gap-2 items-center w-full text-start p-2 cursor-default",
+  base: "flex gap-2 items-center w-fit text-start cursor-default",
   variants: {
     isDisabled: {
       true: "text-unavailable-text",
@@ -113,7 +113,7 @@ export function DisclosureHeader({ children }: DisclosureHeaderProps) {
       <Button
         slot="trigger"
         className={(renderProps) =>
-          disclosureButton({ ...renderProps, isInGroup })
+          disclosureButton({ ...renderProps, isInGroup, useFocusWithin: false })
         }
         onHoverStart={handleHoverStart}
         onHoverEnd={handleHoverEnd}
@@ -145,6 +145,11 @@ export interface DisclosurePanelProps extends HTMLAttributes<HTMLDivElement> {
 export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
   const { isExpanded } = useContext(DisclosureStateContext)!;
 
+  // Due to the overflow hidden styling on the div, the focus ring is being cutoff.
+  // The workaround is to increase the width of the div beyond the width of its container and
+  // add padding to its content.
+  const panelOffset = 5;
+
   return (
     <AnimatePresence initial={false}>
       {isExpanded ? (
@@ -166,10 +171,15 @@ export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
               opacity: { duration: 0.3, ease: "easeInOut" },
             },
           }}
-          className="overflow-hidden"
+          className={`overflow-hidden w-[calc(100%+${
+            panelOffset * 2
+          }px)] -mx-[${panelOffset}px]`}
           role="region"
         >
-          <div {...props} className={twMerge(props.className, "py-2 px-4")}>
+          <div
+            {...props}
+            className={twMerge(props.className, `py-2 px-[${panelOffset}px]`)}
+          >
             {children}
           </div>
         </motion.div>

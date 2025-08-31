@@ -7,6 +7,12 @@ import { useMediaQuery } from "../utils/hooks/useWindowDimensions";
 import { AccordianItem } from "../components/ui/AccordianItem";
 import { useState } from "react";
 import { CheckoutRequiredData } from "../types/CheckoutType";
+import {
+  Disclosure,
+  DisclosureHeader,
+  DisclosurePanel,
+} from "../components/ui/aria/Disclosure";
+import { TextArea } from "../components/ui/aria/TextArea";
 
 const CheckoutPage: React.FC = () => {
   const {
@@ -44,6 +50,16 @@ const CheckoutPage: React.FC = () => {
       ) : (
         <div className="w-[85%] order-1 md:order-2 md:w-3/7 p-7 flex flex-col items-center min-w-[270px] md:sticky md:top-0">
           <PickupMap />
+          <Disclosure className={`py-4 w-full`}>
+            <DisclosureHeader>Add special instructions</DisclosureHeader>
+            <DisclosurePanel>
+              <TextArea
+                aria-label="Special instructions"
+                className={`w-full`}
+                description="Please free to add any additional requests or requirements you may need for your order and we'll do our best to accomodate."
+              />
+            </DisclosurePanel>
+          </Disclosure>
           <OrderSummary items={items} total={total} />
         </div>
       )}
