@@ -1,4 +1,10 @@
-import { HTMLAttributes, ReactNode, useContext, useEffect } from "react";
+import {
+  CSSProperties,
+  HTMLAttributes,
+  ReactNode,
+  useContext,
+  useEffect,
+} from "react";
 import {
   Disclosure as AriaDisclosure,
   DisclosureGroup as AriaDisclosureGroup,
@@ -148,12 +154,13 @@ export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
   // Due to the overflow hidden styling on the div, the focus ring is being cutoff.
   // The workaround is to increase the width of the div beyond the width of its container and
   // add padding to its content.
-  const panelOffset = 5;
+  const X_OFFSET_PX = 5;
 
   return (
     <AnimatePresence initial={false}>
       {isExpanded ? (
         <motion.div
+          style={{ "--x-offset": `${X_OFFSET_PX}px` } as CSSProperties}
           initial={{ height: 0, opacity: 0 }}
           animate={{
             height: "fit-content",
@@ -171,14 +178,11 @@ export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
               opacity: { duration: 0.3, ease: "easeInOut" },
             },
           }}
-          className={`overflow-hidden w-[calc(100%+${
-            panelOffset * 2
-          }px)] -mx-[${panelOffset}px]`}
-          role="region"
+          className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)]`}
         >
           <div
             {...props}
-            className={twMerge(props.className, `py-2 px-[${panelOffset}px]`)}
+            className={twMerge(props.className, `py-2 px-[var(--x-offset)]`)}
           >
             {children}
           </div>
