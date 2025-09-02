@@ -119,7 +119,7 @@ export function DisclosureHeader({ children }: DisclosureHeaderProps) {
       <Button
         slot="trigger"
         className={(renderProps) =>
-          disclosureButton({ ...renderProps, isInGroup, useFocusWithin: false })
+          disclosureButton({ ...renderProps, isInGroup })
         }
         onHoverStart={handleHoverStart}
         onHoverEnd={handleHoverEnd}

@@ -4,7 +4,7 @@ export const fieldBorderStyles = tv({
   variants: {
     isFocusWithin: {
       false: "",
-      true: "",
+      true: "border-brand-colour-4",
     },
     isInvalid: {
       true: "border-error-red",
@@ -13,4 +13,11 @@ export const fieldBorderStyles = tv({
       true: "bg-unavailable",
     },
   },
+  compoundVariants: [
+    {
+      isFocusWithin: true,
+      isInvalid: true,
+      className: "border-error-red",
+    },
+  ],
 });

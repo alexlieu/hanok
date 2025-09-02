@@ -60,7 +60,7 @@ export function TextArea({
         maxLength={maxLength}
         className={textAreaStyles}
       />
-      {description && <Description>{description}</Description>}
+      {Description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
     </TextField>
   );

@@ -3,17 +3,24 @@ import { twMerge } from "tailwind-merge";
 import { tv } from "tailwind-variants";
 
 export const focusRing = tv({
-  base: "ring-brand-focus focus:outline-none ring-offset-[2px] ring-offset-default-bg transition-shadow",
+  base: "outline-hidden forced-colors:outline-[Hightlight] ring-brand-focus ring-offset-[2px] ring-offset-default-bg transition",
   variants: {
     isFocusVisible: {
       true: "ring-[2px]",
     },
-    useFocusWithin: {
-      true: " focus-within:ring-[2px]",
-    },
   },
-  defaultVariants: { useFocusWithin: true },
 });
+
+export function getFocusRingClasses(
+  isFocusVisible: boolean,
+  offsetOverride?: string
+) {
+  const baseClasses = focusRing({ isFocusVisible });
+  if (offsetOverride) {
+    return twMerge(baseClasses, offsetOverride);
+  }
+  return baseClasses;
+}
 
 export function composeTailwindRenderProps<T>(
   className: string | ((v: T) => string) | undefined,

@@ -114,7 +114,7 @@ const Tooltip: React.FC<ToolTipProps> = ({
   const hover = useHover(context, {
     move: false,
     mouseOnly: true,
-    delay: { close: 450 },
+    delay: { open: 300, close: 450 },
   });
   const click = useClick(context, { ignoreMouse: true });
   const focus = useFocus(context, { visibleOnly: true });

@@ -4,7 +4,6 @@ import {
   TextFieldProps,
   TextField,
 } from "react-aria-components";
-import { inputStyles } from "./styles/inputStyles";
 import { memo, useEffect, useId, useRef, useState } from "react";
 import { Description, FieldError, FieldGroup, Input } from "./Field";
 import { Select, SelectItem, SelectSection } from "./Select";
@@ -50,11 +49,6 @@ function cleanPhoneNumber(input: string, countryDetails: SingleCountryType) {
 
   return formattedResult;
 }
-
-const fieldStyles = tv({
-  extend: inputStyles,
-  base: "min-w-[208px] w-auto",
-});
 
 const buttonStyles = tv({
   base: "flex items-center text-start w-full cursor-default px-1 mx-1 py-1 focus:outline-none inset-ring-brand-focus",
@@ -142,9 +136,10 @@ export const PhoneField = memo(function PhoneField({
       )}
       isInvalid={isInvalid}
       onFocusChange={setIsFocused}
+      aria-labelledby={labelId}
     >
       {createLabel({ label, isFocused, id: labelId, htmlFor: inputId })}
-      <FieldGroup className={fieldStyles} aria-labelledby={labelId}>
+      <FieldGroup className={`min-w-[208px] w-auto`}>
         <Select
           listBoxRef={listBoxRef}
           aria-label="Country select for phone number"
@@ -173,7 +168,7 @@ export const PhoneField = memo(function PhoneField({
           id={inputId}
           value={phoneNumber}
           inputRef={inputRef}
-          className="focus:outline-0 flex-1"
+          className="focus:outline-0 flex-1 text-sm"
           placeholder={getCountryFromCode(countryCode).example}
           onChange={(e) =>
             onPhoneNumberChange(

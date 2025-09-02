@@ -71,7 +71,7 @@ export function Calendar<T extends DateValue>({
               date={date}
               className={(renderProps) => {
                 let state: VariantProps<typeof cellStyles>["state"] = "default";
-                let baseStyles: string[] = [];
+                const baseStyles: string[] = [];
                 if (renderProps.isSelected) {
                   state = "selected";
                 } else if (
@@ -106,7 +106,7 @@ export function Calendar<T extends DateValue>({
 }
 
 export function CalendarHeader() {
-  let { direction } = useLocale();
+  const { direction } = useLocale();
   return (
     <header className="flex justify-between items-center gap-1.5 pb-4 pl-3 pr-2 w-full">
       <Heading
@@ -114,22 +114,14 @@ export function CalendarHeader() {
         className="tracking-wide font-medium text-lg text-center"
       />
       <div className="flex gap-2">
-        <Button
-          variant="icon"
-          slot="previous"
-          className="hover:bg-stone-200 transition-colors"
-        >
+        <Button variant="icon" slot="previous" invisibleOnDisabled>
           {direction === "rtl" ? (
             <FaChevronRight aria-hidden />
           ) : (
             <FaChevronLeft aria-hidden />
           )}
         </Button>
-        <Button
-          variant="icon"
-          slot="next"
-          className="hover:bg-stone-200 transition-colors"
-        >
+        <Button variant="icon" slot="next" invisibleOnDisabled>
           {direction === "rtl" ? (
             <FaChevronLeft aria-hidden />
           ) : (
