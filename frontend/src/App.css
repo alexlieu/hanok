@@ -33,7 +33,7 @@
     --color-brand-colour-5: #6B8083;
     --color-unavailable: #DBD9DA;
     --color-unavailable-text: #59585D;
-    --color-tooltip-bg: #181527;
+    --color-tooltip-bg: #181527; /* Not using at the moment */
     --color-icon-disabled: #B6C2C4;
     --color-icon-disabled-bg: #E7E9EC;
     --color-icon-hover: #8D89A2;

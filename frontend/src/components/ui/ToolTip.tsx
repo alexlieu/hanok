@@ -156,7 +156,7 @@ const Tooltip: React.FC<ToolTipProps> = ({
           >
             <div
               style={{ ...styles }}
-              className="p-3 rounded-sm text-sm bg-tooltip-bg text-default-bg max-w-[250px] drop-shadow-md"
+              className="p-3 rounded-sm text-sm bg-brand-colour-4 text-default-bg max-w-[250px] drop-shadow-md"
             >
               {children}
               <FloatingArrow
@@ -164,7 +164,7 @@ const Tooltip: React.FC<ToolTipProps> = ({
                 context={context}
                 width={arrowWidth}
                 height={arrowHeight}
-                fill={"var(--color-tooltip-bg)"}
+                fill={"var(--color-brand-colour-4)"}
                 d="M0 20C1.3 20 3.051 19.709 4.246 18.943 5.547 18.009 6.175 17.075 7.492 15.436 8.151 14.563 8.916 14 10 14 11.084 14 11.849 14.563 12.508 15.436 13.825 17.075 14.463 18.009 15.754 18.943 16.949 19.709 18.7 20 20 20H0Z"
               />
             </div>
