@@ -54,14 +54,18 @@ export const DatePicker = ({
       )}
       onFocusChange={setIsFocused}
     >
-      {createLabel({ label, isRequired, isFocused })}
-      <FieldGroup className={`min-w-[208px] w-auto`}>
+      {createLabel({ label, isRequired, isFocused, isInvalid })}
+      <FieldGroup
+        className={`min-w-[208px] w-auto ${
+          isFocused && !isInvalid && "border-brand-colour-4"
+        }`}
+      >
         <DateInput
           inputRef={inputRef}
           className="flex-1 min-w-[150px] px-2 py-1.5 text-sm"
         />
-        <Button variant="icon" className="w-6 mr-1 delay-50">
-          <LuCalendar aria-hidden className="w-4 h-4" strokeWidth={2.5} />
+        <Button variant="icon" className="w-6 mr-1 relative">
+          <LuCalendar aria-hidden className={`w-4 h-4`} strokeWidth={3} />
         </Button>
       </FieldGroup>
       {description && <Description>{description}</Description>}

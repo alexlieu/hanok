@@ -138,7 +138,13 @@ export const PhoneField = memo(function PhoneField({
       onFocusChange={setIsFocused}
       aria-labelledby={labelId}
     >
-      {createLabel({ label, isFocused, id: labelId, htmlFor: inputId })}
+      {createLabel({
+        label,
+        isFocused,
+        isInvalid,
+        id: labelId,
+        htmlFor: inputId,
+      })}
       <FieldGroup className={`min-w-[208px] w-auto`}>
         <Select
           listBoxRef={listBoxRef}

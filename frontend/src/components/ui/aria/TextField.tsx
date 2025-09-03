@@ -49,7 +49,7 @@ export const TextField = ({
       isInvalid={isInvalid}
     >
       {isValidElement(tooltip) && tooltip.type === Tooltip && tooltip}
-      {createLabel({ label, isRequired, isFocused })}
+      {createLabel({ label, isRequired, isFocused, isInvalid })}
       <Input
         inputRef={inputRef}
         onFocus={() => setIsFocused(true)}

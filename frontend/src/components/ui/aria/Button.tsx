@@ -23,7 +23,7 @@ const button = tv({
       primary: "",
       secondary:
         "text-black bg-transparent hover:bg-black hover:text-default-bg hover:border-black",
-      icon: "border-0 p-1 flex items-center justify-center text-brand-colour-5 hover:bg-icon-pressed hover:text-default-bg",
+      icon: "border-0 p-1 flex items-center justify-center text-brand-colour-5 hover:bg-icon-hover hover:text-default-bg pressed:scale-90 pressed:transition-transform",
     },
     isDisabled: {
       true: "bg-unavailable",

@@ -53,7 +53,7 @@ export function TextArea({
       isInvalid={isInvalid}
       onFocusChange={setIsFocused}
     >
-      {createLabel({ label, isRequired, isFocused })}
+      {createLabel({ label, isRequired, isFocused, isInvalid })}
       <AriaTextArea
         ref={inputRef}
         rows={1}
