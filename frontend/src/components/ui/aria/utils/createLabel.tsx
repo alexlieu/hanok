@@ -1,5 +1,6 @@
 import { Label } from "../Field";
 import { motion } from "motion/react";
+import { CSSProperties } from "react";
 import { LuAsterisk } from "react-icons/lu";
 
 export interface CreateLabelProps {
@@ -32,8 +33,8 @@ export function createLabel({
       {animateBackgroundFill({
         text: label,
         animateFill: isFocused!,
-        initialLineWidth: "0px",
-        invalidColourFill: isInvalid,
+        lineWidth: "0px",
+        isInvalid: isInvalid,
       })}
       {isRequired && (
         <LuAsterisk className="h-[0.8lh] w-[0.8lh] text-error-red" />
@@ -58,29 +59,38 @@ export function createNoFocusLabel({
 interface backgroundFillProps {
   text: string;
   animateFill: boolean;
-  invalidColourFill?: boolean;
-  initialLineWidth?: string;
+  fill?: string;
+  isInvalid?: boolean;
+  lineWidth?: string;
+  left?: string;
 }
 
 function animateBackgroundFill({
   text,
   animateFill,
-  invalidColourFill = false,
-  initialLineWidth = "4px",
+  fill = "var(--color-brand-colour-4)",
+  isInvalid = false,
+  lineWidth = "4px",
+  left = "0px",
 }: backgroundFillProps) {
   return (
     <span className="inline-block relative w-fit h-fit">
       <motion.span
-        initial={{ height: initialLineWidth }}
+        style={
+          {
+            "--bottom": lineWidth,
+            "--left": left,
+            "--fill": fill,
+          } as CSSProperties
+        }
+        initial={{ height: lineWidth }}
         animate={{
-          height: animateFill
-            ? `calc(100% + ${initialLineWidth})`
-            : initialLineWidth,
+          height: animateFill ? `calc(100% + ${lineWidth})` : lineWidth,
         }}
-        transition={{ ease: "easeOut" }}
-        className={`absolute -left-[2px] -bottom-[${initialLineWidth}] ${
-          invalidColourFill ? "bg-error-red" : "bg-brand-colour-4"
-        } w-[calc(100%+4px)]`}
+        transition={{ ease: "easeOut", duration: 0.3 }}
+        className={`absolute -left-[var(--left)] -bottom-[var(--bottom)] ${
+          isInvalid ? "bg-error-red" : `bg-[var(--fill)]`
+        } w-[calc(100%+var(--left)*2)]`}
       />
       <span className="invisible">{text}</span>
       <span

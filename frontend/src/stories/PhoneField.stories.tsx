@@ -1,28 +1,35 @@
-import { Meta } from "@storybook/react-vite";
-import { PhoneField } from "../components/ui/aria/PhoneField";
-import { CountryCodeUnion } from "../schemas/PhoneSchema";
-import { useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
-const meta: Meta<typeof PhoneField> = {
+import { PhoneField, PhoneFieldProps } from "../components/ui/aria/PhoneField";
+import { useState } from "react";
+import { CountryCodeUnion } from "../schemas/PhoneSchema";
+
+const meta = {
   component: PhoneField,
   parameters: {
     layout: "centered",
   },
-  tags: ["autodocs"],
-  args: {
-    label: "Phone number",
-  },
-};
+} satisfies Meta<typeof PhoneField>;
 
 export default meta;
 
-export const Example = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
+type Story = StoryObj<typeof meta>;
+
+const PhoneFieldWithState = (
+  props: Omit<
+    PhoneFieldProps,
+    | "phoneNumber"
+    | "countryCode"
+    | "onPhoneNumberChange"
+    | "onCountryCodeChange"
+  >
+) => {
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [countryCode, setCountryCode] = useState<CountryCodeUnion>("GB");
 
   return (
     <PhoneField
-      label="Phone number"
+      {...props}
       phoneNumber={phoneNumber}
       countryCode={countryCode}
       onPhoneNumberChange={setPhoneNumber}
@@ -32,4 +39,16 @@ export const Example = () => {
       }}
     />
   );
+};
+
+export const Interactive: Story = {
+  args: {
+    label: "Phone Number (Stateful)",
+    description: "This is an interactive example with local state.",
+    phoneNumber: "",
+    countryCode: "GB",
+    onPhoneNumberChange: () => {},
+    onCountryCodeChange: () => {},
+  },
+  render: (args) => <PhoneFieldWithState {...args} />,
 };
