@@ -9,6 +9,10 @@ export const inputStyles = tv({
     isFocused: fieldBorderStyles.variants.isFocusWithin,
     isInvalid: fieldBorderStyles.variants.isInvalid,
     isDisabled: fieldBorderStyles.variants.isDisabled,
+    borderless: {
+      forCardNo: "border-hidden ring-offset-0 w-2/3",
+      default: "border-hidden ring-offset-0",
+    },
   },
   compoundVariants: [
     {
@@ -18,3 +22,5 @@ export const inputStyles = tv({
     },
   ],
 });
+
+export type InputBorderlessTypes = keyof typeof inputStyles.variants.borderless;

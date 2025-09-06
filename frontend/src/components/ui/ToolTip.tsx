@@ -19,7 +19,7 @@ import {
   useRole,
   useInteractions,
 } from "@floating-ui/react";
-import { IoMdInformationCircleOutline } from "react-icons/io";
+import { BiInfoSquare } from "react-icons/bi";
 import { Button } from "./aria/Button";
 import { twMerge } from "tailwind-merge";
 
@@ -38,10 +38,12 @@ const Tooltip: React.FC<ToolTipProps> = ({
   children,
   className,
   toolTipIcon = (isOpen) => (
-    <IoMdInformationCircleOutline
-      className={`w-[1lh] h-[1lh] text-brand-colour-2 transition-colors ${
-        isOpen && "text-brand-colour-5"
-      }`}
+    <BiInfoSquare
+      className={`w-[1lh] h-[1lh] transition-colors`}
+      color={
+        isOpen ? "var(--color-brand-colour-5)" : "var(--color-brand-colour-4)"
+      }
+      strokeWidth={0.6}
     />
   ),
   placement = "top",

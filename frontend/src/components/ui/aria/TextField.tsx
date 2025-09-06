@@ -6,7 +6,7 @@ import {
 } from "react-aria-components";
 import { Description, FieldError, Input } from "./Field";
 import { composeTailwindRenderProps } from "./utils";
-import { inputStyles } from "./styles/inputStyles";
+import { InputBorderlessTypes, inputStyles } from "./styles/inputStyles";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
 import Tooltip from "../Tooltip";
@@ -18,6 +18,7 @@ export interface TextFieldProps extends AriaTextFieldProps {
   placeholder?: string;
   tooltip?: ReactNode;
   inputRef?: RefCallBack;
+  borderless?: InputBorderlessTypes;
 }
 
 export const TextField = ({
@@ -27,6 +28,7 @@ export const TextField = ({
   errorMessage,
   placeholder,
   tooltip,
+  borderless,
   inputRef,
   isInvalid,
   value,
@@ -35,6 +37,7 @@ export const TextField = ({
   ...props
 }: TextFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
+
   return (
     <AriaTextField
       {...props}
@@ -55,7 +58,7 @@ export const TextField = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
-        className={inputStyles}
+        className={(renderProps) => inputStyles({ ...renderProps, borderless })}
       />
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
