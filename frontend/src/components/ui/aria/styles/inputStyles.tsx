@@ -10,7 +10,7 @@ export const inputStyles = tv({
     isInvalid: fieldBorderStyles.variants.isInvalid,
     isDisabled: fieldBorderStyles.variants.isDisabled,
     borderless: {
-      forCardNo: "border-hidden ring-offset-0 w-2/3",
+      forCardNo: "border-hidden ring-offset-0",
       default: "border-hidden ring-offset-0",
     },
   },

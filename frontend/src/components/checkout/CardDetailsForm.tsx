@@ -1,12 +1,11 @@
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { PaymentFormFields } from "../../schemas/PaymentFormSchema";
-import VisaSymbol from "../../assets/checkout_logos/visa_symbol.svg?react";
-import MasterCardSymbol from "../../assets/checkout_logos/mastercard_symbol.svg?react";
-import AmexSymbol from "../../assets/checkout_logos/amex_symbol.svg?react";
+import NumberCardFieldGroup from "../ui/NumberCardFieldGroup";
+import { TextField } from "../ui/aria/TextField";
 
 const CardDetailsForm: React.FC = () => {
   const {
-    register,
+    control,
     setValue,
     formState: { errors },
   } = useFormContext<PaymentFormFields>();
@@ -48,73 +47,95 @@ const CardDetailsForm: React.FC = () => {
     setValue("cvv", finalValue);
   };
 
-  const logoStyling =
-    "h-5 sm:h-6 w-auto border border-stone-200 rounded p-[1px]";
+  const errorMessages = [
+    errors.cardNumber?.message,
+    errors.expiration?.message,
+    errors.cvv?.message,
+  ].filter((msg): msg is string => !!msg);
 
   return (
     <>
       <fieldset>
-        <legend>Card information</legend>
-        <div className="relative flex items-center w-full">
-          <input
-            type="text"
-            placeholder="1234 1234 1234 1234"
-            inputMode="numeric"
-            autoCorrect="false"
-            spellCheck="false"
-            autoComplete="false"
-            aria-label="Card Number"
-            {...register("cardNumber", {})}
-            onChange={cardNumberChangeHandler}
-            className={`
-              w-full form-input-base
-              ${errors.cardNumber ? "border-error-red" : "border-gray-300"}
-            `}
+        <legend title="Card details" />
+        <div className="flex flex-col gap-4">
+          <NumberCardFieldGroup
+            cardNoField={
+              <Controller
+                name="cardNumber"
+                control={control}
+                render={({
+                  field: { onChange, onBlur, value, ref },
+                  // fieldState: { invalid, error },
+                }) => (
+                  <TextField
+                    placeholder="1234 1234 1234 1234"
+                    borderless="forCardNo"
+                    inputRef={ref}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    isRequired
+                    aria-label="Card number field"
+                    maxLength={19}
+                    // isInvalid={invalid}
+                    // errorMessage={error?.message}
+                  />
+                )}
+              />
+            }
+            expirationField={
+              <Controller
+                name="expiration"
+                control={control}
+                render={({
+                  field: { onChange, onBlur, value, ref },
+                  // fieldState: { invalid, error },
+                }) => (
+                  <TextField
+                    placeholder="MM/YY"
+                    borderless="default"
+                    inputRef={ref}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    isRequired
+                    aria-label="Card expiration date field"
+                    maxLength={5}
+                    // isInvalid={invalid}
+                    // errorMessage={error?.message}
+                  />
+                )}
+              />
+            }
+            cvvField={
+              <Controller
+                name="cvv"
+                control={control}
+                render={({
+                  field: { onChange, onBlur, value, ref },
+                  // fieldState: { invalid, error },
+                }) => (
+                  <TextField
+                    placeholder="CVV"
+                    borderless="default"
+                    inputRef={ref}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    isRequired
+                    aria-label="Card CVV field"
+                    maxLength={3}
+                    // isInvalid={invalid}
+                    // errorMessage={error?.message}
+                  />
+                )}
+              />
+            }
+            isInvalid={!!(errors.cardNumber || errors.expiration || errors.cvv)}
+            errorMessage={errorMessages}
           />
-          <div
-            className={`
-              absolute right-2 top-1/2 -translate-y-1/2
-              flex flex-row gap-[0.5em] sm:gap-[0.75em]
-            `}
-          >
-            <MasterCardSymbol id="mastercard" className={logoStyling} />
-            <VisaSymbol id="visa" className={logoStyling} />
-            <AmexSymbol id="amex" className={logoStyling} />
-          </div>
+          <TextField label="Holder Name" maxLength={50} />
         </div>
-        <div className="flex flex-row w-full">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="MM/YY"
-              inputMode="numeric"
-              aria-label="Expiration"
-              {...register("expiration")}
-              onChange={expirationChangeHandler}
-              className="w-full mt-[-2px] form-input-base border-gray-300"
-            />
-          </div>
-          <div className="flex-1 ml-[-2px]">
-            <input
-              type="text"
-              placeholder="CVV"
-              inputMode="numeric"
-              aria-label="CVV"
-              {...register("cvv")}
-              onChange={cvvChangeHandler}
-              className="w-full mt-[-2px] form-input-base border-gray-300"
-            />
-          </div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Cardholder name</legend>
-        <input
-          type="text"
-          placeholder="Full name on card"
-          {...register("holderName")}
-          className="w-full focus:z-10 form-input-base border-gray-300"
-        />
       </fieldset>
     </>
   );

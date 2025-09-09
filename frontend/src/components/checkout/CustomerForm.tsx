@@ -17,7 +17,6 @@ import { z } from "zod/v4";
 import { TextField } from "../ui/aria/TextField";
 import { PhoneField } from "../ui/aria/PhoneField";
 import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
-import { TextArea } from "../ui/aria/TextArea";
 import Tooltip from "../ui/Tooltip";
 import { Button } from "../ui/aria/Button";
 
@@ -233,7 +232,7 @@ const CustomerForm: React.FC = () => {
               </CheckboxGroup>
             )}
           />
-          <Controller
+          {/* <Controller
             name="specialInstructions"
             control={control}
             render={({
@@ -251,7 +250,7 @@ const CustomerForm: React.FC = () => {
                 errorMessage={error?.message}
               />
             )}
-          />
+          /> */}
         </fieldset>
         <div className="mt-3 mb-7 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
           <Button type="submit" className="w-full h-full" variant="secondary">

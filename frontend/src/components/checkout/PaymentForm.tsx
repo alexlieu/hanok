@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CardDetailsForm from "./CardDetailsForm";
-import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
+import { SubmitHandler, useForm, Form, FormProvider } from "react-hook-form";
 import {
   PaymentFormFields,
   PaymentFormSchema,
@@ -8,14 +8,21 @@ import {
 import { BillingAddressData } from "../../schemas/BillingAddressSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CardInformation } from "../../schemas/CardSchema";
-import BillingAddressForm from "./BillingAddressForm";
+// import BillingAddressForm from "./BillingAddressForm";
 import { AccordianRadioItem } from "../ui/AccordianItem";
 import ExpressCheckout from "./ExpressCheckout";
+import {
+  Disclosure,
+  DisclosureGroup,
+  DisclosureHeader,
+  DisclosurePanel,
+} from "../ui/aria/Disclosure";
+import { Button } from "../ui/aria/Button";
 
 const PAYMENT_METHODS = [
   {
-    value: "DEBIT",
-    label: "Debit Card",
+    value: "CARD",
+    label: "Card",
   },
   {
     value: "CASH",
@@ -98,7 +105,7 @@ const PaymentForm: React.FC = () => {
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     PaymentMethodValue | undefined
-  >("DEBIT");
+  >("CARD");
 
   // const updatePaymentMethod = (event: React.MouseEvent<HTMLButtonElement>) => {
   //   const value = event.currentTarget.value;
@@ -124,53 +131,31 @@ const PaymentForm: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto">
+    <div className="border-2 border-cyan-300/50">
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={({ data }) => console.log(data)}>
+          <h4 className="uppercase tracking-wide text-xl mb-2">Payment</h4>
           <div>
-            <fieldset>
-              <legend className="text-xl font-medium tracking-wide mx-auto">
-                Express checkout
-              </legend>
-              <ExpressCheckout />
-            </fieldset>
+            <DisclosureGroup className={"flex flex-col gap-2"}>
+              {PAYMENT_METHODS.map(({ value, label }) => (
+                <Disclosure key={value}>
+                  <DisclosureHeader>{label}</DisclosureHeader>
+                  <DisclosurePanel>
+                    {value === "CARD" && (
+                      <div className="flex flex-col gap-4">
+                        <CardDetailsForm />
+                        {/* <BillingAddressForm /> */}
+                      </div>
+                    )}
+                  </DisclosurePanel>
+                </Disclosure>
+              ))}
+            </DisclosureGroup>
           </div>
-          <p
-            className="flex items-center font-semibold tracking-wider text-xl text-gray-400 my-5 
-          before:content-[''] before:flex-1 before:h-[3px] before:bg-gray-300 before:mr-2
-          after:content-[''] after:flex-1 after:h-[3px] after:bg-gray-300 after:ml-2"
-          >
-            OR
-          </p>
-          <div>
-            {PAYMENT_METHODS.map(({ value, label }) => (
-              <AccordianRadioItem
-                key={value}
-                isExpanded={selectedPaymentMethod === value}
-                title={label}
-                onToggle={() => updatePaymentMethod(value)}
-                radioName="payment-method-accordian-item"
-                radioValue={value}
-                isChecked={selectedPaymentMethod === value}
-              >
-                {value === "DEBIT" && (
-                  <div className="flex flex-col w-full mx-auto">
-                    <CardDetailsForm />
-                    <BillingAddressForm />
-                    <button type="submit" className="mx-auto w-full">
-                      Continue
-                    </button>
-                  </div>
-                )}
-                {value === "PAYPAL" && (
-                  <div>
-                    <h3>PAYPAL</h3>
-                  </div>
-                )}
-              </AccordianRadioItem>
-            ))}
-          </div>
-        </form>
+          <Button variant="secondary" type="submit" className={"mt-7"}>
+            Submit
+          </Button>
+        </Form>
       </FormProvider>
     </div>
   );

@@ -30,7 +30,7 @@ const disclosure = tv({
       secondary: "border border-2 border-brand-colour-5",
     },
     isInGroup: {
-      true: "border-0 border-b last:border-b-0",
+      true: "border-0 last:border-b-0",
     },
   },
 });
@@ -200,10 +200,7 @@ export function DisclosureGroup({ children, ...props }: DisclosureGroupProps) {
   return (
     <AriaDisclosureGroup
       {...props}
-      className={composeTailwindRenderProps(
-        props.className,
-        "border border-brand-colour-5"
-      )}
+      className={composeTailwindRenderProps(props.className, "")}
     >
       {children}
     </AriaDisclosureGroup>

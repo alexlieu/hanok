@@ -15,6 +15,8 @@ import { twMerge } from "tailwind-merge";
 import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
 import { fieldGroupStyles } from "./styles/fieldGroupStyles";
+import { ReactNode } from "react";
+import { tv } from "tailwind-variants";
 
 export function Label(props: LabelProps) {
   return (
@@ -48,6 +50,20 @@ export function FieldError(props: FieldErrorProps) {
       )}
     />
   );
+}
+
+interface FieldGroupErrorProps {
+  children: ReactNode;
+  className?: string;
+}
+
+const fieldGroupErrorStyles = tv({
+  base: "text-error-red text-sm",
+});
+
+export function FieldGroupError({ children, className }: FieldGroupErrorProps) {
+  if (!children) return null;
+  return <div className={fieldGroupErrorStyles({ className })}>{children}</div>;
 }
 
 export function FieldGroup(props: GroupProps) {
