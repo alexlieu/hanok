@@ -10,6 +10,7 @@ import { InputBorderlessTypes, inputStyles } from "./styles/inputStyles";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
 import Tooltip from "../Tooltip";
+import { tv } from "tailwind-variants";
 
 export interface TextFieldProps extends AriaTextFieldProps {
   label?: string;
@@ -19,7 +20,13 @@ export interface TextFieldProps extends AriaTextFieldProps {
   tooltip?: ReactNode;
   inputRef?: RefCallBack;
   borderless?: InputBorderlessTypes;
+  contentInField?: ReactNode;
 }
+
+const textFieldStyles = tv({
+  extend: inputStyles,
+  base: "w-full",
+});
 
 export const TextField = ({
   label,
@@ -27,6 +34,7 @@ export const TextField = ({
   description,
   errorMessage,
   placeholder,
+  contentInField,
   tooltip,
   borderless,
   inputRef,
@@ -37,6 +45,18 @@ export const TextField = ({
   ...props
 }: TextFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
+
+  const input = (
+    <Input
+      inputRef={inputRef}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+      placeholder={placeholder}
+      className={(renderProps) =>
+        textFieldStyles({ ...renderProps, borderless })
+      }
+    />
+  );
 
   return (
     <AriaTextField
@@ -53,13 +73,14 @@ export const TextField = ({
     >
       {isValidElement(tooltip) && tooltip.type === Tooltip && tooltip}
       {createLabel({ label, isRequired, isFocused, isInvalid })}
-      <Input
-        inputRef={inputRef}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        placeholder={placeholder}
-        className={(renderProps) => inputStyles({ ...renderProps, borderless })}
-      />
+      {contentInField ? (
+        <span className="relative">
+          {input}
+          {contentInField}
+        </span>
+      ) : (
+        input
+      )}
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
     </AriaTextField>

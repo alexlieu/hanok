@@ -130,34 +130,54 @@ const PaymentForm: React.FC = () => {
     });
   };
 
+  const validCard = "1789372997";
+
+  function luhnAlgorithm(cardNo: string) {
+    if (/^\d+$/.test(cardNo) === false) return "not a number";
+    const digitsReversed = cardNo.split("").reverse();
+    let sumDigits: number = 0;
+    for (let step = 0; step < cardNo.length; step++) {
+      console.log(digitsReversed[step]);
+      if (step % 2 !== 0) {
+        const doubleDigit = Number(digitsReversed[step]) * 2;
+        sumDigits += doubleDigit > 9 ? doubleDigit - 9 : doubleDigit;
+      } else {
+        sumDigits += Number(digitsReversed[step]);
+      }
+    }
+    return sumDigits % 10 === 0 ? "passed" : "failed";
+  }
+
   return (
-    <div className="border-2 border-cyan-300/50">
-      <FormProvider {...methods}>
-        <Form onSubmit={({ data }) => console.log(data)}>
-          <h4 className="uppercase tracking-wide text-xl mb-2">Payment</h4>
-          <div>
-            <DisclosureGroup className={"flex flex-col gap-2"}>
-              {PAYMENT_METHODS.map(({ value, label }) => (
-                <Disclosure key={value}>
-                  <DisclosureHeader>{label}</DisclosureHeader>
-                  <DisclosurePanel>
-                    {value === "CARD" && (
-                      <div className="flex flex-col gap-4">
-                        <CardDetailsForm />
-                        {/* <BillingAddressForm /> */}
-                      </div>
-                    )}
-                  </DisclosurePanel>
-                </Disclosure>
-              ))}
-            </DisclosureGroup>
-          </div>
-          <Button variant="secondary" type="submit" className={"mt-7"}>
-            Submit
-          </Button>
-        </Form>
-      </FormProvider>
-    </div>
+    <FormProvider {...methods}>
+      <Form onSubmit={({ data }) => console.log(data)}>
+        <h4 className="uppercase tracking-wide text-xl mb-2">Payment</h4>
+        <div>
+          <DisclosureGroup
+            className={"flex flex-col gap-2"}
+            allowsMultipleExpanded={false}
+            defaultExpandedKeys={["CARD"]}
+          >
+            {PAYMENT_METHODS.map(({ value, label }) => (
+              <Disclosure id={value} key={value}>
+                <DisclosureHeader>{label}</DisclosureHeader>
+                <DisclosurePanel>
+                  {value === "CARD" && (
+                    <div className="flex flex-col gap-4">
+                      <CardDetailsForm />
+                      {/* <BillingAddressForm /> */}
+                    </div>
+                  )}
+                </DisclosurePanel>
+              </Disclosure>
+            ))}
+          </DisclosureGroup>
+        </div>
+        <Button variant="secondary" type="submit" className={"mt-7"}>
+          Submit
+        </Button>
+      </Form>
+    </FormProvider>
   );
 };
 
