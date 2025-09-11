@@ -2,9 +2,12 @@ import { Controller, useFormContext } from "react-hook-form";
 import { PaymentFormFields } from "../../schemas/PaymentFormSchema";
 import { TextField } from "../ui/aria/TextField";
 import { tv } from "tailwind-variants";
+import { getIssuingBank, issuingBank } from "../../schemas/CardSchema";
 import Visa from "../../assets/checkout_logos/visa.svg?react";
 import Mastercard from "../../assets/checkout_logos/mastercard.svg?react";
 import Amex from "../../assets/checkout_logos/amex.svg?react";
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 
 const CardDetailsForm: React.FC = () => {
   const {
@@ -17,6 +20,12 @@ const CardDetailsForm: React.FC = () => {
   const logoStyles = tv({
     base: "",
   });
+
+  const [issuingBank, setIssuingBank] = useState<issuingBank>(undefined);
+
+  const MotionVisa = motion.create(Visa);
+  const MotionMastercard = motion.create(Mastercard);
+  const MotionAmex = motion.create(Amex);
 
   return (
     <>
@@ -59,6 +68,7 @@ const CardDetailsForm: React.FC = () => {
                   formattedInput.length <= 19
                     ? formattedInput
                     : formattedInput.substring(0, 19);
+                setIssuingBank(getIssuingBank(finalValue));
                 onChange(finalValue);
               };
               return (
@@ -75,13 +85,55 @@ const CardDetailsForm: React.FC = () => {
                   isInvalid={invalid}
                   errorMessage={error?.message}
                   className={"col-span-2"}
-                  contentInField={
-                    <span className="absolute flex flex-row items-center justify-between h-full w-[100px] right-2 top-0">
-                      <Visa id="amex" className={logoStyles()} />
-                      <Mastercard id="mastercard" className={logoStyles()} />
-                      <Amex id="amex" className={logoStyles()} />
-                    </span>
-                  }
+                  contentInField={(() => {
+                    const logoVariants = {
+                      hidden: { opacity: 0, translateY: 5 },
+                      visible: { opacity: 1, translateY: 0 },
+                      exit: { opacity: 0, translateY: 5 },
+                    };
+                    return (
+                      <AnimatePresence>
+                        <span className="absolute flex flex-row items-center justify-between h-full gap-2 top-0 right-2">
+                          {(issuingBank === "Visa" ||
+                            issuingBank === undefined) && (
+                            <MotionVisa
+                              id="visa"
+                              key="visa"
+                              variants={logoVariants}
+                              initial="hidden"
+                              animate="visible"
+                              exit="exit"
+                              className={logoStyles()}
+                            />
+                          )}
+                          {(issuingBank === "Mastercard" ||
+                            issuingBank === undefined) && (
+                            <MotionMastercard
+                              id="mastercard"
+                              key="mastercard"
+                              layout="position"
+                              initial={{ opacity: 0, translateY: 5 }}
+                              animate={{ opacity: 1, translateY: 0 }}
+                              exit={{ opacity: 0, translateY: 5 }}
+                              className={logoStyles()}
+                            />
+                          )}
+                          {(issuingBank === "Amex" ||
+                            issuingBank === undefined) && (
+                            <MotionAmex
+                              id="amex"
+                              key="amex"
+                              layout="position"
+                              initial={{ opacity: 0, translateY: 5 }}
+                              animate={{ opacity: 1, translateY: 0 }}
+                              exit={{ opacity: 0, translateY: 5 }}
+                              className={logoStyles()}
+                            />
+                          )}
+                        </span>
+                      </AnimatePresence>
+                    );
+                  })()}
                 />
               );
             }}

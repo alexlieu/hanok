@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import CardDetailsForm from "./CardDetailsForm";
-import { SubmitHandler, useForm, Form, FormProvider } from "react-hook-form";
+import { useForm, Form, FormProvider } from "react-hook-form";
 import {
   PaymentFormFields,
   PaymentFormSchema,
@@ -86,7 +86,6 @@ const PaymentForm: React.FC = () => {
 
   const {
     watch,
-    handleSubmit,
     formState: { errors },
   } = methods;
 
@@ -98,55 +97,6 @@ const PaymentForm: React.FC = () => {
   }, [watch]);
 
   console.log(errors);
-
-  const onSubmit: SubmitHandler<PaymentFormFields> = (data) => {
-    console.log("Submitting payment data... ", data);
-  };
-
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    PaymentMethodValue | undefined
-  >("CARD");
-
-  // const updatePaymentMethod = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   const value = event.currentTarget.value;
-  //   // if (value !== selectedPaymentMethod) {
-  //   //   reset();
-  //   // }
-  //   if (isPaymentMethod(value)) {
-  //     setSelectedPaymentMethod((prevState) =>
-  //       prevState === value ? undefined : value
-  //     );
-  //   } else {
-  //     console.log("Invalid payment method type: ", value);
-  //   }
-  // };
-
-  const updatePaymentMethod = (value: PaymentMethodValue) => {
-    setSelectedPaymentMethod((prevVal) => {
-      if (prevVal !== value) {
-        methods.reset(DEFAULT_PAYMENT_FORM_VALUES);
-      }
-      return value;
-    });
-  };
-
-  const validCard = "1789372997";
-
-  function luhnAlgorithm(cardNo: string) {
-    if (/^\d+$/.test(cardNo) === false) return "not a number";
-    const digitsReversed = cardNo.split("").reverse();
-    let sumDigits: number = 0;
-    for (let step = 0; step < cardNo.length; step++) {
-      console.log(digitsReversed[step]);
-      if (step % 2 !== 0) {
-        const doubleDigit = Number(digitsReversed[step]) * 2;
-        sumDigits += doubleDigit > 9 ? doubleDigit - 9 : doubleDigit;
-      } else {
-        sumDigits += Number(digitsReversed[step]);
-      }
-    }
-    return sumDigits % 10 === 0 ? "passed" : "failed";
-  }
 
   return (
     <FormProvider {...methods}>

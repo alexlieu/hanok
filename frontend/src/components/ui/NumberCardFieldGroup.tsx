@@ -2,9 +2,9 @@ import { Description, FieldGroup, FieldGroupError } from "./aria/Field";
 import { createLabel } from "./aria/utils/createLabel";
 import { memo, ReactNode, useState } from "react";
 import { tv } from "tailwind-variants";
-import VisaSymbol from "../../assets/checkout_logos/visa_symbol.svg?react";
-import MasterCardSymbol from "../../assets/checkout_logos/mastercard_symbol.svg?react";
-import AmexSymbol from "../../assets/checkout_logos/amex_symbol.svg?react";
+import VisaSymbol from "../../assets/checkout_logos/visa.svg?react";
+import MasterCardSymbol from "../../assets/checkout_logos/mastercard.svg?react";
+import AmexSymbol from "../../assets/checkout_logos/amex.svg?react";
 
 export interface NumberCardFieldGroupProps {
   cardNoField: ReactNode;

@@ -1,5 +1,49 @@
 import { z } from "zod/v4";
 
+function luhnAlgorithm(cardNo: string) {
+  if (/^\d+$/.test(cardNo) === false) return "not a number";
+  const digitsReversed = cardNo.split("").reverse();
+  let sumDigits: number = 0;
+  for (let step = 0; step < cardNo.length; step++) {
+    console.log(digitsReversed[step]);
+    if (step % 2 !== 0) {
+      const doubleDigit = Number(digitsReversed[step]) * 2;
+      sumDigits += doubleDigit > 9 ? doubleDigit - 9 : doubleDigit;
+    } else {
+      sumDigits += Number(digitsReversed[step]);
+    }
+  }
+  return sumDigits % 10 === 0;
+}
+
+export function getIssuingBank(cardNo: string) {
+  if (cardNo.match(new RegExp("^4")) !== null) return "Visa";
+  if (/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[01]|2720)/.test(cardNo))
+    return "Mastercard";
+  if (cardNo.match("^3[47]") !== null) return "Amex";
+  return;
+}
+
+export type issuingBank = ReturnType<typeof getIssuingBank>;
+
+function validateBIN(cardNo: string) {
+  const cardLength = cardNo.replace(" ", "").length;
+  const issuingBank = getIssuingBank(cardNo);
+  if (issuingBank === "Visa" && ![13, 16, 19].includes(cardLength)) {
+    return false;
+  }
+  if (issuingBank === "Mastercard" && cardLength !== 16) {
+    return false;
+  }
+  if (issuingBank === "Amex" && cardLength !== 15) {
+    return false;
+  }
+  if (issuingBank === undefined) {
+    return false;
+  }
+  return true;
+}
+
 export const CardSchema = z.object({
   cardNumber: z
     .string()
