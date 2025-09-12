@@ -1,19 +1,21 @@
 import { z } from "zod/v4";
 
 function luhnAlgorithm(cardNo: string) {
-  if (/^\d+$/.test(cardNo) === false) return "not a number";
-  const digitsReversed = cardNo.split("").reverse();
-  let sumDigits: number = 0;
-  for (let step = 0; step < cardNo.length; step++) {
-    console.log(digitsReversed[step]);
-    if (step % 2 !== 0) {
+  if (/^[0-9]*$/.test(cardNo.replace(/\D/g, "")) === false) return false;
+  const checkDigit = Number(cardNo[cardNo.length - 1]);
+  const payload = cardNo.substring(0, cardNo.length - 1).replace(/\D/g, "");
+  const digitsReversed = payload.split("").reverse();
+  let sum: number = 0;
+  for (let step = 0; step < digitsReversed.length; step++) {
+    if (step % 2 === 0) {
       const doubleDigit = Number(digitsReversed[step]) * 2;
-      sumDigits += doubleDigit > 9 ? doubleDigit - 9 : doubleDigit;
+      sum += doubleDigit > 9 ? doubleDigit - 9 : doubleDigit;
     } else {
-      sumDigits += Number(digitsReversed[step]);
+      sum += Number(digitsReversed[step]);
     }
   }
-  return sumDigits % 10 === 0;
+  const totalSum = sum + checkDigit;
+  return totalSum % 10 === 0;
 }
 
 export function getIssuingBank(cardNo: string) {
@@ -25,14 +27,18 @@ export function getIssuingBank(cardNo: string) {
 }
 
 export type issuingBank = ReturnType<typeof getIssuingBank>;
+export type filteredIssuingBank = Exclude<issuingBank, undefined>;
 
 function validateBIN(cardNo: string) {
-  const cardLength = cardNo.replace(" ", "").length;
+  const cardLength = cardNo.replace(/\D/g, "").length;
   const issuingBank = getIssuingBank(cardNo);
-  if (issuingBank === "Visa" && ![13, 16, 19].includes(cardLength)) {
-    return false;
-  }
-  if (issuingBank === "Mastercard" && cardLength !== 16) {
+  // if (issuingBank === "Visa" && ![13, 16, 19].includes(cardLength)) {
+  //   return false;
+  // }
+  if (
+    (issuingBank === "Mastercard" || issuingBank === "Visa") &&
+    cardLength !== 16
+  ) {
     return false;
   }
   if (issuingBank === "Amex" && cardLength !== 15) {
@@ -45,9 +51,12 @@ function validateBIN(cardNo: string) {
 }
 
 export const CardSchema = z.object({
-  cardNumber: z
-    .string()
-    .regex(/^(\d{4}\s){3}\d{4}$/, "Card number must be 16 digits."),
+  cardNumber: z.string().refine(
+    (val) => {
+      return validateBIN(val) && luhnAlgorithm(val);
+    },
+    { message: "Your card number is invalid." }
+  ),
   expiration: z
     .string()
     .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format.")

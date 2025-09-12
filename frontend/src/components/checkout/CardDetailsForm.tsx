@@ -8,8 +8,8 @@ import Mastercard from "../../assets/checkout_logos/mastercard.svg?react";
 import Amex from "../../assets/checkout_logos/amex.svg?react";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-// import { FaRegCreditCard } from "react-icons/fa6";
-// import { LuCircleX } from "react-icons/lu";
+import { FaRegCreditCard } from "react-icons/fa6";
+import { LuCircleX } from "react-icons/lu";
 
 const allLogos = ["Visa", "Mastercard", "Amex"];
 
@@ -73,14 +73,26 @@ const CardDetailsForm: React.FC = () => {
             }) => {
               const handleCleanCardNumber = (rawInput: string) => {
                 const filteredInput = rawInput.replace(/\D/g, "");
-                const formattedInput =
-                  filteredInput.match(/.{1,4}/g)?.join(" ") || "";
-                const finalValue =
-                  formattedInput.length <= 19
-                    ? formattedInput
-                    : formattedInput.substring(0, 19);
-                setIssuingBank(getIssuingBank(finalValue));
-                onChange(finalValue);
+                const len = filteredInput.length;
+                const localIssuingBank = getIssuingBank(filteredInput);
+                let formattedInput;
+                if (localIssuingBank === "Amex") {
+                  formattedInput = "";
+                  if (len > 0) {
+                    formattedInput += filteredInput.substring(0, 4);
+                    if (len > 4) {
+                      formattedInput += " " + filteredInput.substring(4, 10);
+                    }
+                    if (len > 10) {
+                      formattedInput += " " + filteredInput.substring(10, 15);
+                    }
+                  }
+                } else {
+                  formattedInput =
+                    filteredInput.match(/.{1,4}/g)?.join(" ") || "";
+                }
+                setIssuingBank(localIssuingBank);
+                onChange(formattedInput);
               };
               return (
                 <TextField
@@ -92,41 +104,82 @@ const CardDetailsForm: React.FC = () => {
                   onBlur={onBlur}
                   isRequired
                   aria-label="Card number field"
-                  maxLength={19}
+                  maxLength={issuingBank === "Amex" ? 17 : 19}
                   isInvalid={invalid}
                   errorMessage={error?.message}
                   className={"col-span-2"}
                   contentInField={(() => {
+                    const duration = 0.08;
                     const logoVariants = {
-                      hidden: { opacity: 0, translateY: 5 },
-                      visible: { opacity: 1, translateY: 0 },
-                      exit: { opacity: 0, translateY: 5 },
+                      hidden: {
+                        opacity: 0,
+                        translateY: 5,
+                        transition: { duration: duration },
+                      },
+                      visible: {
+                        opacity: 1,
+                        translateY: 0,
+                        transition: { duration: duration },
+                      },
+                      exit: {
+                        opacity: 0,
+                        translateY: 5,
+                        transition: { duration: duration },
+                      },
                     };
                     return (
-                      <ul className="absolute flex flex-row justify-center items-center h-full gap-3 top-0 right-2">
-                        <AnimatePresence>
-                          {presentLogos.map((logo) => (
-                            <motion.li
-                              key={logo}
-                              layout
-                              variants={logoVariants}
-                              initial={isInitialMount ? false : "hidden"}
-                              animate="visible"
-                              exit="exit"
-                            >
-                              {logo === "Visa" && (
-                                <Visa className={logoStyles()} />
-                              )}
-                              {logo === "Mastercard" && (
-                                <Mastercard className={logoStyles()} />
-                              )}
-                              {logo === "Amex" && (
-                                <Amex className={logoStyles()} />
-                              )}
-                            </motion.li>
-                          ))}
-                        </AnimatePresence>
-                      </ul>
+                      <AnimatePresence mode="wait">
+                        {invalid && value === "" ? (
+                          <motion.span
+                            className="absolute flex justify-center items-center right-3 top-0 h-full"
+                            key="invalid"
+                            variants={logoVariants}
+                            initial={isInitialMount ? false : "hidden"}
+                            animate="visible"
+                            exit="exit"
+                          >
+                            <FaRegCreditCard
+                              fill="var(--color-error-red)"
+                              className="scale-150 relative"
+                            />
+                            <LuCircleX
+                              stroke="var(--color-error-red)"
+                              strokeWidth={3}
+                              className="absolute scale-70 bg-default-bg rounded-full -right-2 bottom-1"
+                            />
+                          </motion.span>
+                        ) : (
+                          <motion.div
+                            key={issuingBank || "all"}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute h-full top-0 right-2"
+                          >
+                            <ul className="flex flex-row justify-center items-center h-full gap-3">
+                              {presentLogos.map((logo) => (
+                                <motion.li
+                                  key={logo}
+                                  variants={logoVariants}
+                                  initial={isInitialMount ? false : "hidden"}
+                                  animate="visible"
+                                  exit="exit"
+                                >
+                                  {logo === "Visa" && (
+                                    <Visa className={logoStyles()} />
+                                  )}
+                                  {logo === "Mastercard" && (
+                                    <Mastercard className={logoStyles()} />
+                                  )}
+                                  {logo === "Amex" && (
+                                    <Amex className={logoStyles()} />
+                                  )}
+                                </motion.li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     );
                   })()}
                 />
