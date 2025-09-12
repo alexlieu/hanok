@@ -6,8 +6,12 @@ import { getIssuingBank, issuingBank } from "../../schemas/CardSchema";
 import Visa from "../../assets/checkout_logos/visa.svg?react";
 import Mastercard from "../../assets/checkout_logos/mastercard.svg?react";
 import Amex from "../../assets/checkout_logos/amex.svg?react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+// import { FaRegCreditCard } from "react-icons/fa6";
+// import { LuCircleX } from "react-icons/lu";
+
+const allLogos = ["Visa", "Mastercard", "Amex"];
 
 const CardDetailsForm: React.FC = () => {
   const {
@@ -21,11 +25,18 @@ const CardDetailsForm: React.FC = () => {
     base: "",
   });
 
+  const [isInitialMount, setIsInitialMount] = useState(true);
+
+  useEffect(() => {
+    setIsInitialMount(false);
+  }, []);
+
   const [issuingBank, setIssuingBank] = useState<issuingBank>(undefined);
 
-  const MotionVisa = motion.create(Visa);
-  const MotionMastercard = motion.create(Mastercard);
-  const MotionAmex = motion.create(Amex);
+  const presentLogos =
+    issuingBank === undefined
+      ? allLogos
+      : allLogos.filter((logo) => logo === issuingBank);
 
   return (
     <>
@@ -92,46 +103,30 @@ const CardDetailsForm: React.FC = () => {
                       exit: { opacity: 0, translateY: 5 },
                     };
                     return (
-                      <AnimatePresence>
-                        <span className="absolute flex flex-row items-center justify-between h-full gap-2 top-0 right-2">
-                          {(issuingBank === "Visa" ||
-                            issuingBank === undefined) && (
-                            <MotionVisa
-                              id="visa"
-                              key="visa"
+                      <ul className="absolute flex flex-row justify-center items-center h-full gap-3 top-0 right-2">
+                        <AnimatePresence>
+                          {presentLogos.map((logo) => (
+                            <motion.li
+                              key={logo}
+                              layout
                               variants={logoVariants}
-                              initial="hidden"
+                              initial={isInitialMount ? false : "hidden"}
                               animate="visible"
                               exit="exit"
-                              className={logoStyles()}
-                            />
-                          )}
-                          {(issuingBank === "Mastercard" ||
-                            issuingBank === undefined) && (
-                            <MotionMastercard
-                              id="mastercard"
-                              key="mastercard"
-                              layout="position"
-                              initial={{ opacity: 0, translateY: 5 }}
-                              animate={{ opacity: 1, translateY: 0 }}
-                              exit={{ opacity: 0, translateY: 5 }}
-                              className={logoStyles()}
-                            />
-                          )}
-                          {(issuingBank === "Amex" ||
-                            issuingBank === undefined) && (
-                            <MotionAmex
-                              id="amex"
-                              key="amex"
-                              layout="position"
-                              initial={{ opacity: 0, translateY: 5 }}
-                              animate={{ opacity: 1, translateY: 0 }}
-                              exit={{ opacity: 0, translateY: 5 }}
-                              className={logoStyles()}
-                            />
-                          )}
-                        </span>
-                      </AnimatePresence>
+                            >
+                              {logo === "Visa" && (
+                                <Visa className={logoStyles()} />
+                              )}
+                              {logo === "Mastercard" && (
+                                <Mastercard className={logoStyles()} />
+                              )}
+                              {logo === "Amex" && (
+                                <Amex className={logoStyles()} />
+                              )}
+                            </motion.li>
+                          ))}
+                        </AnimatePresence>
+                      </ul>
                     );
                   })()}
                 />
