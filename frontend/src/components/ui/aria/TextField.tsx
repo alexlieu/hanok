@@ -1,10 +1,9 @@
-import { isValidElement, ReactNode, useState } from "react";
+import { isValidElement, ReactNode, useId, useState } from "react";
 import {
   TextField as AriaTextField,
   TextFieldProps as AriaTextFieldProps,
-  ValidationResult,
 } from "react-aria-components";
-import { Description, FieldError, Input } from "./Field";
+import { AnimatedFieldError, Description, Input } from "./Field";
 import { composeTailwindRenderProps } from "./utils";
 import { InputBorderlessTypes, inputStyles } from "./styles/inputStyles";
 import { RefCallBack } from "react-hook-form";
@@ -15,7 +14,7 @@ import { tv } from "tailwind-variants";
 export interface TextFieldProps extends AriaTextFieldProps {
   label?: string;
   description?: string;
-  errorMessage?: string | ((validation: ValidationResult) => string);
+  errorMessage?: string;
   placeholder?: string;
   tooltip?: ReactNode;
   inputRef?: RefCallBack;
@@ -45,6 +44,7 @@ export const TextField = ({
   ...props
 }: TextFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
+  const errorMessageId = useId();
 
   const input = (
     <Input
@@ -55,6 +55,7 @@ export const TextField = ({
       className={(renderProps) =>
         textFieldStyles({ ...renderProps, borderless })
       }
+      aria-describedby={errorMessageId}
     />
   );
 
@@ -82,7 +83,11 @@ export const TextField = ({
         input
       )}
       {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      <AnimatedFieldError
+        children={errorMessage}
+        isInvalid={isInvalid}
+        id={errorMessageId}
+      />
     </AriaTextField>
   );
 };

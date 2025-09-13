@@ -59,7 +59,10 @@ export const CardSchema = z.object({
   ),
   expiration: z
     .string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format.")
+    .regex(
+      /^(0[1-9]|1[0-2])\/\d{2}$/,
+      "Your card's expiration date must be in MM/YY format."
+    )
     .refine(
       (val) => {
         const [month2Digit, year2Digit] = val.split("/");
@@ -80,7 +83,7 @@ export const CardSchema = z.object({
 
         return true;
       },
-      { message: "Expiration date is invalid or in the past." }
+      { message: "Your card's expiration date is in the past." }
     ),
   cvv: z.string().regex(/^\d{3,4}$/, "CVV must be 3 or 4 digits"),
   holderName: z.string().min(1, "Holder name is required"),

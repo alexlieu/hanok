@@ -15,8 +15,9 @@ import { twMerge } from "tailwind-merge";
 import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
 import { fieldGroupStyles } from "./styles/fieldGroupStyles";
-import { ReactNode } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import { tv } from "tailwind-variants";
+import { AnimatePresence, HTMLMotionProps, motion } from "motion/react";
 
 export function Label(props: LabelProps) {
   return (
@@ -49,6 +50,34 @@ export function FieldError(props: FieldErrorProps) {
         "text-error-red text-sm"
       )}
     />
+  );
+}
+
+export interface AnimatedFieldErrorProps
+  extends HTMLAttributes<HTMLSpanElement> {
+  isInvalid: boolean | undefined;
+  children: ReactNode;
+}
+
+export function AnimatedFieldError({
+  isInvalid,
+  children,
+  ...props
+}: AnimatedFieldErrorProps) {
+  return (
+    <AnimatePresence>
+      {isInvalid && (
+        <motion.span
+          {...(props as HTMLMotionProps<"span">)}
+          className={twMerge(props.className, "text-error-red text-sm")}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {children}
+        </motion.span>
+      )}
+    </AnimatePresence>
   );
 }
 
