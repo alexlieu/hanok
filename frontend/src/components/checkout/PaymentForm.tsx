@@ -18,6 +18,7 @@ import {
   DisclosurePanel,
 } from "../ui/aria/Disclosure";
 import { Button } from "../ui/aria/Button";
+import BillingAddressForm from "./BillingAddressForm";
 
 const PAYMENT_METHODS = [
   {
@@ -115,7 +116,7 @@ const PaymentForm: React.FC = () => {
                   {value === "CARD" && (
                     <div className="flex flex-col gap-4">
                       <CardDetailsForm />
-                      {/* <BillingAddressForm /> */}
+                      <BillingAddressForm />
                     </div>
                   )}
                 </DisclosurePanel>

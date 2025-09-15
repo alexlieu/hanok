@@ -8,32 +8,22 @@ import {
   SelectValue,
   ValidationResult,
 } from "react-aria-components";
-import { tv } from "tailwind-variants";
-import { Description, FieldError, Label } from "./Field";
+import { Description, FieldError } from "./Field";
 import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
 import { twMerge } from "tailwind-merge";
-import { ReactNode, RefObject } from "react";
-
-const styles = tv({
-  base: "flex items-center text-start gap-4 w-full cursor-default px-2 py-1",
-  variants: {
-    isDisabled: {
-      false: "text-gray-800 hover:bg-gray-100 group-invalid:border-error-red",
-      true: "text-gray-200",
-    },
-    isFocused: {
-      true: "ring-[2px] ring-brand-focus outline-none transition-shadow",
-    },
-  },
-});
+import { ReactNode, RefObject, useState } from "react";
+import { RefCallBack } from "react-hook-form";
+import { createLabel } from "./utils/createLabel";
+import { selectButtonStyles } from "./styles/selectButtonStyles";
 
 export interface SelectProps<T extends object>
   extends Omit<AriaSelectProps<T>, "children"> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
+  inputRef?: RefCallBack;
   listBoxRef?: RefObject<HTMLDivElement | null>;
   listBoxClassNames?: string;
   buttonClassNames?: () => string;
@@ -46,6 +36,9 @@ export function Select<T extends object>({
   label,
   description,
   errorMessage,
+  isInvalid,
+  isRequired,
+  inputRef,
   listBoxRef,
   listBoxClassNames = "max-h-[inherit]",
   buttonClassNames,
@@ -55,6 +48,7 @@ export function Select<T extends object>({
   items,
   ...props
 }: SelectProps<T>) {
+  const [isFocused, setIsFocused] = useState(false);
   return (
     <AriaSelect
       {...props}
@@ -62,9 +56,13 @@ export function Select<T extends object>({
         props.className,
         "group flex flex-col gap-1 relative"
       )}
+      onFocusChange={setIsFocused}
+      ref={inputRef}
     >
-      {label && <Label>{label}</Label>}
-      <Button className={buttonClassNames ? buttonClassNames : styles}>
+      {createLabel({ label, isRequired, isFocused, isInvalid })}
+      <Button
+        className={buttonClassNames ? buttonClassNames : selectButtonStyles}
+      >
         <SelectValue className="flex-1 text-sm placeholder-shown:italic">
           {({ defaultChildren, isPlaceholder }) => {
             return isPlaceholder ? (
@@ -74,7 +72,7 @@ export function Select<T extends object>({
                     <b>{placeholder}</b> selection
                   </>
                 ) : (
-                  <>Select...</>
+                  <p className="font-light not-italic">Select...</p>
                 )}
               </>
             ) : (
@@ -82,7 +80,11 @@ export function Select<T extends object>({
             );
           }}
         </SelectValue>
-        <LuChevronDown className="w-4 h-4 text-gray-600 group-disabled:text-gray-200" />
+        <LuChevronDown
+          stroke="var(--color-brand-colour-5)"
+          strokeWidth={3}
+          className="scale-115 group-disabled:text-gray-200"
+        />
       </Button>
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
@@ -98,7 +100,7 @@ export function Select<T extends object>({
           // Cleanly hides any overflow, preventing visual glitches.
           // [clip-path:insert(0_0_0_0_round_.75rem)]
         >
-          {children}
+          {children as (item: object) => ReactNode}
         </ListBox>
       </Popover>
     </AriaSelect>

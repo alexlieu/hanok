@@ -1,6 +1,29 @@
 import { z } from "zod/v4";
 
 export const COUNTRY_CODES = ["GB", "US", "CA", "KR"] as const;
+export const KR_PROVINCES: string[] = [
+  // Special City
+  "Seoul",
+  // Metropolitan Cities
+  "Busan",
+  "Daegu",
+  "Incheon",
+  "Gwangju City",
+  "Daejeon",
+  "Ulsan",
+  // Special Self-Governing City
+  "Sejong",
+  // Provinces
+  "Gyeonggi",
+  "Gangwon",
+  "North Chungcheong",
+  "South Chungcheong",
+  "North Jeolla",
+  "South Jeolla",
+  "North Gyeongsang",
+  "South Gyeongsang",
+  "Jeju",
+];
 
 export const CountryEnum = z.enum(COUNTRY_CODES);
 
@@ -18,8 +41,8 @@ export const BillingAddressSchema = z
     addressLine2: z.string().max(100).optional().or(z.literal("")),
     city: z.string().min(2).max(100),
     stateProvinceRegion: z.string().max(50).optional().or(z.literal("")),
+    krProvince: z.string().optional(),
     county: z.string().max(50).optional().or(z.literal("")),
-
     postalCode: z.string().min(3).max(15),
   })
   .check((ctx) => {
