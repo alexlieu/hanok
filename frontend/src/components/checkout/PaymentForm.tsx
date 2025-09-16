@@ -97,7 +97,7 @@ const PaymentForm: React.FC = () => {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  console.log(errors);
+  console.log("error:", errors);
 
   return (
     <FormProvider {...methods}>

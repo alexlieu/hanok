@@ -32,9 +32,6 @@ export type filteredIssuingBank = Exclude<issuingBank, undefined>;
 function validateBIN(cardNo: string) {
   const cardLength = cardNo.replace(/\D/g, "").length;
   const issuingBank = getIssuingBank(cardNo);
-  // if (issuingBank === "Visa" && ![13, 16, 19].includes(cardLength)) {
-  //   return false;
-  // }
   if (
     (issuingBank === "Mastercard" || issuingBank === "Visa") &&
     cardLength !== 16

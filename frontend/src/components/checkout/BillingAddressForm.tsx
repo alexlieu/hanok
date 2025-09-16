@@ -135,7 +135,7 @@ const BillingAddressForm = () => {
               />
               <div className="flex gap-3">
                 <Controller
-                  name="krProvince"
+                  name="stateProvinceRegion"
                   control={control}
                   render={({
                     field: { ref, onChange, value, ...field },
@@ -216,8 +216,8 @@ const BillingAddressForm = () => {
             }) => {
               return (
                 <TextField
-                  label="Address line 2"
-                  placeholder="Address line 2"
+                  label="Apartment, suite, etc. (optional)"
+                  placeholder="Apartment, suite, etc. (optional)"
                   inputRef={ref}
                   isInvalid={invalid}
                   errorMessage={error?.message}
