@@ -3,7 +3,7 @@ import {
   BillingAddressData,
   BillingAddressSchema,
   countryList,
-  KR_PROVINCES,
+  KR_PROVINCES as FRONTEND_KR_PROVINCES,
 } from "../../schemas/BillingAddressSchema";
 import { useEffect } from "react";
 import { Select, SelectItem } from "../ui/aria/Select";
@@ -13,6 +13,8 @@ import { tv } from "tailwind-variants";
 import { twMerge } from "tailwind-merge";
 import { TextField } from "../ui/aria/TextField";
 import { COUNTRY_CODES } from "../../schemas/BillingAddressSchema";
+import { useLoaderData } from "react-router-dom";
+import { CheckoutRequiredData } from "../../types/CheckoutType";
 
 const selectButtonStyles = tv({
   extend: defaultSelectButtonStyles,
@@ -60,6 +62,9 @@ const BillingAddressForm = () => {
   const method = useFormContext<BillingAddressData>();
   const { control, resetField } = method;
   const selectedCountry = useWatch({ name: "country", control });
+  const {
+    validStatesProvincesRegions: { US_STATES, CA_PROVINCES, KR_PROVINCES },
+  } = useLoaderData() as CheckoutRequiredData;
 
   function checkIsCountry(countries: (typeof COUNTRY_CODES)[number][]) {
     return countries.includes(selectedCountry);
@@ -154,7 +159,7 @@ const BillingAddressForm = () => {
                         buttonClassNames={selectButtonStyles}
                         {...field}
                       >
-                        {KR_PROVINCES.map((value) => (
+                        {FRONTEND_KR_PROVINCES.map((value) => (
                           <SelectItem key={value} id={value}>
                             {value}
                           </SelectItem>

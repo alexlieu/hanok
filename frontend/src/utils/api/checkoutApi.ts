@@ -10,10 +10,11 @@ import {
   PickupRulesResponse,
 } from "../../types/ConfigTypes";
 import { DateValue } from "react-aria-components";
+import { ValidStatesProvincesRegions } from "../../types/ValidStatesProvincesRegions";
 // import { parseISO } from "date-fns";
 // import { toZonedTime } from "date-fns-tz";
 
-const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
+export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
   try {
     const response = await fetch(
       "http://localhost:8080/api/config/pickup-rules"
@@ -81,4 +82,29 @@ const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
   }
 };
 
-export default getPickupRules;
+export const getValidStatesProvincesRegions =
+  async (): Promise<ValidStatesProvincesRegions> => {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/config/addresses/statesProvincesRegions"
+      );
+      if (!response.ok) {
+        throw new Error(
+          `HTTP Error: ${response.status} - ${response.statusText}`
+        );
+      }
+      const { US_STATES, CA_PROVINCES, KR_PROVINCES } =
+        (await response.json()) as ValidStatesProvincesRegions;
+
+      return {
+        US_STATES,
+        CA_PROVINCES,
+        KR_PROVINCES,
+      } as ValidStatesProvincesRegions;
+    } catch (error) {
+      console.log("Failed to fetch valid states/provinces/regions: ", error);
+      throw new Error(
+        "Could not retrieve valid states/provinces/regions due to a network or server error."
+      );
+    }
+  };

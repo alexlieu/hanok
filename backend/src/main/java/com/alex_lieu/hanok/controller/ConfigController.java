@@ -29,7 +29,7 @@ public class ConfigController {
         return ResponseEntity.ok(pickupService.getPickupRules());
     }
 
-    @GetMapping("addresses/statesProvincesRegions")
+    @GetMapping("/addresses/statesProvincesRegions")
     public ResponseEntity<ValidStateProvincesRegionsDto> getValidStateProvincesRegions() {
         Set<String> US_STATES = StateProvinceRegionLogic.US_STATES;
         Set<String> CA_PROVINCES = StateProvinceRegionLogic.CA_PROVINCES;

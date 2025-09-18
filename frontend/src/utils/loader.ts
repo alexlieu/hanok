@@ -6,9 +6,11 @@ import { BasketResponse, BasketItem } from "../types/BasketTypes";
 import { CheckoutRequiredData } from "../types/CheckoutType";
 import getBasketFromLocalStorage from "./getBasketFromLocalStorage";
 import getBasketResponse from "./api/basketApi";
-import getPickupRules from "./api/checkoutApi";
+import {
+  getPickupRules,
+  getValidStatesProvincesRegions,
+} from "./api/checkoutApi";
 import { getLocalTimeZone, now, today } from "@internationalized/date";
-import { DateValue } from "react-aria-components";
 import { ConfiguredPickupRules } from "../types/ConfigTypes";
 
 export const productsLoader = async (): Promise<LoaderData> => {
@@ -105,11 +107,16 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
       pickupRules: {
         firstValidDate: today(getLocalTimeZone()).add({ days: 3 }),
         lastValidDate: today(getLocalTimeZone()).add({ days: 3, months: 3 }),
-        isHoliday: (dateToCheck: DateValue) => false,
+        isHoliday: () => false,
         receivedAt: now(getLocalTimeZone()),
         unavailableDates: [],
       } as ConfiguredPickupRules,
       basketContent: { items: [], total: 0 } as BasketResponse,
+      validStatesProvincesRegions: {
+        US_STATES: new Set(),
+        CA_PROVINCES: new Set(),
+        KR_PROVINCES: new Set(),
+      },
     };
   }
 
@@ -117,14 +124,23 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
   const quantities = basketItems.map((item) => item.quantity);
 
   try {
-    const [basketResponse, pickupRulesResponse] = await Promise.all([
+    const [
+      basketResponse,
+      pickupRulesResponse,
+      { US_STATES, CA_PROVINCES, KR_PROVINCES },
+    ] = await Promise.all([
       await getBasketResponse(ids, quantities),
       await getPickupRules(),
+      await getValidStatesProvincesRegions(),
     ]);
-    console.log(pickupRulesResponse);
     return {
       pickupRules: pickupRulesResponse,
       basketContent: basketResponse,
+      validStatesProvincesRegions: {
+        US_STATES,
+        CA_PROVINCES,
+        KR_PROVINCES,
+      },
     };
   } catch (error) {
     console.error("Error fetching checkout data: ", error);
