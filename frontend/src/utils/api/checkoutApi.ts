@@ -94,12 +94,16 @@ export const getValidStatesProvincesRegions =
         );
       }
       const { US_STATES, CA_PROVINCES, KR_PROVINCES } =
-        (await response.json()) as ValidStatesProvincesRegions;
+        (await response.json()) as {
+          US_STATES: Record<string, string>;
+          CA_PROVINCES: Record<string, string>;
+          KR_PROVINCES: string[];
+        };
 
       return {
         US_STATES,
         CA_PROVINCES,
-        KR_PROVINCES,
+        KR_PROVINCES: new Set(KR_PROVINCES),
       } as ValidStatesProvincesRegions;
     } catch (error) {
       console.log("Failed to fetch valid states/provinces/regions: ", error);

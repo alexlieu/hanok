@@ -1,16 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import CardDetailsForm from "./CardDetailsForm";
 import { useForm, Form, FormProvider } from "react-hook-form";
 import {
-  PaymentFormFields,
-  PaymentFormSchema,
+  createPaymentFormSchema,
+  PaymentFormData,
 } from "../../schemas/PaymentFormSchema";
 import { BillingAddressData } from "../../schemas/BillingAddressSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CardInformation } from "../../schemas/CardSchema";
-// import BillingAddressForm from "./BillingAddressForm";
-import { AccordianRadioItem } from "../ui/AccordianItem";
-import ExpressCheckout from "./ExpressCheckout";
 import {
   Disclosure,
   DisclosureGroup,
@@ -19,6 +16,8 @@ import {
 } from "../ui/aria/Disclosure";
 import { Button } from "../ui/aria/Button";
 import BillingAddressForm from "./BillingAddressForm";
+import { useLoaderData } from "react-router-dom";
+import { CheckoutRequiredData } from "../../types/CheckoutType";
 
 const PAYMENT_METHODS = [
   {
@@ -51,8 +50,6 @@ const PAYMENT_METHODS = [
   },
 ] as const;
 
-type PaymentMethodValue = (typeof PAYMENT_METHODS)[number]["value"];
-
 // const isPaymentMethod = (value: string): value is PaymentMethodValue => {
 //   return PAYMENT_METHODS.some((method) => method.value === value);
 // };
@@ -74,14 +71,21 @@ const DEFAULT_CARD_DETAILS: CardInformation = {
   holderName: "",
 };
 
-const DEFAULT_PAYMENT_FORM_VALUES: PaymentFormFields = {
+const DEFAULT_PAYMENT_FORM_VALUES: PaymentFormData = {
   ...DEFAULT_CARD_DETAILS,
   ...DEFAULT_BILLING_ADDRESS,
 };
 
 const PaymentForm: React.FC = () => {
-  const methods = useForm<PaymentFormFields>({
-    resolver: zodResolver(PaymentFormSchema),
+  const { validStatesProvincesRegions } =
+    useLoaderData() as CheckoutRequiredData;
+
+  const schema = useMemo(() => {
+    return createPaymentFormSchema(validStatesProvincesRegions);
+  }, [validStatesProvincesRegions]);
+
+  const methods = useForm<PaymentFormData>({
+    resolver: zodResolver(schema),
     defaultValues: DEFAULT_PAYMENT_FORM_VALUES,
   });
 

@@ -1,11 +1,17 @@
 import { z } from "zod/v4";
 import { CardSchema } from "./CardSchema";
-import { BillingAddressSchema } from "./BillingAddressSchema";
+import { createBillingAddressSchema } from "./BillingAddressSchema";
+import { ValidStatesProvincesRegions } from "../types/ValidStatesProvincesRegions";
 
-// export const PaymentFormSchema = z.object({
-//   ...CardSchema.shape,
-//   ...BillingAddressSchema.shape,
-// });
-export const PaymentFormSchema = CardSchema.and(BillingAddressSchema);
+export const createPaymentFormSchema = (
+  validStatesProvincesRegions: ValidStatesProvincesRegions
+) => {
+  return CardSchema.and(
+    createBillingAddressSchema(validStatesProvincesRegions)
+  );
+};
 
-export type PaymentFormFields = z.infer<typeof PaymentFormSchema>;
+export type DynamicPaymentFormFields = ReturnType<
+  typeof createPaymentFormSchema
+>;
+export type PaymentFormData = z.infer<DynamicPaymentFormFields>;

@@ -1,29 +1,7 @@
 import { z } from "zod/v4";
+import { ValidStatesProvincesRegions } from "../types/ValidStatesProvincesRegions";
 
 export const COUNTRY_CODES = ["GB", "US", "CA", "KR"] as const;
-export const KR_PROVINCES: string[] = [
-  // Special City
-  "Seoul",
-  // Metropolitan Cities
-  "Busan",
-  "Daegu",
-  "Incheon",
-  "Gwangju City",
-  "Daejeon",
-  "Ulsan",
-  // Special Self-Governing City
-  "Sejong",
-  // Provinces
-  "Gyeonggi",
-  "Gangwon",
-  "North Chungcheong",
-  "South Chungcheong",
-  "North Jeolla",
-  "South Jeolla",
-  "North Gyeongsang",
-  "South Gyeongsang",
-  "Jeju",
-];
 
 export const CountryEnum = z.enum(COUNTRY_CODES);
 
@@ -37,13 +15,11 @@ export const countryList = [
 export const BillingAddressSchema = z
   .object({
     country: CountryEnum,
-    // addressLine1: z.string().min(5).max(100),
     addressLine1: z.string().optional(),
     addressLine2: z.string().optional(),
     city: z.string().optional(),
     stateProvinceRegion: z.string().optional(),
     county: z.string().optional(),
-    // postalCode: z.string().min(3).max(15),
     postalCode: z.string().optional(),
   })
   .superRefine(
@@ -130,11 +106,11 @@ export const BillingAddressSchema = z
           );
         }
       }
-      if (["US, CA, KR"].includes(country) && !stateProvinceRegion) {
+      if (["US", "CA", "KR"].includes(country) && !stateProvinceRegion) {
         const message =
           country === "US"
             ? "State is required for US."
-            : `Province is required for ${country}`;
+            : `Province is required for ${country}.`;
         ctx.addIssue({
           code: "custom",
           message: message,
@@ -185,5 +161,43 @@ export const BillingAddressSchema = z
       }
     }
   );
+
+export const createBillingAddressSchema = (
+  validStatesProvincesRegions: ValidStatesProvincesRegions
+) => {
+  return BillingAddressSchema.superRefine(
+    ({ stateProvinceRegion, country }, ctx) => {
+      if (country === "KR") {
+        if (
+          !validStatesProvincesRegions.KR_PROVINCES.has(stateProvinceRegion!)
+        ) {
+          ctx.addIssue({
+            code: "custom",
+            message: `Invalid province ${stateProvinceRegion} for ${country}.`,
+            path: ["stateProvinceRegion"],
+          });
+        }
+      }
+      if (country === "US") {
+        if (!validStatesProvincesRegions.US_STATES[stateProvinceRegion!]) {
+          ctx.addIssue({
+            code: "custom",
+            message: `Invalid state ${stateProvinceRegion} for ${country}.`,
+            path: ["stateProvinceRegion"],
+          });
+        }
+      }
+      if (country === "CA") {
+        if (!validStatesProvincesRegions.CA_PROVINCES[stateProvinceRegion!]) {
+          ctx.addIssue({
+            code: "custom",
+            message: `Invalid province ${stateProvinceRegion} for ${country}.`,
+            path: ["stateProvinceRegion"],
+          });
+        }
+      }
+    }
+  );
+};
 
 export type BillingAddressData = z.infer<typeof BillingAddressSchema>;

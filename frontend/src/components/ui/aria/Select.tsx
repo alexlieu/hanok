@@ -6,9 +6,8 @@ import {
   ListBox,
   ListBoxItemProps,
   SelectValue,
-  ValidationResult,
 } from "react-aria-components";
-import { Description, FieldError } from "./Field";
+import { AnimatedFieldError, Description } from "./Field";
 import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
@@ -22,7 +21,7 @@ export interface SelectProps<T extends object>
   extends Omit<AriaSelectProps<T>, "children"> {
   label?: string;
   description?: string;
-  errorMessage?: string | ((validation: ValidationResult) => string);
+  errorMessage?: string;
   inputRef?: RefCallBack;
   listBoxRef?: RefObject<HTMLDivElement | null>;
   listBoxClassNames?: string;
@@ -54,8 +53,9 @@ export function Select<T extends object>({
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        "group flex flex-col gap-1 relative"
+        "group flex flex-col gap-1 relative h-full"
       )}
+      isInvalid={isInvalid}
       onFocusChange={setIsFocused}
       ref={inputRef}
     >
@@ -87,7 +87,9 @@ export function Select<T extends object>({
         />
       </Button>
       {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      <AnimatedFieldError isInvalid={isInvalid}>
+        {errorMessage}
+      </AnimatedFieldError>
       <Popover className="min-w-(--trigger-width)">
         <ListBox
           ref={listBoxRef}

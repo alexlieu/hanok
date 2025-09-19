@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 @RestController
@@ -31,8 +32,8 @@ public class ConfigController {
 
     @GetMapping("/addresses/statesProvincesRegions")
     public ResponseEntity<ValidStateProvincesRegionsDto> getValidStateProvincesRegions() {
-        Set<String> US_STATES = StateProvinceRegionLogic.US_STATES;
-        Set<String> CA_PROVINCES = StateProvinceRegionLogic.CA_PROVINCES;
+        LinkedHashMap<String, String> US_STATES = StateProvinceRegionLogic.US_STATES;
+        LinkedHashMap<String, String> CA_PROVINCES = StateProvinceRegionLogic.CA_PROVINCES;
         Set<String> KR_PROVINCES = StateProvinceRegionLogic.KR_PROVINCES;
         return ResponseEntity.ok(new ValidStateProvincesRegionsDto(US_STATES, CA_PROVINCES, KR_PROVINCES));
     }

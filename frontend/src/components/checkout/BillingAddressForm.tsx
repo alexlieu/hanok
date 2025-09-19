@@ -3,7 +3,6 @@ import {
   BillingAddressData,
   BillingAddressSchema,
   countryList,
-  KR_PROVINCES as FRONTEND_KR_PROVINCES,
 } from "../../schemas/BillingAddressSchema";
 import { useEffect } from "react";
 import { Select, SelectItem } from "../ui/aria/Select";
@@ -15,6 +14,11 @@ import { TextField } from "../ui/aria/TextField";
 import { COUNTRY_CODES } from "../../schemas/BillingAddressSchema";
 import { useLoaderData } from "react-router-dom";
 import { CheckoutRequiredData } from "../../types/CheckoutType";
+import {
+  cleanPostalCode,
+  getPostalCodeMaxLength,
+} from "../../utils/postalCodeUtils";
+import { checkIsCountry } from "../../utils/countryUtils";
 
 const selectButtonStyles = tv({
   extend: defaultSelectButtonStyles,
@@ -63,11 +67,18 @@ const BillingAddressForm = () => {
   const { control, resetField } = method;
   const selectedCountry = useWatch({ name: "country", control });
   const {
-    validStatesProvincesRegions: { US_STATES, CA_PROVINCES, KR_PROVINCES },
+    validStatesProvincesRegions: { KR_PROVINCES, US_STATES, CA_PROVINCES },
   } = useLoaderData() as CheckoutRequiredData;
 
-  function checkIsCountry(countries: (typeof COUNTRY_CODES)[number][]) {
-    return countries.includes(selectedCountry);
+  const checkIsCountryForComponent = (
+    countries: (typeof COUNTRY_CODES)[number][]
+  ) => {
+    return checkIsCountry(selectedCountry, countries);
+  };
+
+  const selectedProvince = useWatch({ name: "stateProvinceRegion", control });
+  if (!selectedProvince) {
+    console.log("selectedProvince", selectedProvince);
   }
 
   useEffect(() => {
@@ -110,13 +121,13 @@ const BillingAddressForm = () => {
           }}
         />
         <div className="flex flex-col gap-3">
-          {checkIsCountry(["KR"]) && (
+          {checkIsCountryForComponent(["KR"]) && (
             <>
               <Controller
                 name="postalCode"
                 control={control}
                 render={({
-                  field: { ref, ...field },
+                  field: { ref, onChange, ...field },
                   fieldState: { invalid, error },
                 }) => {
                   return (
@@ -127,9 +138,12 @@ const BillingAddressForm = () => {
                       placeholder={
                         countryFieldConfigs[selectedCountry].postalCode?.label
                       }
+                      onChange={(input) =>
+                        cleanPostalCode(input, selectedCountry, onChange)
+                      }
                       isRequired
                       inputRef={ref}
-                      maxLength={15}
+                      maxLength={getPostalCodeMaxLength(selectedCountry)}
                       isInvalid={invalid}
                       errorMessage={error?.message}
                       className={`flex-1`}
@@ -159,7 +173,7 @@ const BillingAddressForm = () => {
                         buttonClassNames={selectButtonStyles}
                         {...field}
                       >
-                        {FRONTEND_KR_PROVINCES.map((value) => (
+                        {Array.from(KR_PROVINCES).map((value) => (
                           <SelectItem key={value} id={value}>
                             {value}
                           </SelectItem>
@@ -180,6 +194,7 @@ const BillingAddressForm = () => {
                         className={"flex-1"}
                         label={"Town or City"}
                         placeholder={"Town or City"}
+                        maxLength={30}
                         inputRef={ref}
                         isRequired
                         isInvalid={invalid}
@@ -203,6 +218,7 @@ const BillingAddressForm = () => {
                 <TextField
                   label="Address line 1"
                   placeholder="Address line 1"
+                  maxLength={40}
                   inputRef={ref}
                   isInvalid={invalid}
                   isRequired
@@ -223,6 +239,7 @@ const BillingAddressForm = () => {
                 <TextField
                   label="Apartment, suite, etc. (optional)"
                   placeholder="Apartment, suite, etc. (optional)"
+                  maxLength={30}
                   inputRef={ref}
                   isInvalid={invalid}
                   errorMessage={error?.message}
@@ -231,7 +248,7 @@ const BillingAddressForm = () => {
               );
             }}
           />
-          {!checkIsCountry(["KR"]) && (
+          {!checkIsCountryForComponent(["KR"]) && (
             <div className="flex gap-3">
               <Controller
                 name="city"
@@ -245,6 +262,7 @@ const BillingAddressForm = () => {
                       className={"flex-1"}
                       label={"Town or City"}
                       placeholder={"Town or City"}
+                      maxLength={30}
                       inputRef={ref}
                       isRequired
                       isInvalid={invalid}
@@ -254,31 +272,41 @@ const BillingAddressForm = () => {
                   );
                 }}
               />
-              {checkIsCountry(["US", "CA"]) && (
+              {checkIsCountryForComponent(["US", "CA"]) && (
                 <Controller
                   name="stateProvinceRegion"
                   control={control}
                   render={({
-                    field: { ref, ...field },
+                    field: { ref, onChange, value, ...field },
                     fieldState: { invalid, error },
                   }) => {
                     return (
-                      <TextField
-                        className={"flex-1"}
+                      <Select
                         label={
-                          countryFieldConfigs[selectedCountry]
-                            .stateProvinceRegion?.label
+                          checkIsCountryForComponent(["US"])
+                            ? "State"
+                            : "Province"
                         }
-                        placeholder={
-                          countryFieldConfigs[selectedCountry]
-                            .stateProvinceRegion?.label
-                        }
-                        inputRef={ref}
+                        className={"flex-1"}
                         isRequired
                         isInvalid={invalid}
                         errorMessage={error?.message}
+                        inputRef={ref}
+                        selectedKey={value}
+                        onSelectionChange={onChange}
+                        buttonClassNames={selectButtonStyles}
                         {...field}
-                      />
+                      >
+                        {Object.entries(
+                          checkIsCountryForComponent(["US"])
+                            ? US_STATES
+                            : CA_PROVINCES
+                        ).map(([key, value]) => (
+                          <SelectItem key={key} id={key}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                      </Select>
                     );
                   }}
                 />
@@ -287,7 +315,7 @@ const BillingAddressForm = () => {
                 name="postalCode"
                 control={control}
                 render={({
-                  field: { ref, ...field },
+                  field: { ref, onChange, ...field },
                   fieldState: { invalid, error },
                 }) => {
                   return (
@@ -300,7 +328,10 @@ const BillingAddressForm = () => {
                       }
                       isRequired
                       inputRef={ref}
-                      maxLength={15}
+                      maxLength={getPostalCodeMaxLength(selectedCountry)}
+                      onChange={(input) =>
+                        cleanPostalCode(input, selectedCountry, onChange)
+                      }
                       isInvalid={invalid}
                       errorMessage={error?.message}
                       className={`flex-1`}
@@ -311,7 +342,7 @@ const BillingAddressForm = () => {
               />
             </div>
           )}
-          {checkIsCountry(["GB"]) && (
+          {checkIsCountryForComponent(["GB"]) && (
             <Controller
               name="county"
               control={control}

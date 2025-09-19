@@ -113,8 +113,8 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
       } as ConfiguredPickupRules,
       basketContent: { items: [], total: 0 } as BasketResponse,
       validStatesProvincesRegions: {
-        US_STATES: new Set(),
-        CA_PROVINCES: new Set(),
+        US_STATES: {},
+        CA_PROVINCES: {},
         KR_PROVINCES: new Set(),
       },
     };
@@ -133,6 +133,9 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
       await getPickupRules(),
       await getValidStatesProvincesRegions(),
     ]);
+    console.log("US_STATES: ", US_STATES);
+    console.log("CA_PROVINCES: ", CA_PROVINCES);
+    console.log("KR_PROVINCES: ", KR_PROVINCES);
     return {
       pickupRules: pickupRulesResponse,
       basketContent: basketResponse,
