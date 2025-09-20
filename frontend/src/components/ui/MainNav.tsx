@@ -43,7 +43,7 @@ const MainNav: React.FC = () => {
   return (
     <header>
       {width < 768 ? (
-        <nav className="w-screen border-b-1 flex flex-row justify-center min-[360px]:justify-end h-[100px]">
+        <nav className="w-full border-b-1 flex flex-row justify-center min-[360px]:justify-end h-[100px]">
           <button
             onClick={() => setIsMenuOpen((prevState) => !prevState)}
             className="w-fit h-fit min-[360px]:mr-[20px] mt-[15px] cursor-pointer"
@@ -56,7 +56,7 @@ const MainNav: React.FC = () => {
         </nav>
       ) : (
         <>
-          <nav className={`w-screen border-b-1`}>
+          <nav className={`w-full border-b-1`}>
             {getNavContent(
               "flex flex-row w-fit m-auto gap-10 text-[22px] font-dm-sans font-medium h-[110px]",
               true

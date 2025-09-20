@@ -152,7 +152,7 @@ const BillingAddressForm = () => {
                   );
                 }}
               />
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Controller
                   name="stateProvinceRegion"
                   control={control}
@@ -163,7 +163,7 @@ const BillingAddressForm = () => {
                     return (
                       <Select
                         label="Province"
-                        className={"flex-1"}
+                        className={"flex-1 min-w-0"}
                         isRequired
                         isInvalid={invalid}
                         errorMessage={error?.message}
@@ -249,7 +249,7 @@ const BillingAddressForm = () => {
             }}
           />
           {!checkIsCountryForComponent(["KR"]) && (
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Controller
                 name="city"
                 control={control}
@@ -287,7 +287,7 @@ const BillingAddressForm = () => {
                             ? "State"
                             : "Province"
                         }
-                        className={"flex-1"}
+                        className={"flex-1 min-w-0"}
                         isRequired
                         isInvalid={invalid}
                         errorMessage={error?.message}

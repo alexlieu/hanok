@@ -9,13 +9,13 @@ import {
 } from "react-aria-components";
 import { AnimatedFieldError, Description } from "./Field";
 import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
-import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
 import { twMerge } from "tailwind-merge";
 import { ReactNode, RefObject, useState } from "react";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
 import { selectButtonStyles } from "./styles/selectButtonStyles";
+import { Popover } from "./Popover";
 
 export interface SelectProps<T extends object>
   extends Omit<AriaSelectProps<T>, "children"> {
@@ -39,7 +39,7 @@ export function Select<T extends object>({
   isRequired,
   inputRef,
   listBoxRef,
-  listBoxClassNames = "max-h-[inherit]",
+  listBoxClassNames = "max-h-60",
   buttonClassNames,
   customSelectValue,
   placeholder,
@@ -63,7 +63,7 @@ export function Select<T extends object>({
       <Button
         className={buttonClassNames ? buttonClassNames : selectButtonStyles}
       >
-        <SelectValue className="flex-1 text-sm placeholder-shown:italic">
+        <SelectValue className="flex-1 text-sm placeholder-shown:italic truncate">
           {({ defaultChildren, isPlaceholder }) => {
             return isPlaceholder ? (
               <>
@@ -76,7 +76,16 @@ export function Select<T extends object>({
                 )}
               </>
             ) : (
-              <>{customSelectValue ? customSelectValue : defaultChildren}</>
+              <span
+                className="truncate"
+                title={
+                  typeof defaultChildren === "string"
+                    ? defaultChildren
+                    : undefined
+                }
+              >
+                {customSelectValue ? customSelectValue : defaultChildren}
+              </span>
             );
           }}
         </SelectValue>
@@ -102,7 +111,7 @@ export function Select<T extends object>({
           // Cleanly hides any overflow, preventing visual glitches.
           // [clip-path:insert(0_0_0_0_round_.75rem)]
         >
-          {children as (item: object) => ReactNode}
+          {children}
         </ListBox>
       </Popover>
     </AriaSelect>
