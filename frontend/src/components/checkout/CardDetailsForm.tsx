@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { PaymentFormFields } from "../../schemas/PaymentFormSchema";
+import { PaymentFormData } from "../../schemas/PaymentFormSchema";
 import { TextField } from "../ui/aria/TextField";
 import { tv } from "tailwind-variants";
 import { getIssuingBank, issuingBank } from "../../schemas/CardSchema";
@@ -17,7 +17,7 @@ const CardDetailsForm: React.FC = () => {
   const {
     control,
     formState: { errors },
-  } = useFormContext<PaymentFormFields>();
+  } = useFormContext<PaymentFormData>();
 
   console.log(errors);
 

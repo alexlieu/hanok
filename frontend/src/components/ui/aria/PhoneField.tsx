@@ -51,7 +51,7 @@ function cleanPhoneNumber(input: string, countryDetails: SingleCountryType) {
 }
 
 const buttonStyles = tv({
-  base: "flex items-center text-start w-full cursor-default px-1 mx-1 py-1 focus:outline-none inset-ring-brand-focus",
+  base: "flex items-center text-start w-full cursor-default px-1 my-auto ml-1 py-1 focus:outline-none inset-ring-brand-focus",
   variants: {
     isDisabled: {
       true: "bg-stone-300",

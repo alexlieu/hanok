@@ -14,7 +14,7 @@ export interface PopoverProps extends Omit<AriaPopoverProps, "children"> {
 }
 
 const styles = tv({
-  base: "bg-default-bg bg-clip-padding border-2 border-brand-colour-5",
+  base: "bg-default-bg bg-clip-padding border-2 border-brand-colour-5 shadow-md max-h-[80vh] overflow-hidden",
   variants: {
     isEntering: {
       true: "animate-in fade-in duration-150 ease-out placement-bottom:slide-in-from-top-1 placement-top:slide-in-from-bottom-1 placement-left:slide-in-from-right-1 placement-right:slide-in-from-left-1 ease-out duration-200",
@@ -42,6 +42,10 @@ export function Popover({
       className={composeRenderProps(className, (className, renderProps) =>
         styles({ ...renderProps, className })
       )}
+      style={{
+        maxHeight: "80vh",
+        ...props.style,
+      }}
     >
       {showArrow && (
         <OverlayArrow className="group">
