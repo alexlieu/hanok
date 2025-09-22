@@ -4,6 +4,9 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useState,
+  useCallback,
+  useRef,
 } from "react";
 import {
   Disclosure as AriaDisclosure,
@@ -16,6 +19,7 @@ import {
   DisclosureStateContext,
   DisclosureGroupStateContext,
 } from "react-aria-components";
+import { Key } from "@react-types/shared";
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 import { LuPlus } from "react-icons/lu";
@@ -149,7 +153,17 @@ export interface DisclosurePanelProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
   const { isExpanded } = useContext(DisclosureStateContext)!;
+
+  const handleAnimationComplete = () => {
+    if (panelRef.current) {
+      panelRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
 
   // Due to the overflow hidden styling on the div, the focus ring is being cutoff.
   // The workaround is to increase the width of the div beyond the width of its container and
@@ -178,9 +192,11 @@ export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
               opacity: { duration: 0.3, ease: "easeInOut" },
             },
           }}
+          onAnimationComplete={handleAnimationComplete}
           className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)]`}
         >
           <div
+            ref={panelRef}
             {...props}
             className={twMerge(props.className, `py-2 px-[var(--x-offset)]`)}
           >
@@ -194,12 +210,50 @@ export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
 
 export interface DisclosureGroupProps extends AriaDisclosureGroupProps {
   children: ReactNode;
+  requiresOneOpen?: boolean;
 }
 
-export function DisclosureGroup({ children, ...props }: DisclosureGroupProps) {
+export function DisclosureGroup({
+  children,
+  requiresOneOpen = false,
+  expandedKeys: controlledExpandedKeys,
+  defaultExpandedKeys,
+  onExpandedChange,
+  ...props
+}: DisclosureGroupProps) {
+  // Internal state for uncontrolled mode
+  const [internalExpandedKeys, setInternalExpandedKeys] = useState<Set<Key>>(
+    defaultExpandedKeys ? new Set(defaultExpandedKeys) : new Set()
+  );
+
+  // Use controlled or uncontrolled state
+  const isControlled = controlledExpandedKeys !== undefined;
+  const expandedKeys = isControlled
+    ? controlledExpandedKeys
+    : internalExpandedKeys;
+
+  const handleExpandedChange = useCallback(
+    (keys: Set<Key>) => {
+      if (requiresOneOpen && keys.size === 0) {
+        return;
+      }
+
+      if (!isControlled) {
+        setInternalExpandedKeys(keys);
+      }
+
+      if (onExpandedChange) {
+        onExpandedChange(keys);
+      }
+    },
+    [requiresOneOpen, isControlled, onExpandedChange]
+  );
+
   return (
     <AriaDisclosureGroup
       {...props}
+      expandedKeys={expandedKeys}
+      onExpandedChange={handleExpandedChange}
       className={composeTailwindRenderProps(props.className, "")}
     >
       {children}

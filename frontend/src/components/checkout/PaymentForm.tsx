@@ -111,6 +111,7 @@ const PaymentForm: React.FC = () => {
           <DisclosureGroup
             className={"flex flex-col gap-2"}
             allowsMultipleExpanded={false}
+            requiresOneOpen={true}
             defaultExpandedKeys={["CARD"]}
           >
             {PAYMENT_METHODS.map(({ value, label }) => (

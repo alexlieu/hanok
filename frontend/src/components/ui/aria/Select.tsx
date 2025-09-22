@@ -133,17 +133,12 @@ export function Select<T extends object>({
       <AnimatedFieldError isInvalid={isInvalid}>
         {errorMessage}
       </AnimatedFieldError>
-      <Popover
-        className="min-w-(--trigger-width)"
-        placement="bottom start"
-        shouldFlip={true}
-        shouldUpdatePosition={true}
-      >
+      <Popover className="min-w-(--trigger-width)">
         <ListBox
           ref={actualListBoxRef}
           items={items}
           className={twMerge(
-            "outline-hidden p-1 overflow-auto max-h-full",
+            "outline-hidden p-1 overflow-auto",
             listBoxClassNames
           )}
           // It ensures that the ListBox is clipped with a .75rem radius, even if the underlying content extends beyond that.
