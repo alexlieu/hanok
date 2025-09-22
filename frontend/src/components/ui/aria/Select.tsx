@@ -11,7 +11,7 @@ import { AnimatedFieldError, Description } from "./Field";
 import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
 import { composeTailwindRenderProps } from "./utils";
 import { twMerge } from "tailwind-merge";
-import { ReactNode, RefObject, useState } from "react";
+import { ReactNode, RefObject, useState, useEffect, useRef } from "react";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
 import { selectButtonStyles } from "./styles/selectButtonStyles";
@@ -48,6 +48,39 @@ export function Select<T extends object>({
   ...props
 }: SelectProps<T>) {
   const [isFocused, setIsFocused] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const internalListBoxRef = useRef<HTMLDivElement>(null);
+
+  const actualListBoxRef = listBoxRef || internalListBoxRef;
+
+  useEffect(() => {
+    if (isOpen && actualListBoxRef.current && props.selectedKey) {
+      const selectedItem = actualListBoxRef.current?.querySelector<HTMLElement>(
+        `[data-key="${props.selectedKey}"]`
+      );
+      if (selectedItem) {
+        const listBox = actualListBoxRef.current;
+        const itemRect = selectedItem.getBoundingClientRect();
+        const listBoxRect = listBox.getBoundingClientRect();
+
+        const isItemVisible =
+          itemRect.top >= listBoxRect.top &&
+          itemRect.bottom <= listBoxRect.bottom;
+
+        if (!isItemVisible) {
+          const itemOffsetTop = selectedItem.offsetTop;
+          const itemHeight = selectedItem.offsetHeight;
+          const listBoxHeight = listBox.clientHeight;
+
+          const targetScrollTop =
+            itemOffsetTop - listBoxHeight / 2 + itemHeight / 2;
+
+          listBox.scrollTop = Math.max(0, targetScrollTop);
+        }
+      }
+    }
+  }, [isOpen, props.selectedKey, actualListBoxRef]);
+
   return (
     <AriaSelect
       {...props}
@@ -57,6 +90,7 @@ export function Select<T extends object>({
       )}
       isInvalid={isInvalid}
       onFocusChange={setIsFocused}
+      onOpenChange={setIsOpen}
       ref={inputRef}
     >
       {createLabel({ label, isRequired, isFocused, isInvalid })}
@@ -101,7 +135,7 @@ export function Select<T extends object>({
       </AnimatedFieldError>
       <Popover className="min-w-(--trigger-width)">
         <ListBox
-          ref={listBoxRef}
+          ref={actualListBoxRef}
           items={items}
           className={twMerge(
             "outline-hidden p-1 overflow-auto",

@@ -4,7 +4,7 @@ import {
   TextFieldProps,
   TextField,
 } from "react-aria-components";
-import { memo, useEffect, useId, useRef, useState } from "react";
+import { memo, useId, useState } from "react";
 import { Description, FieldError, FieldGroup, Input } from "./Field";
 import { Select, SelectItem, SelectSection } from "./Select";
 import {
@@ -87,8 +87,6 @@ export const PhoneField = memo(function PhoneField({
   onCountryCodeChange,
   ...props
 }: PhoneFieldProps) {
-  const listBoxRef = useRef<HTMLDivElement>(null);
-
   const countryDetails = getCountryFromCode(countryCode);
 
   function getCountryFlag() {
@@ -104,25 +102,7 @@ export const PhoneField = memo(function PhoneField({
     );
   }
 
-  const [selectOpen, setSelectOpen] = useState(false);
-
   const [isFocused, setIsFocused] = useState(false);
-
-  // React guarantees that all DOM updates have been flushed and the DOM is ready before it runs useEffect.
-  // This ensures that side effects, such as the scrollIntoView, are performed on a stable, up-to-date DOM tree.
-  useEffect(() => {
-    if (selectOpen && listBoxRef.current) {
-      const selectedItem = listBoxRef.current?.querySelector<HTMLElement>(
-        `[data-key="${countryCode}"]`
-      );
-      if (selectedItem) {
-        selectedItem.scrollIntoView({
-          block: "end",
-          behavior: "instant",
-        });
-      }
-    }
-  }, [selectOpen, countryCode]);
 
   const inputId = useId();
   const labelId = useId();
@@ -147,7 +127,6 @@ export const PhoneField = memo(function PhoneField({
       })}
       <FieldGroup className={`min-w-[208px] w-auto`}>
         <Select
-          listBoxRef={listBoxRef}
           aria-label="Country select for phone number"
           placeholder="Country"
           selectedKey={countryCode}
@@ -156,7 +135,6 @@ export const PhoneField = memo(function PhoneField({
           onSelectionChange={(key) => {
             onCountryCodeChange(key as CountryCodeUnion);
           }}
-          onOpenChange={setSelectOpen}
           customSelectValue={getCountryFlag()}
           onFocusChange={setIsFocused}
         >
