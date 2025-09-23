@@ -3,7 +3,6 @@ import {
   HTMLAttributes,
   ReactNode,
   useContext,
-  useEffect,
   useState,
   useCallback,
   useRef,
@@ -23,8 +22,9 @@ import { Key } from "@react-types/shared";
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 import { LuPlus } from "react-icons/lu";
-import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { AnimatePresence, motion, Variants } from "motion/react";
 import { twMerge } from "tailwind-merge";
+import { BiChevronDown } from "react-icons/bi";
 
 const disclosure = tv({
   base: "group min-w-64",
@@ -87,72 +87,105 @@ export function Disclosure({ children, ...props }: DisclosureProps) {
 
 export interface DisclosureHeaderProps {
   children: ReactNode;
+  variant?: "primary" | "secondary";
 }
 
 const MotionPlus = motion.create(LuPlus);
 
-export function DisclosureHeader({ children }: DisclosureHeaderProps) {
+const iconVariants: Variants = {
+  rest: {
+    scale: 1,
+  },
+  hover: {
+    scale: 1.1,
+  },
+  pressed: {
+    scale: 0.9,
+  },
+  expanded: {
+    rotate: 45,
+    color: "var(--color-brand-colour-1)",
+  },
+  collapsed: {
+    rotate: 0,
+    color: "var(--color-tooltip-bg)",
+  },
+};
+
+export function DisclosureHeader({
+  variant = "primary",
+  children,
+}: DisclosureHeaderProps) {
   const { isExpanded } = useContext(DisclosureStateContext)!;
   const isInGroup = useContext(DisclosureGroupStateContext) !== null;
-  const controls = useAnimationControls();
 
-  const handleHoverStart = () => {
-    controls.start({ scale: 1.1 });
-  };
-  const handleHoverEnd = () => {
-    controls.start({ scale: 1 });
-  };
-  const handleTap = () => {
-    controls.start({ scale: 0.9 });
-  };
-
-  useEffect(() => {
-    controls.start(
-      {
-        rotate: isExpanded ? 45 : 0,
-        color: isExpanded
-          ? "var(--color-brand-colour-1)"
-          : "var(--color-tooltip-bg)",
-      },
-      { duration: 0.1, ease: "easeInOut" }
-    );
-  }, [isExpanded, controls]);
+  const animationState = isExpanded ? "expanded" : "collapsed";
 
   return (
     <Heading className="text-lg font-semibold">
-      <Button
-        slot="trigger"
-        className={(renderProps) =>
-          disclosureButton({ ...renderProps, isInGroup })
-        }
-        onHoverStart={handleHoverStart}
-        onHoverEnd={handleHoverEnd}
-        onPressStart={handleTap}
-        onPressEnd={handleHoverEnd}
+      <motion.div
+        initial="rest"
+        whileHover="hover"
+        whileTap="pressed"
+        className="w-fit"
       >
-        {({ isDisabled }) => (
-          <>
-            <MotionPlus
-              aria-hidden
-              className={chevron({ isDisabled })}
-              strokeWidth={3.5}
-              initial={{ rotate: 0, color: "var(--color-tooltip-bg)" }}
-              animate={controls}
-              transition={{ duration: 0.05 }}
-            />
-            {children}
-          </>
-        )}
-      </Button>
+        <Button
+          slot="trigger"
+          className={(renderProps) =>
+            disclosureButton({ ...renderProps, isInGroup })
+          }
+        >
+          {({ isDisabled }) => (
+            <>
+              {variant === "primary" && (
+                <MotionPlus
+                  aria-hidden
+                  className={chevron({ isDisabled })}
+                  strokeWidth={3.5}
+                  variants={iconVariants}
+                  animate={animationState}
+                  transition={{
+                    rotate: {
+                      duration: 0.05,
+                      ease: "easeOut",
+                    },
+                    color: {
+                      duration: 0.2,
+                      ease: "easeOut",
+                    },
+                    scale: {
+                      duration: 0.01,
+                    },
+                  }}
+                  initial={false}
+                />
+              )}
+              {children}
+              {variant === "secondary" && (
+                <BiChevronDown
+                  aria-hidden
+                  strokeWidth={2}
+                  color="var(--color-tooltip-bg)"
+                />
+              )}
+            </>
+          )}
+        </Button>
+      </motion.div>
     </Heading>
   );
 }
 
 export interface DisclosurePanelProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
+  scrollIntoView?: boolean;
 }
 
-export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
+export function DisclosurePanel({
+  children,
+  scrollIntoView = false,
+  ...props
+}: DisclosurePanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const { isExpanded } = useContext(DisclosureStateContext)!;
 
@@ -192,7 +225,9 @@ export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
               opacity: { duration: 0.3, ease: "easeInOut" },
             },
           }}
-          onAnimationComplete={handleAnimationComplete}
+          onAnimationComplete={
+            scrollIntoView ? handleAnimationComplete : undefined
+          }
           className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)]`}
         >
           <div

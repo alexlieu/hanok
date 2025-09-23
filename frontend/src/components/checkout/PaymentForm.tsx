@@ -116,8 +116,8 @@ const PaymentForm: React.FC = () => {
           >
             {PAYMENT_METHODS.map(({ value, label }) => (
               <Disclosure id={value} key={value}>
-                <DisclosureHeader>{label}</DisclosureHeader>
-                <DisclosurePanel>
+                <DisclosureHeader variant="secondary">{label}</DisclosureHeader>
+                <DisclosurePanel scrollIntoView={true}>
                   {value === "CARD" && (
                     <div className="flex flex-col gap-4">
                       <CardDetailsForm />
