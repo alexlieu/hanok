@@ -71,7 +71,7 @@ const CustomerForm: React.FC = () => {
     control,
     trigger,
     reset,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, dirtyFields },
   } = methods;
 
   console.log(errors);
@@ -126,7 +126,8 @@ const CustomerForm: React.FC = () => {
                 value={value}
                 onChange={(e) => {
                   onChange(e);
-                  if (touchedFields.email) trigger("updatePreference");
+                  if (touchedFields.email || dirtyFields.email)
+                    trigger("updatePreference");
                   trigger("contact");
                 }}
                 onBlur={onBlur}
@@ -169,7 +170,8 @@ const CustomerForm: React.FC = () => {
                 }}
                 onPhoneNumberChange={(newPhoneNumber: string) => {
                   onChange({ ...value, phoneNumber: newPhoneNumber });
-                  if (touchedFields.phoneNumber) trigger("updatePreference");
+                  if (touchedFields.phoneNumber || dirtyFields.phoneNumber)
+                    trigger("updatePreference");
                   trigger("contact");
                 }}
               />
