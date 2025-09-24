@@ -1,48 +1,76 @@
-// import { useState } from "react";
-import PaymentForm from "./PaymentForm";
-import CustomerForm from "./CustomerForm";
-// import { AccordianItem } from "../ui/AccordianItem";
+import PaymentForm, { PaymentFormRef } from "./PaymentForm";
+import CustomerForm, { CustomerFormRef } from "./CustomerForm";
+import { Button } from "../ui/aria/Button";
+import { useRef, useState } from "react";
+
+interface FormRefs {
+  customerForm: CustomerFormRef | null;
+  paymentForm: PaymentFormRef | null;
+}
 
 const CheckoutForm: React.FC = () => {
-  // const [customerFormOpen, setCustomerFormOpen] = useState(true);
-  // const [paymentFormOpen, setPaymentFormOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRefs = useRef<FormRefs>({
+    customerForm: null,
+    paymentForm: null,
+  });
 
-  // const openPaymentForm = () => {
-  //   setPaymentFormOpen((prevVal) => !prevVal);
-  // };
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
 
-  // const openCustomerForm = () => {
-  //   setCustomerFormOpen((prevVal) => !prevVal);
-  // };
+    setIsSubmitting(true);
 
-  // useEffect(() => {
-  //   const subscription = watch((data) => {
-  //     console.log(data);
-  //   });
-  //   return () => subscription.unsubscribe();
-  // }, [watch]);
-  // console.log("Touched fields: ", touchedFields);
-  // console.log("Dirty fields: ", dirtyFields);
-  // console.log("Errors:", errors);
+    try {
+      // Add a small delay to ensure UI shows loading state
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const customerValid =
+        await formRefs.current.customerForm?.triggerSubmit();
+      const paymentValid = await formRefs.current.paymentForm?.triggerSubmit();
+
+      if (!customerValid || !paymentValid) {
+        console.log("Form validation failed");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const customerData = formRefs.current.customerForm?.getValues();
+      const paymentData = formRefs.current.paymentForm?.getValues();
+
+      const orderData = {
+        customer: customerData,
+        payment: paymentData,
+      };
+
+      console.log("Submitting order:", orderData);
+    } catch (error) {
+      console.error("Order submission failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="mx-auto px-10">
-      {/* <AccordianItem
-        title="Contact details"
-        isExpanded={customerFormOpen}
-        onToggle={() => openCustomerForm()}
+      <CustomerForm
+        ref={(ref) => {
+          formRefs.current.customerForm = ref;
+        }}
+      />
+      <PaymentForm
+        ref={(ref) => {
+          formRefs.current.paymentForm = ref;
+        }}
+      />
+      <Button
+        variant="secondary"
+        type="submit"
+        className="mt-7"
+        onClick={handleSubmit}
+        isDisabled={isSubmitting}
       >
-        <CustomerForm />
-      </AccordianItem>
-      <AccordianItem
-        title="Payment form"
-        isExpanded={paymentFormOpen}
-        onToggle={() => openPaymentForm()}
-      >
-        <PaymentForm />
-      </AccordianItem> */}
-      <CustomerForm />
-      <PaymentForm />
+        {isSubmitting ? "Processing..." : "Place Order"}
+      </Button>
     </div>
   );
 };

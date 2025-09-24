@@ -22,7 +22,7 @@ const button = tv({
     variant: {
       primary: "",
       secondary:
-        "text-black bg-transparent hover:bg-black hover:text-default-bg hover:border-black",
+        "text-black bg-default-bg hover:bg-black hover:text-default-bg hover:border-black bg-default-bg",
       icon: "border-0 p-1 flex items-center justify-center text-brand-colour-5 hover:bg-icon-hover hover:text-default-bg pressed:scale-90 pressed:transition-transform",
     },
     isDisabled: {
@@ -38,10 +38,18 @@ const button = tv({
       isDisabled: true,
       className: "text-icon-disabled bg-icon-disabled-bg",
     },
+    {
+      variant: "secondary",
+      isDisabled: true,
+      className: "hover:bg-default-bg hover:text-black",
+    },
   ],
 });
 
-export const Button = (props: ButtonProps) => {
+export const Button = ({
+  invisibleOnDisabled = false,
+  ...props
+}: ButtonProps) => {
   return (
     <RACButton
       {...props}
@@ -54,7 +62,7 @@ export const Button = (props: ButtonProps) => {
             variantOffset ? variantOffset : undefined
           );
           const invisibleClass =
-            renderProps.isDisabled && props.invisibleOnDisabled
+            renderProps.isDisabled && invisibleOnDisabled === true
               ? "invisible transition-none"
               : "";
           return twMerge(

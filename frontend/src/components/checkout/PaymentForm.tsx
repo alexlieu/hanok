@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useImperativeHandle } from "react";
 import CardDetailsForm from "./CardDetailsForm";
-import { useForm, Form, FormProvider } from "react-hook-form";
+import { useForm, Form, FormProvider, SubmitHandler } from "react-hook-form";
 import {
   createPaymentFormSchema,
   PaymentFormData,
@@ -54,6 +54,18 @@ const PAYMENT_METHODS = [
 //   return PAYMENT_METHODS.some((method) => method.value === value);
 // };
 
+interface PaymentFormProps {
+  controlledSubmit?: boolean;
+  onSubmissionComplete?: () => void;
+  ref?: React.Ref<PaymentFormRef>;
+}
+
+export interface PaymentFormRef {
+  getValues: () => PaymentFormData;
+  triggerSubmit: () => Promise<boolean>;
+  reset: () => void;
+}
+
 const DEFAULT_BILLING_ADDRESS: BillingAddressData = {
   country: "GB",
   addressLine1: "",
@@ -76,7 +88,11 @@ const DEFAULT_PAYMENT_FORM_VALUES: PaymentFormData = {
   ...DEFAULT_BILLING_ADDRESS,
 };
 
-const PaymentForm: React.FC = () => {
+const PaymentForm: React.FC<PaymentFormProps> = ({
+  controlledSubmit,
+  onSubmissionComplete,
+  ref,
+}) => {
   const { validStatesProvincesRegions } =
     useLoaderData() as CheckoutRequiredData;
 
@@ -86,13 +102,37 @@ const PaymentForm: React.FC = () => {
 
   const methods = useForm<PaymentFormData>({
     resolver: zodResolver(schema),
+    mode: "onTouched",
+    reValidateMode: "onChange",
+    criteriaMode: "all",
     defaultValues: DEFAULT_PAYMENT_FORM_VALUES,
   });
 
   const {
+    handleSubmit,
     watch,
+    getValues,
+    reset,
     formState: { errors },
   } = methods;
+
+  // Expose methods to parent component
+  useImperativeHandle(
+    ref,
+    () => ({
+      getValues: () => getValues(),
+      triggerSubmit: () => {
+        return new Promise<boolean>((resolve) => {
+          handleSubmit(
+            () => resolve(true),
+            () => resolve(false)
+          )();
+        });
+      },
+      reset: () => reset(),
+    }),
+    [getValues, handleSubmit, reset]
+  );
 
   useEffect(() => {
     const subscription = watch((data) => {
@@ -102,6 +142,17 @@ const PaymentForm: React.FC = () => {
   }, [watch]);
 
   console.log("error:", errors);
+
+  const onSubmit: SubmitHandler<PaymentFormData> = (data: PaymentFormData) => {
+    console.log(data);
+  };
+
+  useEffect(() => {
+    if (controlledSubmit) {
+      handleSubmit(onSubmit)();
+      onSubmissionComplete?.();
+    }
+  }, [controlledSubmit, handleSubmit, onSubmissionComplete]);
 
   return (
     <FormProvider {...methods}>
@@ -129,9 +180,11 @@ const PaymentForm: React.FC = () => {
             ))}
           </DisclosureGroup>
         </div>
-        <Button variant="secondary" type="submit" className={"mt-7"}>
-          Submit
-        </Button>
+        {controlledSubmit && (
+          <Button variant="secondary" type="submit" className={"mt-7"}>
+            Submit
+          </Button>
+        )}
       </Form>
     </FormProvider>
   );

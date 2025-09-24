@@ -6,7 +6,7 @@ import {
   Form,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
+import { useEffect, useMemo, useImperativeHandle } from "react";
 import { CountryCodeUnion } from "../../schemas/PhoneSchema";
 import { DatePicker } from "../ui/aria/DatePicker";
 import { I18nProvider } from "react-aria-components";
@@ -30,7 +30,23 @@ type FormData = z.infer<CustomerFormSchemaType["schema"]>;
 
 const defaultCountryCode = "GB" as CountryCodeUnion;
 
-const CustomerForm: React.FC = () => {
+interface CustomerFormProps {
+  controlledSubmit?: boolean;
+  onSubmissionComplete?: () => void;
+  ref?: React.Ref<CustomerFormRef>;
+}
+
+export interface CustomerFormRef {
+  getValues: () => FormData;
+  triggerSubmit: () => Promise<boolean>;
+  reset: () => void;
+}
+
+const CustomerForm: React.FC<CustomerFormProps> = ({
+  controlledSubmit,
+  onSubmissionComplete,
+  ref,
+}) => {
   const {
     pickupRules: { firstValidDate, lastValidDate, isHoliday, unavailableDates },
   } = useLoaderData() as CheckoutRequiredData;
@@ -67,18 +83,46 @@ const CustomerForm: React.FC = () => {
 
   const {
     // register,
-    // handleSubmit,
+    handleSubmit,
     control,
     trigger,
     reset,
+    getValues,
     formState: { errors, touchedFields, dirtyFields },
   } = methods;
+
+  // Expose methods to parent component
+  useImperativeHandle(
+    ref,
+    () => ({
+      getValues: () => getValues(),
+      triggerSubmit: () => {
+        return new Promise<boolean>((resolve) => {
+          handleSubmit(
+            () => resolve(true),
+            () => resolve(false)
+          )();
+        });
+      },
+      reset: () => reset(),
+    }),
+    [getValues, handleSubmit, reset]
+  );
 
   console.log(errors);
 
   const onSubmit: SubmitHandler<FormData> = (data: FormData) => {
     console.log(data);
   };
+
+  // Handle programmatic submission when controlledSubmit becomes true
+  useEffect(() => {
+    if (controlledSubmit) {
+      handleSubmit(onSubmit)();
+      // Notify parent that submission has been triggered
+      onSubmissionComplete?.();
+    }
+  }, [controlledSubmit, handleSubmit, onSubmissionComplete]);
 
   const legendStyling = "text-xl uppercase tracking-wide mb-2";
 
@@ -234,39 +278,22 @@ const CustomerForm: React.FC = () => {
               </CheckboxGroup>
             )}
           />
-          {/* <Controller
-            name="specialInstructions"
-            control={control}
-            render={({
-              field: { onChange, onBlur, value, ref },
-              fieldState: { invalid, error },
-            }) => (
-              <TextArea
-                label="Special instructions"
-                isInvalid={invalid}
-                value={value}
-                onChange={onChange}
-                inputRef={ref}
-                onBlur={onBlur}
-                maxLength={500}
-                errorMessage={error?.message}
-              />
-            )}
-          /> */}
         </fieldset>
-        <div className="mt-3 mb-7 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
-          <Button type="submit" className="w-full h-full" variant="secondary">
-            Place Order
-          </Button>
-          <Button
-            type="reset"
-            onClick={() => reset()}
-            className="w-full h-full"
-            variant="secondary"
-          >
-            Clear Form
-          </Button>
-        </div>
+        {controlledSubmit && (
+          <div className="mt-3 mb-7 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+            <Button type="submit" className="w-full h-full" variant="secondary">
+              Place Order
+            </Button>
+            <Button
+              type="reset"
+              onClick={() => reset()}
+              className="w-full h-full"
+              variant="secondary"
+            >
+              Clear Form
+            </Button>
+          </div>
+        )}
       </Form>
     </div>
   );
