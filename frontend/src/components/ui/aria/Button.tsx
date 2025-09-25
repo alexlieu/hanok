@@ -22,11 +22,11 @@ const button = tv({
     variant: {
       primary: "",
       secondary:
-        "text-black bg-default-bg hover:bg-black hover:text-default-bg hover:border-black bg-default-bg",
+        "text-black bg-transparent enabled:hover:bg-black enabled:hover:text-default-bg enabled:hover:border-black",
       icon: "border-0 p-1 flex items-center justify-center text-brand-colour-5 hover:bg-icon-hover hover:text-default-bg pressed:scale-90 pressed:transition-transform",
     },
     isDisabled: {
-      true: "bg-unavailable",
+      true: "",
     },
   },
   defaultVariants: {
@@ -37,11 +37,6 @@ const button = tv({
       variant: "icon",
       isDisabled: true,
       className: "text-icon-disabled bg-icon-disabled-bg",
-    },
-    {
-      variant: "secondary",
-      isDisabled: true,
-      className: "hover:bg-default-bg hover:text-black",
     },
   ],
 });

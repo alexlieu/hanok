@@ -10,10 +10,18 @@ interface FormRefs {
 
 const CheckoutForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /**
+   * This is the hover state for the button.
+   * It is used to force the hover state to be applied when the button is hovered.
+   * This is necessary because react-aria's hover state is not applied when the mouse is stationary over the button while it transitions from disabled to enabled.
+   */
+  const [isHovered, setIsHovered] = useState(false);
   const formRefs = useRef<FormRefs>({
     customerForm: null,
     paymentForm: null,
   });
+
+  const isPhysicallyHovered = useRef(false);
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
@@ -22,7 +30,7 @@ const CheckoutForm: React.FC = () => {
 
     try {
       // Add a small delay to ensure UI shows loading state
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const customerValid =
         await formRefs.current.customerForm?.triggerSubmit();
@@ -47,6 +55,9 @@ const CheckoutForm: React.FC = () => {
       console.error("Order submission failed:", error);
     } finally {
       setIsSubmitting(false);
+      if (isPhysicallyHovered.current) {
+        setIsHovered(true);
+      }
     }
   };
 
@@ -62,15 +73,34 @@ const CheckoutForm: React.FC = () => {
           formRefs.current.paymentForm = ref;
         }}
       />
-      <Button
-        variant="secondary"
-        type="submit"
-        className="mt-7"
-        onClick={handleSubmit}
-        isDisabled={isSubmitting}
+      <div
+        className="relative inline-block"
+        onMouseEnter={() => {
+          isPhysicallyHovered.current = true;
+          if (!isSubmitting) {
+            setIsHovered(true);
+          }
+        }}
+        onMouseLeave={() => {
+          isPhysicallyHovered.current = false;
+          setIsHovered(false);
+        }}
       >
-        {isSubmitting ? "Processing..." : "Place Order"}
-      </Button>
+        <Button
+          key={`button-${isSubmitting}`}
+          variant="secondary"
+          type="submit"
+          className={
+            isHovered && !isSubmitting
+              ? "bg-black text-default-bg border-black"
+              : undefined
+          }
+          onClick={handleSubmit}
+          isDisabled={isSubmitting}
+        >
+          {isSubmitting ? "Processing..." : "Place Order"}
+        </Button>
+      </div>
     </div>
   );
 };

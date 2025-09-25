@@ -106,6 +106,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     reValidateMode: "onChange",
     criteriaMode: "all",
     defaultValues: DEFAULT_PAYMENT_FORM_VALUES,
+    shouldFocusError: false,
   });
 
   const {

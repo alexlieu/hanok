@@ -79,6 +79,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     mode: "onTouched",
     reValidateMode: "onChange",
     criteriaMode: "all",
+    shouldFocusError: false,
   });
 
   const {
