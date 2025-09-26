@@ -1,107 +1,122 @@
-import PaymentForm, { PaymentFormRef } from "./PaymentForm";
-import CustomerForm, { CustomerFormRef } from "./CustomerForm";
+import PaymentForm from "./PaymentForm";
+import CustomerForm from "./CustomerForm";
 import { Button } from "../ui/aria/Button";
-import { useRef, useState } from "react";
+import { useMemo } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  FieldErrors,
+  FormProvider,
+  Resolver,
+  SubmitErrorHandler,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import {
+  CheckoutFormValues,
+  createCheckoutSchema,
+} from "../../schemas/CheckoutSchema";
+import { useLoaderData } from "react-router-dom";
+import { CheckoutRequiredData } from "../../types/CheckoutType";
+import {
+  BillingAddressData,
+  DEFAULT_COUNTRY_CODE,
+} from "../../schemas/BillingAddressSchema";
+import { CardInformation } from "../../schemas/CardSchema";
 
-interface FormRefs {
-  customerForm: CustomerFormRef | null;
-  paymentForm: PaymentFormRef | null;
-}
+const DEFAULT_CUSTOMER_DETAILS = {
+  fullName: "",
+  email: "",
+  phoneNumber: { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: "" },
+  updatePreference: [],
+  pickupDate: null,
+  specialInstructions: undefined,
+};
+
+const DEFAULT_BILLING_ADDRESS: BillingAddressData = {
+  country: "GB",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  stateProvinceRegion: "",
+  county: "",
+  postalCode: "",
+};
+
+const DEFAULT_CARD_DETAILS: CardInformation = {
+  cardNumber: "",
+  expiration: "",
+  cvv: "",
+  holderName: "",
+};
+
+const DEFAULT_CHECKOUT_FORM_VALUES: CheckoutFormValues = {
+  ...DEFAULT_CUSTOMER_DETAILS,
+  ...DEFAULT_BILLING_ADDRESS,
+  ...DEFAULT_CARD_DETAILS,
+};
 
 const CheckoutForm: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  /**
-   * This is the hover state for the button.
-   * It is used to force the hover state to be applied when the button is hovered.
-   * This is necessary because react-aria's hover state is not applied when the mouse is stationary over the button while it transitions from disabled to enabled.
-   */
-  const [isHovered, setIsHovered] = useState(false);
-  const formRefs = useRef<FormRefs>({
-    customerForm: null,
-    paymentForm: null,
+  const {
+    pickupRules: { firstValidDate, lastValidDate, isHoliday },
+    validStatesProvincesRegions,
+  } = useLoaderData() as CheckoutRequiredData;
+
+  const schema = useMemo(() => {
+    return createCheckoutSchema(
+      isHoliday,
+      { start: firstValidDate, end: lastValidDate },
+      validStatesProvincesRegions
+    );
+  }, [isHoliday, firstValidDate, lastValidDate, validStatesProvincesRegions]);
+
+  const methods = useForm<CheckoutFormValues>({
+    // A problem arises when the schema is passed to useForm
+    // useForm uses a generic type TFieldValues that it uses for validation.
+    // Sometimes with the way types are inferred and passed, the expected type can become slightly more general
+    // e.g. {countryCode: string}
+    // So we cast the resolver to match the FormData type
+    // We cast to unknown first as this is the safest way to perform a type assertion that breaks the direct type compatibility check.
+    resolver: zodResolver(schema) as unknown as Resolver<CheckoutFormValues>,
+    mode: "onTouched",
+    reValidateMode: "onChange",
+    criteriaMode: "all",
+    defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
   });
 
-  const isPhysicallyHovered = useRef(false);
+  const {
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
-  const handleSubmit = async () => {
-    if (isSubmitting) return;
+  console.log("error:", errors);
 
-    setIsSubmitting(true);
+  const onSubmit: SubmitHandler<CheckoutFormValues> = (
+    data: CheckoutFormValues
+  ) => {
+    console.log("Form has not validation errors:", data);
+    alert("Form has not validation errors!");
+  };
 
-    try {
-      // Add a small delay to ensure UI shows loading state
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const customerValid =
-        await formRefs.current.customerForm?.triggerSubmit();
-      const paymentValid = await formRefs.current.paymentForm?.triggerSubmit();
-
-      if (!customerValid || !paymentValid) {
-        console.log("Form validation failed");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const customerData = formRefs.current.customerForm?.getValues();
-      const paymentData = formRefs.current.paymentForm?.getValues();
-
-      const orderData = {
-        customer: customerData,
-        payment: paymentData,
-      };
-
-      console.log("Submitting order:", orderData);
-    } catch (error) {
-      console.error("Order submission failed:", error);
-    } finally {
-      setIsSubmitting(false);
-      if (isPhysicallyHovered.current) {
-        setIsHovered(true);
-      }
-    }
+  const onError: SubmitErrorHandler<CheckoutFormValues> = (
+    errors: FieldErrors<CheckoutFormValues>
+  ) => {
+    console.log("Form has validation errors:", errors);
   };
 
   return (
-    <div className="mx-auto px-10">
-      <CustomerForm
-        ref={(ref) => {
-          formRefs.current.customerForm = ref;
-        }}
-      />
-      <PaymentForm
-        ref={(ref) => {
-          formRefs.current.paymentForm = ref;
-        }}
-      />
-      <div
-        className="relative inline-block"
-        onMouseEnter={() => {
-          isPhysicallyHovered.current = true;
-          if (!isSubmitting) {
-            setIsHovered(true);
-          }
-        }}
-        onMouseLeave={() => {
-          isPhysicallyHovered.current = false;
-          setIsHovered(false);
-        }}
-      >
-        <Button
-          key={`button-${isSubmitting}`}
-          variant="secondary"
-          type="submit"
-          className={
-            isHovered && !isSubmitting
-              ? "bg-black text-default-bg border-black"
-              : undefined
-          }
-          onClick={handleSubmit}
-          isDisabled={isSubmitting}
-        >
-          {isSubmitting ? "Processing..." : "Place Order"}
-        </Button>
-      </div>
-    </div>
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
+        <div className="mx-auto px-10">
+          <CustomerForm />
+          <PaymentForm />
+          <div className="relative inline-block">
+            <Button variant="secondary" type="submit">
+              Place Order
+            </Button>
+          </div>
+        </div>
+      </form>
+    </FormProvider>
   );
 };
 

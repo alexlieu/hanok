@@ -1,5 +1,8 @@
 import { z } from "zod/v4";
 import { ValidStatesProvincesRegions } from "../types/ValidStatesProvincesRegions";
+import { CountryCodeUnion } from "./PhoneSchema";
+
+export const DEFAULT_COUNTRY_CODE = "GB" as CountryCodeUnion;
 
 export const COUNTRY_CODES = ["GB", "US", "CA", "KR"] as const;
 
