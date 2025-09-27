@@ -112,10 +112,13 @@ export interface InputProps extends AriaInputProps {
 }
 
 export const Input = (props: InputProps) => {
+  // Destructure inputRef from props to prevent it from being passed to DOM
+  const { inputRef, ...inputProps } = props;
+
   return (
     <RACInput
-      {...props}
-      ref={props.inputRef}
+      {...inputProps}
+      ref={inputRef}
       className={composeTailwindRenderProps(props.className, "px-2 py-1.5")}
       placeholder={props.placeholder}
     />

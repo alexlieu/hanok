@@ -62,16 +62,19 @@ export interface DateInputProps extends Omit<AriaDateInputProps, "children"> {
 }
 
 export const DateInput = (props: DateInputProps) => {
+  // Destructure inputRef from props to prevent it from being passed to DOM
+  const { inputRef, ...dateInputProps } = props;
+
   return (
     <AriaDateInput
-      ref={props.inputRef}
+      ref={inputRef}
       className={(renderProps) =>
         fieldGroupStyles({
           ...renderProps,
           class: "block min-w-[150px] px-2 py-1.5 text-sm",
         })
       }
-      {...props}
+      {...dateInputProps}
     >
       {(segment) => <DateSegment segment={segment} className={segmentStyles} />}
     </AriaDateInput>
