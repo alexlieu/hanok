@@ -3,6 +3,35 @@ import { CalendarDate } from "@internationalized/date";
 import { DateValue } from "react-aria-components";
 import { PhoneSchema } from "./PhoneSchema";
 
+export const PAYMENT_METHODS = [
+  {
+    value: "card",
+    label: "Card",
+  },
+  {
+    value: "cash",
+    label: "Cash",
+  },
+  {
+    value: "paypal",
+    label: "Paypal",
+  },
+  {
+    value: "apple",
+    label: "Apple Pay",
+  },
+  {
+    value: "google",
+    label: "Google Pay",
+  },
+  {
+    value: "mobile",
+    label: "Mobile Payment",
+  },
+] as const;
+
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number]["value"];
+
 const CustomerFormSchema = z
   .object({
     fullName: z
@@ -25,9 +54,22 @@ const CustomerFormSchema = z
         .max(500, { error: "You've exceeded the character limit of 500." })
     ),
     contact: z.string().optional(),
+    paymentMethod: z
+      .enum(PAYMENT_METHODS.map((method) => method.value))
+      .optional(),
   })
   .superRefine(
-    ({ fullName, pickupDate, email, phoneNumber, updatePreference }, ctx) => {
+    (
+      {
+        fullName,
+        pickupDate,
+        email,
+        phoneNumber,
+        updatePreference,
+        paymentMethod,
+      },
+      ctx
+    ) => {
       if (fullName.length < 2) {
         ctx.addIssue({
           code: "custom",
@@ -100,6 +142,18 @@ const CustomerFormSchema = z
           code: "custom",
           message: "Please provide a phone number to receive SMS updates.",
           path: ["updatePreference"],
+        });
+      }
+
+      if (
+        !paymentMethod ||
+        (paymentMethod &&
+          !PAYMENT_METHODS.some((method) => method.value === paymentMethod))
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please select a valid payment method.",
+          path: ["paymentMethod"],
         });
       }
     }

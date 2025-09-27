@@ -22,6 +22,7 @@ import {
   DEFAULT_COUNTRY_CODE,
 } from "../../schemas/BillingAddressSchema";
 import { CardInformation } from "../../schemas/CardSchema";
+import { PaymentMethod } from "../../schemas/CustomerFormSchema";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -30,6 +31,7 @@ const DEFAULT_CUSTOMER_DETAILS = {
   updatePreference: [],
   pickupDate: null,
   specialInstructions: undefined,
+  paymentMethod: "card" as PaymentMethod,
 };
 
 const DEFAULT_BILLING_ADDRESS: BillingAddressData = {
