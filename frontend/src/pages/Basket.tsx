@@ -5,6 +5,7 @@ import BasketFooter from "../components/basket/BasketFooter";
 import { motion, LayoutGroup, AnimatePresence } from "motion/react";
 import { easeInOutExpo } from "../utils/ease";
 import { useEffect, useRef, useState } from "react";
+import { VerticalCutAnimatedText } from "../animations/VerticalCutAnimatedText";
 
 const BasketPage: React.FC = () => {
   const state = useBasketState();
@@ -21,28 +22,52 @@ const BasketPage: React.FC = () => {
     }
   }, [state.items.length]);
 
+  const createContinueShoppingContainer = (
+    emptyBasket: boolean
+  ): React.ReactNode => {
+    return (
+      <motion.div
+        layout="position"
+        initial={emptyBasket && isEmptyThroughDeletion ? { opacity: 0 } : false}
+        animate={{ opacity: 1 }}
+        whileHover={{
+          color: "var(--color-brand-colour-2)",
+          transition: { duration: 0.2 },
+        }}
+        transition={{
+          delay: isEmptyThroughDeletion && !emptyBasket ? 0.2 : 0,
+          ease: easeInOutExpo,
+          duration: 0.6,
+        }}
+        className={`flex place-content-center ${
+          emptyBasket ? "mt-0 text-2xl" : "mt-10"
+        }`}
+      >
+        <Link to="/products">
+          {emptyBasket ? "Have a look at our products" : "Continue shopping"}
+        </Link>
+      </motion.div>
+    );
+  };
+
   return (
     <LayoutGroup>
-      <motion.div layout initial={false} className="min-h-[500px] w-full">
+      <motion.div
+        layout
+        initial={false}
+        className="relative min-h-[500px] w-full"
+      >
         <AnimatePresence mode="wait">
           {state.items.length === 0 ? (
-            <motion.h2
-              key="empty-state"
-              layout="position"
-              className="text-center text-[clamp(4rem,9vw,6rem)] pt-[15vb] font-outfit"
-              initial={isEmptyThroughDeletion ? { opacity: 0 } : false}
-              animate={{
-                opacity: 1,
-                transition: {
-                  duration: 0.8,
-                  ease: easeInOutExpo,
-                  delay: 0.2,
-                },
-              }}
-            >
-              {`Your basket is empty`}
-              <span className="pl-[0.2em] text-nowrap">{`:(`}</span>
-            </motion.h2>
+            <div className="w-screen min-h-[calc((100svh-220px)/2)] flex flex-col items-center justify-end">
+              <VerticalCutAnimatedText
+                text="Your basket is empty :("
+                splitType="word"
+                className="text-[clamp(4rem,9vw,6rem)] font-outfit"
+                playAnimation={isEmptyThroughDeletion}
+              />
+              {createContinueShoppingContainer(true)}
+            </div>
           ) : (
             <motion.div
               key="basket-content"
@@ -56,22 +81,10 @@ const BasketPage: React.FC = () => {
                 ))}
               </AnimatePresence>
               <BasketFooter />
+              {createContinueShoppingContainer(false)}
             </motion.div>
           )}
         </AnimatePresence>
-        <motion.div
-          layout="position"
-          transition={{
-            delay: state.items.length === 0 ? 0.1 : 0,
-            ease: easeInOutExpo,
-            duration: 0.6,
-          }}
-          className={`flex place-content-center pt-10 ${
-            state.items.length > 0 ? "mt-3" : "pt-5 mt-0"
-          }`}
-        >
-          <Link to="/products">Continue shopping</Link>
-        </motion.div>
       </motion.div>
     </LayoutGroup>
   );
