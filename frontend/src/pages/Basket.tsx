@@ -50,7 +50,7 @@ const BasketPage: React.FC = () => {
               layout="position"
               exit={{ opacity: 0 }}
             >
-              <AnimatePresence mode="sync">
+              <AnimatePresence mode="popLayout">
                 {state.items.map((item) => (
                   <BasketLineItem item={item} key={item.variantId} />
                 ))}

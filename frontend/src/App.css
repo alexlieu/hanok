@@ -16,11 +16,27 @@
     --font-quicksand: Quicksand, "sans-serif";
     --font-jost: Jost, "sans-serif";
     --font-wix-madefor: Wix Madefor, "sans-serif";
-    --color-error-red: #c03d1a;
-    --color-default-bg: #F7F8F4;
-    --color-brand-focus: #8ba888;
-    --color-brand-colour-1: #D0A49E;
-    --color-brand-colour-2: #987998;
+    /* --color-error-red: #c03d1a; */
+    --color-error-red: #d63e20;
+    --color-default-bg: #F3F3F3; /* #F7F8F4; */
+    /* --color-default-bg: #F1F2F4; */
+    --color-brand-focus: #0A65DB;
+    /* --color-brand-colour-1: #b51963; */
+    --color-brand-colour-1: #5CB962;
+    /* --color-brand-colour-2: #624E75; */
+    --color-brand-colour-2: #7B559F;
+    /* --color-brand-colour-3: #f1bdb9; */
+    --color-brand-colour-3: #f2561d;
+    /* --color-brand-colour-4: #e9ecef; */
+    --color-brand-colour-4: #5A92B6;
+    --color-brand-colour-5: #6B8083;
+    --color-unavailable: #DBD9DA;
+    --color-unavailable-text: #59585D;
+    --color-tooltip-bg: #181527; /* Not using at the moment */
+    --color-icon-disabled: #B6C2C4;
+    --color-icon-disabled-bg: #E7E9EC;
+    --color-icon-hover: #ADADAD;
+    --color-icon-pressed: #636172;
 }
 
 .form-error {
