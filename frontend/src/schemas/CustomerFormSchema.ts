@@ -51,7 +51,7 @@ const CustomerFormSchema = z
     specialInstructions: z.optional(
       z
         .string()
-        .max(500, { error: "You've exceeded the character limit of 500." })
+        .max(250, { error: "You've exceeded the character limit of 500." })
     ),
     contact: z.string().optional(),
     paymentMethod: z
