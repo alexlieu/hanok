@@ -22,10 +22,12 @@ const PaymentForm = () => {
     setValue("paymentMethod", paymentMethod);
   }, [paymentMethod, setValue]);
   return (
-    <fieldset className="flex flex-col gap-4 mb-5">
-      <legend className="uppercase tracking-wide text-xl mb-2">Payment</legend>
+    <fieldset className="">
+      <legend className="lowercase tracking-wide text-lg font-medium mb-2">
+        payment method
+      </legend>
       <DisclosureGroup
-        className={"flex flex-col gap-2"}
+        className={"space-y-1"}
         allowsMultipleExpanded={false}
         requiresOneOpen={true}
         defaultExpandedKeys={[paymentMethod]}
@@ -35,10 +37,13 @@ const PaymentForm = () => {
       >
         {PAYMENT_METHODS.map(({ value, label }) => (
           <Disclosure id={value} key={value}>
-            <DisclosureHeader variant="secondary">{label}</DisclosureHeader>
-            <DisclosurePanel scrollIntoView={true}>
+            <DisclosureHeader variant="tertiary">{label}</DisclosureHeader>
+            <DisclosurePanel
+              scrollIntoView={true}
+              className={`p-4 pt-0 ${value !== "card" && "hidden"}`}
+            >
               {value === "card" && (
-                <div className="flex flex-col gap-4">
+                <div className="space-y-6">
                   <CardDetailsForm />
                   <BillingAddressForm />
                 </div>

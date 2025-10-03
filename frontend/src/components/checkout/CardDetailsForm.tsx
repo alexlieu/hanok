@@ -41,7 +41,12 @@ const CardDetailsForm: React.FC = () => {
   return (
     <>
       <fieldset>
-        <legend title="Card details" />
+        <legend
+          title="Card details"
+          className="lowercase tracking-wide text-lg font-medium mb-2"
+        >
+          Card details
+        </legend>
         <div className="grid grid-cols-2 gap-3">
           <Controller
             name="holderName"

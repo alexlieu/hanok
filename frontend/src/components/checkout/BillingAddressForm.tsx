@@ -19,7 +19,6 @@ import {
   getPostalCodeMaxLength,
 } from "../../utils/postalCodeUtils";
 import { checkIsCountry } from "../../utils/countryUtils";
-import { AnimatePresence, motion } from "motion/react";
 
 const selectButtonStyles = tv({
   extend: defaultSelectButtonStyles,
@@ -86,300 +85,279 @@ const BillingAddressForm = () => {
     fieldsToReset.forEach((field) => resetField(field));
   }, [selectedCountry, resetField]);
 
-  return (
-    <fieldset>
-      <div>
-        <legend className="uppercase tracking-wide text-xl mb-2">
-          Billing address
-        </legend>
-        <Controller
-          name="country"
-          control={control}
-          render={({
-            field: { ref, onChange, value, ...field },
-            fieldState: { invalid, error },
-          }) => {
-            return (
-              <Select
-                label="Country"
-                defaultSelectedKey={"GB"}
-                isInvalid={invalid}
-                errorMessage={error?.message}
-                inputRef={ref}
-                selectedKey={value}
-                onSelectionChange={onChange}
-                className={"mb-3"}
-                buttonClassNames={selectButtonStyles}
-                {...field}
-              >
-                {countryList.map(({ value, label }) => (
-                  <SelectItem key={value} id={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </Select>
-            );
-          }}
-        />
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedCountry}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ ease: "easeOut", duration: 0.3 }}
+  const countrySelectField = (
+    <Controller
+      name="country"
+      control={control}
+      render={({
+        field: { ref, onChange, value, ...field },
+        fieldState: { invalid, error },
+      }) => {
+        return (
+          <Select
+            label="Country"
+            defaultSelectedKey={"GB"}
+            isInvalid={invalid}
+            errorMessage={error?.message}
+            inputRef={ref}
+            selectedKey={value}
+            onSelectionChange={onChange}
+            buttonClassNames={selectButtonStyles}
+            {...field}
           >
-            <div className="flex flex-col gap-3">
-              {checkIsCountryForComponent(["KR"]) && (
-                <>
-                  <Controller
-                    name="postalCode"
-                    control={control}
-                    render={({
-                      field: { ref, onChange, ...field },
-                      fieldState: { invalid, error },
-                    }) => {
-                      return (
-                        <TextField
-                          label={
-                            countryFieldConfigs[selectedCountry].postalCode
-                              ?.label
-                          }
-                          placeholder={
-                            countryFieldConfigs[selectedCountry].postalCode
-                              ?.label
-                          }
-                          onChange={(input) =>
-                            cleanPostalCode(input, selectedCountry, onChange)
-                          }
-                          isRequired
-                          inputRef={ref}
-                          maxLength={getPostalCodeMaxLength(selectedCountry)}
-                          isInvalid={invalid}
-                          errorMessage={error?.message}
-                          className={`flex-1`}
-                          {...field}
-                        />
-                      );
-                    }}
-                  />
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <Controller
-                      name="stateProvinceRegion"
-                      control={control}
-                      render={({
-                        field: { ref, onChange, value, ...field },
-                        fieldState: { invalid, error },
-                      }) => {
-                        return (
-                          <Select
-                            label="Province"
-                            className={"flex-1 min-w-0"}
-                            isRequired
-                            isInvalid={invalid}
-                            errorMessage={error?.message}
-                            inputRef={ref}
-                            selectedKey={value}
-                            onSelectionChange={onChange}
-                            buttonClassNames={selectButtonStyles}
-                            {...field}
-                          >
-                            {Array.from(KR_PROVINCES).map((value) => (
-                              <SelectItem key={value} id={value}>
-                                {value}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        );
-                      }}
-                    />
-                    <Controller
-                      name="city"
-                      control={control}
-                      render={({
-                        field: { ref, ...field },
-                        fieldState: { invalid, error },
-                      }) => {
-                        return (
-                          <TextField
-                            className={"flex-1"}
-                            label={"Town or City"}
-                            placeholder={"Town or City"}
-                            maxLength={30}
-                            inputRef={ref}
-                            isRequired
-                            isInvalid={invalid}
-                            errorMessage={error?.message}
-                            {...field}
-                          />
-                        );
-                      }}
-                    />
-                  </div>
-                </>
-              )}
-              <Controller
-                name="addressLine1"
-                control={control}
-                render={({
-                  field: { ref, ...field },
-                  fieldState: { invalid, error },
-                }) => {
-                  return (
-                    <TextField
-                      label="Address line 1"
-                      placeholder="Address line 1"
-                      maxLength={40}
-                      inputRef={ref}
-                      isInvalid={invalid}
-                      isRequired
-                      errorMessage={error?.message}
-                      {...field}
-                    />
-                  );
-                }}
-              />
-              <Controller
-                name="addressLine2"
-                control={control}
-                render={({
-                  field: { ref, ...field },
-                  fieldState: { invalid, error },
-                }) => {
-                  return (
-                    <TextField
-                      label="Apartment, suite, etc. (optional)"
-                      placeholder="Apartment, suite, etc. (optional)"
-                      maxLength={30}
-                      inputRef={ref}
-                      isInvalid={invalid}
-                      errorMessage={error?.message}
-                      {...field}
-                    />
-                  );
-                }}
-              />
-              {!checkIsCountryForComponent(["KR"]) && (
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Controller
-                    name="city"
-                    control={control}
-                    render={({
-                      field: { ref, ...field },
-                      fieldState: { invalid, error },
-                    }) => {
-                      return (
-                        <TextField
-                          className={"flex-1"}
-                          label={"Town or City"}
-                          placeholder={"Town or City"}
-                          maxLength={30}
-                          inputRef={ref}
-                          isRequired
-                          isInvalid={invalid}
-                          errorMessage={error?.message}
-                          {...field}
-                        />
-                      );
-                    }}
-                  />
-                  {checkIsCountryForComponent(["US", "CA"]) && (
-                    <Controller
-                      name="stateProvinceRegion"
-                      control={control}
-                      render={({
-                        field: { ref, onChange, value, ...field },
-                        fieldState: { invalid, error },
-                      }) => {
-                        return (
-                          <Select
-                            label={
-                              checkIsCountryForComponent(["US"])
-                                ? "State"
-                                : "Province"
-                            }
-                            className={"flex-1 min-w-0"}
-                            isRequired
-                            isInvalid={invalid}
-                            errorMessage={error?.message}
-                            inputRef={ref}
-                            selectedKey={value}
-                            onSelectionChange={onChange}
-                            buttonClassNames={selectButtonStyles}
-                            {...field}
-                          >
-                            {Object.entries(
-                              checkIsCountryForComponent(["US"])
-                                ? US_STATES
-                                : CA_PROVINCES
-                            ).map(([key, value]) => (
-                              <SelectItem key={key} id={key}>
-                                {value}
-                              </SelectItem>
-                            ))}
-                          </Select>
-                        );
-                      }}
-                    />
-                  )}
-                  <Controller
-                    name="postalCode"
-                    control={control}
-                    render={({
-                      field: { ref, onChange, ...field },
-                      fieldState: { invalid, error },
-                    }) => {
-                      return (
-                        <TextField
-                          label={
-                            countryFieldConfigs[selectedCountry].postalCode
-                              ?.label
-                          }
-                          placeholder={
-                            countryFieldConfigs[selectedCountry].postalCode
-                              ?.label
-                          }
-                          isRequired
-                          inputRef={ref}
-                          maxLength={getPostalCodeMaxLength(selectedCountry)}
-                          onChange={(input) =>
-                            cleanPostalCode(input, selectedCountry, onChange)
-                          }
-                          isInvalid={invalid}
-                          errorMessage={error?.message}
-                          className={`flex-1`}
-                          {...field}
-                        />
-                      );
-                    }}
-                  />
-                </div>
-              )}
-              {checkIsCountryForComponent(["GB"]) && (
-                <Controller
-                  name="county"
-                  control={control}
-                  render={({
-                    field: { ref, ...field },
-                    fieldState: { invalid, error },
-                  }) => {
-                    return (
-                      <TextField
-                        label={countryFieldConfigs["GB"].county?.label}
-                        placeholder={countryFieldConfigs["GB"].county?.label}
-                        inputRef={ref}
-                        isInvalid={invalid}
-                        errorMessage={error?.message}
-                        {...field}
-                      />
-                    );
-                  }}
+            {countryList.map(({ value, label }) => (
+              <SelectItem key={value} id={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </Select>
+        );
+      }}
+    />
+  );
+
+  return (
+    <fieldset className="grid grid-cols-1 lg:grid-cols-2 gap-[0.7rem]">
+      <legend className="lowercase tracking-wide text-lg font-medium mb-2">
+        Billing address
+      </legend>
+      {checkIsCountryForComponent(["KR"]) && (
+        <>
+          <Controller
+            name="postalCode"
+            control={control}
+            render={({
+              field: { ref, onChange, ...field },
+              fieldState: { invalid, error },
+            }) => {
+              return (
+                <TextField
+                  label={countryFieldConfigs[selectedCountry].postalCode?.label}
+                  placeholder={
+                    countryFieldConfigs[selectedCountry].postalCode?.label
+                  }
+                  onChange={(input) =>
+                    cleanPostalCode(input, selectedCountry, onChange)
+                  }
+                  isRequired
+                  inputRef={ref}
+                  maxLength={getPostalCodeMaxLength(selectedCountry)}
+                  isInvalid={invalid}
+                  errorMessage={error?.message}
+                  className={`flex-1`}
+                  {...field}
                 />
-              )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+              );
+            }}
+          />
+          <Controller
+            name="stateProvinceRegion"
+            control={control}
+            render={({
+              field: { ref, onChange, value, ...field },
+              fieldState: { invalid, error },
+            }) => {
+              return (
+                <Select
+                  label="Province"
+                  className={"flex-1 min-w-0"}
+                  isRequired
+                  isInvalid={invalid}
+                  errorMessage={error?.message}
+                  inputRef={ref}
+                  selectedKey={value}
+                  onSelectionChange={onChange}
+                  buttonClassNames={selectButtonStyles}
+                  {...field}
+                >
+                  {Array.from(KR_PROVINCES).map((value) => (
+                    <SelectItem key={value} id={value}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </Select>
+              );
+            }}
+          />
+          <Controller
+            name="city"
+            control={control}
+            render={({
+              field: { ref, ...field },
+              fieldState: { invalid, error },
+            }) => {
+              return (
+                <TextField
+                  className={"flex-1"}
+                  label={"Town or City"}
+                  placeholder={"Town or City"}
+                  maxLength={30}
+                  inputRef={ref}
+                  isRequired
+                  isInvalid={invalid}
+                  errorMessage={error?.message}
+                  {...field}
+                />
+              );
+            }}
+          />
+          {countrySelectField}
+        </>
+      )}
+      <Controller
+        name="addressLine1"
+        control={control}
+        render={({
+          field: { ref, ...field },
+          fieldState: { invalid, error },
+        }) => {
+          return (
+            <TextField
+              label="Address line 1"
+              placeholder="Address line 1"
+              maxLength={40}
+              inputRef={ref}
+              isInvalid={invalid}
+              isRequired
+              className="lg:col-start-1"
+              errorMessage={error?.message}
+              {...field}
+            />
+          );
+        }}
+      />
+      <Controller
+        name="addressLine2"
+        control={control}
+        render={({
+          field: { ref, ...field },
+          fieldState: { invalid, error },
+        }) => {
+          return (
+            <TextField
+              label="Apartment, suite, etc. (optional)"
+              placeholder="Apartment, suite, etc. (optional)"
+              maxLength={30}
+              inputRef={ref}
+              isInvalid={invalid}
+              errorMessage={error?.message}
+              {...field}
+            />
+          );
+        }}
+      />
+      {!checkIsCountryForComponent(["KR"]) && (
+        <>
+          <Controller
+            name="city"
+            control={control}
+            render={({
+              field: { ref, ...field },
+              fieldState: { invalid, error },
+            }) => {
+              return (
+                <TextField
+                  className={"flex-1"}
+                  label={"Town or City"}
+                  placeholder={"Town or City"}
+                  maxLength={30}
+                  inputRef={ref}
+                  isRequired
+                  isInvalid={invalid}
+                  errorMessage={error?.message}
+                  {...field}
+                />
+              );
+            }}
+          />
+          {checkIsCountryForComponent(["US", "CA"]) && (
+            <Controller
+              name="stateProvinceRegion"
+              control={control}
+              render={({
+                field: { ref, onChange, value, ...field },
+                fieldState: { invalid, error },
+              }) => {
+                return (
+                  <Select
+                    label={
+                      checkIsCountryForComponent(["US"]) ? "State" : "Province"
+                    }
+                    className={"flex-1 min-w-0"}
+                    isRequired
+                    isInvalid={invalid}
+                    errorMessage={error?.message}
+                    inputRef={ref}
+                    selectedKey={value}
+                    onSelectionChange={onChange}
+                    buttonClassNames={selectButtonStyles}
+                    {...field}
+                  >
+                    {Object.entries(
+                      checkIsCountryForComponent(["US"])
+                        ? US_STATES
+                        : CA_PROVINCES
+                    ).map(([key, value]) => (
+                      <SelectItem key={key} id={key}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                );
+              }}
+            />
+          )}
+          <Controller
+            name="postalCode"
+            control={control}
+            render={({
+              field: { ref, onChange, ...field },
+              fieldState: { invalid, error },
+            }) => {
+              return (
+                <TextField
+                  label={countryFieldConfigs[selectedCountry].postalCode?.label}
+                  placeholder={
+                    countryFieldConfigs[selectedCountry].postalCode?.label
+                  }
+                  isRequired
+                  inputRef={ref}
+                  maxLength={getPostalCodeMaxLength(selectedCountry)}
+                  onChange={(input) =>
+                    cleanPostalCode(input, selectedCountry, onChange)
+                  }
+                  isInvalid={invalid}
+                  errorMessage={error?.message}
+                  className={`flex-1`}
+                  {...field}
+                />
+              );
+            }}
+          />
+          {checkIsCountryForComponent(["GB"]) && (
+            <Controller
+              name="county"
+              control={control}
+              render={({
+                field: { ref, ...field },
+                fieldState: { invalid, error },
+              }) => {
+                return (
+                  <TextField
+                    label={countryFieldConfigs["GB"].county?.label}
+                    placeholder={countryFieldConfigs["GB"].county?.label}
+                    inputRef={ref}
+                    isInvalid={invalid}
+                    errorMessage={error?.message}
+                    {...field}
+                  />
+                );
+              }}
+            />
+          )}
+          {countrySelectField}
+        </>
+      )}
     </fieldset>
   );
 };

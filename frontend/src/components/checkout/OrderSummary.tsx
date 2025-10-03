@@ -3,17 +3,17 @@ import { formatPrice } from "../../utils/format";
 
 interface OrderSummaryProps {
   items: BasketResponseItem[];
-  total: number;
+  total?: number;
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({ items, total }) => {
   return (
     <>
       <div className="w-full">
-        <ul className="">
+        <ul className="space-y-2">
           {items.map((item) => (
             <li
-              className="grid grid-cols-[auto_1fr_auto] gap-x-4 items-center border-y-2 mt-[-2px] py-2"
+              className="grid grid-cols-[auto_1fr_auto] gap-x-4 shadow-sm items-center mt-[-2px] py-2 px-2"
               key={`${item.productName}-${item.flavour}-${item.size}`}
             >
               <div className="size-16 flex items-center justify-center overflow-hidden">
@@ -42,9 +42,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ items, total }) => {
             </li>
           ))}
         </ul>
-        <p className="flex justify-end items-center text-lg">
-          Total: {formatPrice(total)}
-        </p>
+        {total && (
+          <p className="flex justify-end items-center text-lg">
+            Total: {formatPrice(total)}
+          </p>
+        )}
       </div>
     </>
   );

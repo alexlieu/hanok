@@ -21,13 +21,12 @@ const CustomerForm = () => {
     formState: { errors, touchedFields, dirtyFields },
   } = useFormContext();
 
-  const legendStyling = "text-xl uppercase tracking-wide mb-2";
-
   return (
-    <fieldset className="mx-auto">
-      <legend className="sr-only">Customer details</legend>
-      <fieldset className="flex flex-col gap-4 mb-5">
-        <legend className={`${legendStyling}`}>Contact details</legend>
+    <>
+      <fieldset className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-[0.7rem]">
+        <legend className="lowercase tracking-wide text-lg font-medium mb-2">
+          contact details
+        </legend>
         <Controller
           name="fullName"
           control={control}
@@ -45,6 +44,7 @@ const CustomerForm = () => {
               isRequired
               isInvalid={invalid}
               errorMessage={error?.message}
+              className="lg:col-span-2"
             />
           )}
         />
@@ -86,6 +86,7 @@ const CustomerForm = () => {
                   ? errors.contact.message
                   : undefined)
               }
+              className="lg:col-start-1"
             />
           )}
         />
@@ -117,8 +118,10 @@ const CustomerForm = () => {
           )}
         />
       </fieldset>
-      <fieldset className="flex flex-col gap-4 pb-4">
-        <legend className={`${legendStyling}`}>Order preferences</legend>
+      <fieldset className="space-y-[0.7rem]">
+        <legend className="lowercase tracking-wide text-lg font-medium mb-2">
+          pickup and updates
+        </legend>
         <I18nProvider locale="en-GB">
           <Controller
             name="pickupDate"
@@ -174,7 +177,7 @@ const CustomerForm = () => {
           )}
         />
       </fieldset>
-    </fieldset>
+    </>
   );
 };
 

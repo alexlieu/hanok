@@ -1,18 +1,10 @@
-import { Navigate, useLoaderData } from "react-router-dom";
-// import { BasketResponse } from "../types/BasketTypes";
+import { Navigate, useLoaderData, useNavigate } from "react-router-dom";
 import OrderSummary from "../components/checkout/OrderSummary";
-import PickupMap from "../components/checkout/PickupMap";
 import CheckoutForm from "../components/checkout/CheckoutForm";
 import { useMediaQuery } from "../utils/hooks/useWindowDimensions";
-import { AccordianItem } from "../components/ui/AccordianItem";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { CheckoutRequiredData } from "../types/CheckoutType";
-import {
-  Disclosure,
-  DisclosureHeader,
-  DisclosurePanel,
-} from "../components/ui/aria/Disclosure";
-import { TextArea } from "../components/ui/aria/TextArea";
+import { formatPrice } from "../utils/format";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FieldErrors,
@@ -21,7 +13,6 @@ import {
   SubmitErrorHandler,
   SubmitHandler,
   useForm,
-  Controller,
 } from "react-hook-form";
 import {
   CheckoutFormValues,
@@ -33,6 +24,9 @@ import {
 } from "../schemas/BillingAddressSchema";
 import { CardInformation } from "../schemas/CardSchema";
 import { PaymentMethod } from "../schemas/CustomerFormSchema";
+import { Button } from "../components/ui/aria/Button";
+import { FaChevronLeft } from "react-icons/fa";
+import { AnimatePresence, motion } from "motion/react";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -68,13 +62,13 @@ const DEFAULT_CHECKOUT_FORM_VALUES: CheckoutFormValues = {
 };
 
 const CheckoutPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     basketContent: { items, total },
     pickupRules: { firstValidDate, lastValidDate, isHoliday },
     validStatesProvincesRegions,
   } = useLoaderData() as CheckoutRequiredData;
 
-  const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
 
   const schema = useMemo(() => {
@@ -93,15 +87,19 @@ const CheckoutPage: React.FC = () => {
     defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
   });
 
-  const { handleSubmit, control } = methods;
+  const {
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = methods;
+
+  console.log(errors);
+
+  const paymentMethod = watch("paymentMethod");
 
   if (items.length <= 0 && total <= 0) {
     return <Navigate to="/basket" />;
   }
-
-  const openOrderSummary = () => {
-    setOrderSummaryExpanded((prevVal) => !prevVal);
-  };
 
   const onSubmit: SubmitHandler<CheckoutFormValues> = (
     data: CheckoutFormValues
@@ -118,57 +116,87 @@ const CheckoutPage: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit, onError)}>
-        <div className="flex flex-col md:flex-row max-w-[70em] m-auto justify-center items-center md:items-start">
-          <div className="w-full order-2 md:order-1 md:w-4/7 py-7 self-start">
-            <CheckoutForm />
-          </div>
-          {isSmallScreen ? (
-            <AccordianItem
-              title="Order Summary"
-              isExpanded={orderSummaryExpanded}
-              onToggle={() => openOrderSummary()}
-              containerStyle="w-full px-10 font-medium pt-7"
-              buttonStyle="tracking-wide text-xl"
-            >
-              <div className="flex flex-col sm:flex-row sm:gap-3 md:flex-col">
-                <PickupMap />
-                <OrderSummary items={items} total={total} />
-              </div>
-            </AccordianItem>
-          ) : (
-            <div className="w-[85%] order-1 md:order-2 md:w-3/7 p-7 flex flex-col items-center min-w-[270px] md:sticky md:top-0">
-              <PickupMap />
-              <Disclosure className={`py-4 w-full`}>
-                <DisclosureHeader>Add special instructions</DisclosureHeader>
-                <DisclosurePanel>
-                  <Controller
-                    name="specialInstructions"
-                    control={control}
-                    render={({
-                      field: { onChange, onBlur, value, ref },
-                      fieldState: { invalid, error },
-                    }) => (
-                      <TextArea
-                        inputRef={ref}
-                        value={value || ""}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        aria-label="Special instructions"
-                        className={`w-full`}
-                        description="Please feel free to add any additional requests or requirements you may need for your order and we'll do our best to accommodate."
-                        errorMessage={error?.message}
-                        isInvalid={invalid}
-                      />
-                    )}
+      <div className="min-h-screen flex justify-center">
+        <div className="w-[80%] max-w-5xl">
+          <div className="sticky top-0 z-10 bg-default-bg">
+            <div className="mx-auto">
+              <div className="flex items-center justify-between h-[4.5rem] relative">
+                <Button
+                  className="flex gap-1 text-[0.8rem] group"
+                  variant="icon"
+                  onClick={() => navigate("/basket")}
+                >
+                  <FaChevronLeft
+                    size="0.8rem"
+                    className="group-hover:translate-x-[-0.15rem] delay-150 ease-out transition-transform"
                   />
-                </DisclosurePanel>
-              </Disclosure>
-              <OrderSummary items={items} total={total} />
+                  <span>back to basket</span>
+                </Button>
+                <h1 className="text-3xl absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
+                  checkout
+                </h1>
+              </div>
             </div>
-          )}
+          </div>
+          <div className={`${isSmallScreen ? "space-y-6" : "flex gap-[4rem]"}`}>
+            <div
+              className={`
+                ${
+                  isSmallScreen
+                    ? "order-1"
+                    : "lg:order-2 lg:sticky lg:top-32 lg:self-start lg:justify-start lg:flex-2/5"
+                }`}
+            >
+              <div className="rounded-sm shadow-sm border border-gray-200 p-6 space-y-[1.3rem]">
+                <h2 className="lowercase text-lg font-semibold mb-4">
+                  order summary
+                </h2>
+                <OrderSummary items={items} />
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex justify-between items-center text-lg font-semibold px-2">
+                    <span>total</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  type="submit"
+                  form="checkout-form"
+                  className="w-full"
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={paymentMethod}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {paymentMethod !== "card"
+                        ? `Pay with ${paymentMethod}`
+                        : "Place Order"}
+                    </motion.span>
+                  </AnimatePresence>
+                </Button>
+              </div>
+            </div>
+
+            <div
+              className={`${
+                isSmallScreen ? "order-2" : "lg:order-1 lg:flex-3/5"
+              }`}
+            >
+              <form
+                id="checkout-form"
+                onSubmit={handleSubmit(onSubmit, onError)}
+                className="space-y-8"
+              >
+                <CheckoutForm />
+                <Button type="submit">Place Order</Button>
+              </form>
+            </div>
+          </div>
         </div>
-      </form>
+      </div>
     </FormProvider>
   );
 };

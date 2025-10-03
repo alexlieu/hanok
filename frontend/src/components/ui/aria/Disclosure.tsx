@@ -87,7 +87,7 @@ export function Disclosure({ children, ...props }: DisclosureProps) {
 
 export interface DisclosureHeaderProps {
   children: ReactNode;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "tertiary";
 }
 
 const MotionPlus = motion.create(LuPlus);
@@ -159,6 +159,25 @@ export function DisclosureHeader({
                   }}
                   initial={false}
                 />
+              )}
+              {variant === "tertiary" && (
+                <div className="flex-shrink-0 h-[0.9rem] w-[0.9rem] border-2 border-brand-colour-5 rounded-full flex items-center justify-center relative">
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.span
+                        initial={{ scale: 0.4, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.4, opacity: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[0.5rem] w-[0.5rem] bg-brand-colour-2 rounded-full"
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
               {children}
               {variant === "secondary" && (
