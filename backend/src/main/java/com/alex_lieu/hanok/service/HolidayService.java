@@ -58,4 +58,46 @@ public class HolidayService {
                 .map(holiday -> new DateRange(holiday.getStartDate(), holiday.getEndDate()))
                 .collect(Collectors.toSet());
     }
+
+    /**
+     * Helper method to find the next available (i.e non-holiday) date.
+     *
+     * @param date The target date
+     * @return The next valid non-holiday that is on or after the target date.
+     */
+    public LocalDate findNextAvailableDate(LocalDate date) {
+        LocalDate availableDate = date;
+        HolidayCheckResult holidayCheckResult = isHoliday(availableDate);
+        while (holidayCheckResult.isHoliday()) {
+            Optional<DateRange> violatedDateRange = holidayCheckResult.violatedDateRange();
+            if (violatedDateRange.isPresent()) {
+                availableDate = violatedDateRange.get().end().plusDays(1);
+            } else {
+                availableDate = availableDate.plusDays(1);
+            }
+            holidayCheckResult = isHoliday(availableDate);
+        }
+        return availableDate;
+    }
+
+    /**
+     * Helper method to find the next available date on or before the given date.
+     *
+     * @param date
+     * @return The latest valid non-holiday date that is on or before the target date.
+     */
+    public LocalDate findPreviousAvailableDate(LocalDate date) {
+        LocalDate availableDate = date;
+        HolidayCheckResult holidayCheckResult = isHoliday(availableDate);
+        while (holidayCheckResult.isHoliday()) {
+            Optional<DateRange> violateDateRange = holidayCheckResult.violatedDateRange();
+            if (violateDateRange.isPresent()) {
+                availableDate = violateDateRange.get().start().minusDays(1);
+            } else {
+                availableDate = availableDate.minusDays(1);
+            }
+            holidayCheckResult = isHoliday(availableDate);
+        }
+        return availableDate;
+    }
 }

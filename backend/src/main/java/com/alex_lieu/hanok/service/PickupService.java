@@ -43,13 +43,18 @@ public class PickupService {
 
     public DateRange getValidPickupDateRange() {
         LocalDateTime now = LocalDateTime.now(timezoneId);
-        LocalDate effectiveBaseDate = now.toLocalDate();
+        LocalDate candidateDate = now.toLocalDate();
+
         if (now.toLocalTime().isAfter(cutoffTime)) {
-            effectiveBaseDate = effectiveBaseDate.plusDays(1);
+            candidateDate = candidateDate.plusDays(1);
         }
-        LocalDate earliestPickupDate = effectiveBaseDate.plusDays(requiredLeadDays);
-        LocalDate latestPickupDate = effectiveBaseDate.plusMonths(maxMonths);
-        return new DateRange(earliestPickupDate, latestPickupDate);
+
+        LocalDate earliestPickup = holidayService.findNextAvailableDate(candidateDate.plusDays(requiredLeadDays));
+
+        LocalDate latestPickup = earliestPickup.plusMonths(maxMonths);
+        latestPickup = holidayService.findPreviousAvailableDate(latestPickup);
+
+        return new DateRange(earliestPickup, latestPickup);
     }
 
     public PickupRulesDto getPickupRules() {
