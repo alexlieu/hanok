@@ -14,6 +14,7 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form";
+import { Form } from "react-aria-components";
 import {
   CheckoutFormValues,
   createCheckoutSchema,
@@ -185,14 +186,15 @@ const CheckoutPage: React.FC = () => {
                 isSmallScreen ? "order-2" : "lg:order-1 lg:flex-3/5"
               }`}
             >
-              <form
+              <Form
                 id="checkout-form"
                 onSubmit={handleSubmit(onSubmit, onError)}
                 className="space-y-8"
+                validationBehavior="aria"
               >
                 <CheckoutForm />
                 <Button type="submit">Place Order</Button>
-              </form>
+              </Form>
             </div>
           </div>
         </div>
