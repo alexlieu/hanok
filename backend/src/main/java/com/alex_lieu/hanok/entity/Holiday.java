@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.entity;
 
+import com.alex_lieu.hanok.utils.orders.DateRange;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,5 +39,14 @@ public class Holiday {
             }
             return new Holiday(id, name, startDate, endDate);
         }
+    }
+
+    /**
+     * Converts this holiday into a DateRange object.
+     *
+     * @return A new DateRange object with matching start and end dates as the holiday.
+     */
+    public DateRange toDateRange() {
+        return new DateRange(startDate, endDate);
     }
 }

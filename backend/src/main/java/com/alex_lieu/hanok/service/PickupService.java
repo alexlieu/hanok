@@ -1,6 +1,8 @@
 package com.alex_lieu.hanok.service;
 
 import com.alex_lieu.hanok.dto.config.PickupRulesDto;
+import com.alex_lieu.hanok.dto.holiday.PickupDateDetails;
+import com.alex_lieu.hanok.entity.Holiday;
 import com.alex_lieu.hanok.utils.orders.DateRange;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class PickupService {
@@ -57,16 +58,27 @@ public class PickupService {
         return new DateRange(earliestPickup, latestPickup);
     }
 
-    public PickupRulesDto getPickupRules() {
+    public PickupDateDetails getPickupDateDetails() {
         DateRange validPickupDateRange = getValidPickupDateRange();
-        Set<DateRange> holidayRanges = holidayService.getHolidaysForDateRange(validPickupDateRange.start(), validPickupDateRange.end());
+        List<Holiday> holidaysInRange = holidayService.findHolidaysInRange(
+                validPickupDateRange.start(),
+                validPickupDateRange.end()
+        );
+        return new PickupDateDetails(validPickupDateRange, holidaysInRange);
+    }
+
+    public PickupRulesDto getPickupRules() {
+        PickupDateDetails pickupDateDetails = getPickupDateDetails();
+        List<DateRange> overlappingHolidayDateRanges = holidayService.convertHolidaysToDateRanges(pickupDateDetails.holidaysInRange());
         return new PickupRulesDto(
                 requiredLeadDays,
                 cutoffHour,
                 cutoffMin,
                 maxMonths,
                 timezone,
-                List.copyOf(holidayRanges)
+                overlappingHolidayDateRanges,
+                pickupDateDetails.validRange().start(),
+                pickupDateDetails.validRange().end()
         );
     }
 }

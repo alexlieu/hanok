@@ -1,6 +1,7 @@
 package com.alex_lieu.hanok.service;
 
 import com.alex_lieu.hanok.dto.holiday.HolidayCheckResult;
+import com.alex_lieu.hanok.entity.Holiday;
 import com.alex_lieu.hanok.repository.HolidayRepository;
 import com.alex_lieu.hanok.utils.orders.DateRange;
 import org.slf4j.Logger;
@@ -8,9 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,11 +51,15 @@ public class HolidayService {
         }
     }
 
-    public Set<DateRange> getHolidaysForDateRange(LocalDate start, LocalDate end) {
-        return holidayRepository.findByStartDateBetweenOrEndDateBetween(start, end, start, end)
-                .stream()
-                .map(holiday -> new DateRange(holiday.getStartDate(), holiday.getEndDate()))
-                .collect(Collectors.toSet());
+    public List<DateRange> convertHolidaysToDateRanges(List<Holiday> holidays) {
+        if (holidays == null || holidays.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return holidays.stream().map(Holiday::toDateRange).collect(Collectors.toList());
+    }
+
+    public List<Holiday> findHolidaysInRange(LocalDate start, LocalDate end) {
+        return holidayRepository.findOverlappingHolidays(start, end);
     }
 
     /**
