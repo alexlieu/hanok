@@ -1,7 +1,8 @@
 import { z } from "zod/v4";
 import { CalendarDate } from "@internationalized/date";
-import { DateValue } from "react-aria-components";
 import { PhoneSchema } from "./PhoneSchema";
+import { isDateInRanges } from "../utils/dateUtils";
+import { DateRange } from "../types/DateTypes";
 
 export const PAYMENT_METHODS = [
   {
@@ -160,12 +161,12 @@ const CustomerFormSchema = z
   );
 
 const createCustomerFormSchema = (
-  isHoliday: (pickupDate: DateValue) => boolean,
-  validDateRange: { start: CalendarDate; end: CalendarDate }
+  unavailableDates: DateRange[],
+  validDateRange: DateRange
 ) => {
   return CustomerFormSchema.superRefine(({ pickupDate }, ctx) => {
     if (pickupDate) {
-      if (isHoliday(pickupDate)) {
+      if (isDateInRanges(pickupDate, unavailableDates)) {
         ctx.addIssue({
           code: "custom",
           message:

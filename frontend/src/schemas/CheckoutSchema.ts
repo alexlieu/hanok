@@ -2,15 +2,18 @@ import { z } from "zod/v4";
 
 import createCustomerFormSchema from "./CustomerFormSchema";
 import { createPaymentFormSchema } from "./PaymentFormSchema";
-import { CalendarDate, DateValue } from "@internationalized/date";
 import { ValidStatesProvincesRegions } from "../types/ValidStatesProvincesRegions";
+import { DateRange } from "../types/DateTypes";
 
 export const createCheckoutSchema = (
-  isHoliday: (pickupDate: DateValue) => boolean,
-  validDateRange: { start: CalendarDate; end: CalendarDate },
+  unavailableDates: DateRange[],
+  validDateRange: DateRange,
   validStatesProvincesRegions: ValidStatesProvincesRegions
 ) => {
-  const customerSchema = createCustomerFormSchema(isHoliday, validDateRange);
+  const customerSchema = createCustomerFormSchema(
+    unavailableDates,
+    validDateRange
+  );
   const paymentSchema = createPaymentFormSchema(validStatesProvincesRegions);
   return customerSchema.and(paymentSchema);
 };

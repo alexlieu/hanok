@@ -2,6 +2,7 @@ import { LuCalendar } from "react-icons/lu";
 import {
   DatePicker as AriaDatePicker,
   DatePickerProps as AriaDatePickerProps,
+  DateRange,
   DateValue,
   ValidationResult,
 } from "react-aria-components";
@@ -12,7 +13,6 @@ import { Dialog } from "./Dialog";
 import { Description, FieldError, FieldGroup } from "./Field";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
-import { CalendarDate } from "@internationalized/date";
 import { RefCallBack } from "react-hook-form";
 import { useState } from "react";
 import { createLabel } from "./utils/createLabel";
@@ -23,7 +23,7 @@ export interface DatePickerProps<T extends DateValue>
   description?: string;
   errorMessage?: string | ((validation: ValidationResult) => string);
   inputRef?: RefCallBack;
-  unavailableDates?: { start: CalendarDate; end: CalendarDate }[];
+  unavailableDates?: DateRange[];
 }
 
 export const DatePicker = ({

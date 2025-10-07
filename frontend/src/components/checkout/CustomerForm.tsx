@@ -9,10 +9,11 @@ import { PhoneField } from "../ui/aria/PhoneField";
 import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
 import Tooltip from "../ui/Tooltip";
 import { DEFAULT_COUNTRY_CODE } from "../../schemas/BillingAddressSchema";
+import { isDateInRanges } from "../../utils/dateUtils";
 
 const CustomerForm = () => {
   const {
-    pickupRules: { firstValidDate, lastValidDate, isHoliday, unavailableDates },
+    pickupRules: { firstValidDate, lastValidDate, unavailableDates },
   } = useLoaderData() as CheckoutRequiredData;
 
   const {
@@ -139,7 +140,9 @@ const CustomerForm = () => {
                 errorMessage={error?.message}
                 minValue={firstValidDate}
                 maxValue={lastValidDate}
-                isDateUnavailable={(date) => isHoliday(date)}
+                isDateUnavailable={(date) =>
+                  isDateInRanges(date, unavailableDates)
+                }
                 unavailableDates={unavailableDates}
                 isRequired
                 label="What is your preferred pickup date?"

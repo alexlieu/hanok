@@ -66,7 +66,7 @@ const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const {
     basketContent: { items, total },
-    pickupRules: { firstValidDate, lastValidDate, isHoliday },
+    pickupRules: { firstValidDate, lastValidDate, unavailableDates },
     validStatesProvincesRegions,
   } = useLoaderData() as CheckoutRequiredData;
 
@@ -74,11 +74,16 @@ const CheckoutPage: React.FC = () => {
 
   const schema = useMemo(() => {
     return createCheckoutSchema(
-      isHoliday,
+      unavailableDates,
       { start: firstValidDate, end: lastValidDate },
       validStatesProvincesRegions
     );
-  }, [isHoliday, firstValidDate, lastValidDate, validStatesProvincesRegions]);
+  }, [
+    unavailableDates,
+    firstValidDate,
+    lastValidDate,
+    validStatesProvincesRegions,
+  ]);
 
   const methods = useForm<CheckoutFormValues>({
     resolver: zodResolver(schema) as unknown as Resolver<CheckoutFormValues>,

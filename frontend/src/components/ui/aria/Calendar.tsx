@@ -7,6 +7,7 @@ import {
   CalendarGrid,
   CalendarGridBody,
   CalendarHeaderCell,
+  DateRange,
   DateValue,
   Heading,
   Text,
@@ -14,7 +15,6 @@ import {
 } from "react-aria-components";
 import { tv, VariantProps } from "tailwind-variants";
 import { Button } from "./Button";
-import { CalendarDate } from "@internationalized/date";
 import { LuX } from "react-icons/lu";
 
 const cellStyles = tv({
@@ -39,7 +39,7 @@ const cellStyles = tv({
 export interface CalendarProps<T extends DateValue>
   extends Omit<AriaCalendarProps<T>, "visibleDuration"> {
   errorMessage?: string;
-  unavailableDates?: { start: CalendarDate; end: CalendarDate }[];
+  unavailableDates?: DateRange[];
 }
 
 export function Calendar<T extends DateValue>({

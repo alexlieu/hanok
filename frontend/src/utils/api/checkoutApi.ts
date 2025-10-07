@@ -1,18 +1,9 @@
-import {
-  CalendarDate,
-  now,
-  parseDate,
-  today,
-  ZonedDateTime,
-} from "@internationalized/date";
+import { now, parseDate } from "@internationalized/date";
 import {
   ConfiguredPickupRules,
   PickupRulesResponse,
 } from "../../types/ConfigTypes";
-import { DateValue } from "react-aria-components";
 import { ValidStatesProvincesRegions } from "../../types/ValidStatesProvincesRegions";
-// import { parseISO } from "date-fns";
-// import { toZonedTime } from "date-fns-tz";
 
 export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
   try {
@@ -25,42 +16,7 @@ export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
       );
     }
     const data = (await response.json()) as PickupRulesResponse;
-    const {
-      requiredLeadDays,
-      cutoffHour,
-      cutoffMin,
-      maxMonth,
-      timezone,
-      holidayRanges,
-    } = data;
-
-    const cutoffTime: ZonedDateTime = now(timezone).set({
-      hour: cutoffHour,
-      minute: cutoffMin,
-      second: 0,
-      millisecond: 0,
-    });
-
-    const firstValidDate: CalendarDate =
-      now(timezone).compare(cutoffTime) < 0
-        ? today(timezone).add({ days: requiredLeadDays + 1 })
-        : today(timezone).add({ days: requiredLeadDays });
-
-    const lastValidDate: CalendarDate = firstValidDate.add({
-      months: maxMonth,
-    });
-
-    function isHoliday(dateToCheck: DateValue): boolean {
-      for (const range of holidayRanges) {
-        if (
-          dateToCheck.compare(parseDate(range.start)) >= 0 &&
-          dateToCheck.compare(parseDate(range.end)) <= 0
-        ) {
-          return true;
-        }
-      }
-      return false;
-    }
+    const { timezone, holidayRanges, firstValidDate, lastValidDate } = data;
 
     const unavailableDates = holidayRanges.map((range) => ({
       start: parseDate(range.start),
@@ -68,9 +24,8 @@ export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
     }));
 
     return {
-      firstValidDate,
-      lastValidDate,
-      isHoliday,
+      firstValidDate: parseDate(firstValidDate),
+      lastValidDate: parseDate(lastValidDate),
       unavailableDates,
       receivedAt: now(timezone),
     } as ConfiguredPickupRules;
