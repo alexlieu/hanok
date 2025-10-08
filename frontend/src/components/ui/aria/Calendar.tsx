@@ -13,9 +13,14 @@ import {
   Text,
   useLocale,
 } from "react-aria-components";
-import { tv, VariantProps } from "tailwind-variants";
+import { tv } from "tailwind-variants";
 import { Button } from "./Button";
 import { LuX } from "react-icons/lu";
+import { twMerge } from "tailwind-merge";
+import {
+  getCssVariableValue,
+  shadeOrBlendColor,
+} from "../../../utils/colourUtils";
 
 const cellStyles = tv({
   base: "h-9 text-sm cursor-default flex items-center justify-center outline-hidden relative",
@@ -23,11 +28,17 @@ const cellStyles = tv({
     state: {
       default:
         "w-9 m-px hover:bg-brand-colour-2/30 rounded-xs focus:bg-brand-colour-2/30",
-      selected:
-        "w-9 m-px bg-brand-colour-2 text-default-bg font-medium transition-all rounded-xs invalid:bg-default-bg invalid:border-2 invalid:border-error-red invalid:text-error-red",
+      selected: twMerge(
+        "w-9 m-px bg-brand-colour-2 text-default-bg font-medium rounded-xs transition-all",
+        "invalid:bg-default-bg invalid:border-2 invalid:border-error-red invalid:text-error-red"
+      ),
       disabled: "w-9 m-px text-unavailable-text transition-none rounded-xs",
-      unavailable:
-        "bg-unavailable focus:bg-unavailable-text focus:text-default-bg focus:transition-colors hover:bg-icon-pressed hover:text-default-bg hover:transition-colors",
+      past_holiday: "text-unavailable-text transition-none",
+      unavailable: twMerge(
+        "bg-unavailable",
+        "focus:bg-unavailable-text focus:text-default-bg focus:transition-colors",
+        "hover:bg-icon-pressed hover:text-default-bg hover:transition-colors"
+      ),
       unavailable_start: "ml-px rounded-l-xs",
       unavailable_middle: "w-full",
       unavailable_end: "mr-px rounded-r-xs",
@@ -67,61 +78,64 @@ export function Calendar<T extends DateValue>({
       <CalendarGrid>
         <CalendarGridHeader />
         <CalendarGridBody className="overflow-visible">
-          {(date) => (
-            <CalendarCell
-              date={date}
-              className={(renderProps) => {
-                let state: VariantProps<typeof cellStyles>["state"] = "default";
-                const baseStyles: string[] = [];
-                if (renderProps.isSelected) {
-                  state = "selected";
-                } else if (
-                  renderProps.isUnavailable &&
-                  renderProps.isDisabled
-                ) {
-                  state = "disabled";
-                } else if (renderProps.isUnavailable) {
-                  const unavailabilityState = getUnavailabilityState(date);
-                  if (unavailabilityState !== "none") {
-                    baseStyles.push(cellStyles({ state: "unavailable" }));
-                    state = `unavailable_${unavailabilityState}`;
-                  } else {
-                    state = "disabled";
+          {(date) => {
+            const unavailabilityState = getUnavailabilityState(date);
+            return (
+              <CalendarCell
+                date={date}
+                className={(renderProps) => {
+                  if (renderProps.isInvalid && renderProps.isSelected) {
+                    return cellStyles({ state: "selected" });
                   }
-                } else if (renderProps.isDisabled) {
-                  state = "disabled";
-                }
-                return [...baseStyles, cellStyles({ state })].join(" ");
-              }}
-            >
-              {(renderProps) => (
-                <>
-                  {renderProps.isUnavailable && !renderProps.isDisabled ? (
+                  if (unavailabilityState !== "none") {
+                    if (renderProps.isDisabled) {
+                      return [
+                        cellStyles({ state: "past_holiday" }),
+                        cellStyles({
+                          state: `unavailable_${unavailabilityState}`,
+                        }),
+                      ].join(" ");
+                    }
+                    return [
+                      cellStyles({ state: "unavailable" }),
+                      cellStyles({
+                        state: `unavailable_${unavailabilityState}`,
+                      }),
+                    ].join(" ");
+                  }
+                  if (renderProps.isSelected) {
+                    return cellStyles({ state: "selected" });
+                  }
+                  if (renderProps.isDisabled) {
+                    return cellStyles({ state: "disabled" });
+                  }
+                  return cellStyles({ state: "default" });
+                }}
+              >
+                {(renderProps) => {
+                  const isPastHoliday =
+                    renderProps.isUnavailable && renderProps.isDisabled;
+                  const shouldShowCross =
+                    (renderProps.isUnavailable && !renderProps.isDisabled) ||
+                    renderProps.isInvalid ||
+                    isPastHoliday;
+                  const getCrossColor = () => {
+                    if (renderProps.isInvalid) return "var(--color-error-red)";
+                    if (isPastHoliday)
+                      return shadeOrBlendColor(
+                        0.3,
+                        getCssVariableValue("--color-unavailable-text")
+                      );
+                    if (renderProps.isFocused || renderProps.isHovered)
+                      return "var(--color-default-bg)";
+                    return "var(--color-icon-pressed)";
+                  };
+                  return (
                     <>
-                      <LuX
-                        className="absolute size-2.5 bottom-1"
-                        stroke={
-                          renderProps.isFocused || renderProps.isHovered
-                            ? renderProps.isInvalid
-                              ? "var(--color-error-red)"
-                              : "var(--color-default-bg)"
-                            : renderProps.isInvalid
-                            ? "var(--color-error-red)"
-                            : "var(--color-icon-pressed)"
-                        }
-                        strokeWidth={5}
-                        strokeOpacity={1}
-                      />
-                      <span className="absolute mb-2">
-                        {renderProps.formattedDate}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {renderProps.isInvalid && (
+                      {shouldShowCross && (
                         <LuX
                           className="absolute size-2.5 bottom-1"
-                          stroke="var(--color-error-red)"
+                          stroke={getCrossColor()}
                           strokeWidth={5}
                           strokeOpacity={1}
                         />
@@ -130,11 +144,11 @@ export function Calendar<T extends DateValue>({
                         {renderProps.formattedDate}
                       </span>
                     </>
-                  )}
-                </>
-              )}
-            </CalendarCell>
-          )}
+                  );
+                }}
+              </CalendarCell>
+            );
+          }}
         </CalendarGridBody>
       </CalendarGrid>
       {errorMessage && (
