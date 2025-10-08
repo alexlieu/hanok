@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Component
@@ -33,7 +35,8 @@ public class PickupDateValidator implements ConstraintValidator<ValidPickupDate,
         if (pickupDate == null) {
             return true;
         }
-        DateRange validPickupDateRange = pickupService.getValidPickupDateRange();
+        LocalDateTime baseDate = LocalDateTime.now(ZoneId.of(timezone));
+        DateRange validPickupDateRange = pickupService.getValidPickupDateRange(baseDate);
 
         if (! validPickupDateRange.isWithinRange(pickupDate)) {
             constraintValidatorContext.disableDefaultConstraintViolation();

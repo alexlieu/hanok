@@ -43,7 +43,10 @@ public class PickupService {
     }
 
     public DateRange getValidPickupDateRange() {
-        LocalDateTime now = LocalDateTime.now(timezoneId);
+        return getValidPickupDateRange(LocalDateTime.now(ZoneId.of(timezone)));
+    }
+
+    public DateRange getValidPickupDateRange(LocalDateTime now) {
         LocalDate candidateDate = now.toLocalDate();
 
         if (now.toLocalTime().isAfter(cutoffTime)) {
@@ -58,17 +61,22 @@ public class PickupService {
         return new DateRange(earliestPickup, latestPickup);
     }
 
-    public PickupDateDetails getPickupDateDetails() {
+    public PickupDateDetails getPickupDateDetails(LocalDate baseDate) {
         DateRange validPickupDateRange = getValidPickupDateRange();
         List<Holiday> holidaysInRange = holidayService.findHolidaysInRange(
-                validPickupDateRange.start(),
+                baseDate,
                 validPickupDateRange.end()
         );
         return new PickupDateDetails(validPickupDateRange, holidaysInRange);
     }
 
     public PickupRulesDto getPickupRules() {
-        PickupDateDetails pickupDateDetails = getPickupDateDetails();
+        LocalDate today = LocalDate.now(timezoneId);
+        return getPickupRules(today);
+    }
+
+    public PickupRulesDto getPickupRules(LocalDate baseDate) {
+        PickupDateDetails pickupDateDetails = getPickupDateDetails(baseDate);
         List<DateRange> overlappingHolidayDateRanges = holidayService.convertHolidaysToDateRanges(pickupDateDetails.holidaysInRange());
         return new PickupRulesDto(
                 requiredLeadDays,
