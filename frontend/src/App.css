@@ -4,6 +4,7 @@
 @import "tailwindcss";
 @plugin "tailwindcss-react-aria-components";
 @plugin "tailwindcss-animate";
+@plugin "tailwind-scrollbar";
 
 :root {
     --focus-border-color: rgba(72, 142, 254, 0.763);

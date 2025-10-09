@@ -14,7 +14,10 @@ export interface PopoverProps extends Omit<AriaPopoverProps, "children"> {
 }
 
 const styles = tv({
-  base: "bg-default-bg bg-clip-padding border-2 border-brand-colour-5 shadow-md max-h-[80vh] overflow-hidden duration-150 ease-out transition-transform",
+  base: [
+    "bg-default-bg bg-clip-padding border-2 border-brand-colour-5 shadow-md max-h-[80vh] overflow-hidden",
+    "duration-150 ease-out transition-transform",
+  ],
   variants: {
     isEntering: {
       true: [

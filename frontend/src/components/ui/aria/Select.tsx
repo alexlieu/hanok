@@ -51,7 +51,28 @@ export function Select<T extends object>({
   const [isOpen, setIsOpen] = useState(false);
   const internalListBoxRef = useRef<HTMLDivElement>(null);
 
+  const [isScrolling, setIsScrolling] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const actualListBoxRef = listBoxRef || internalListBoxRef;
+
+  const handleScroll = () => {
+    setIsScrolling(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 400);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen && actualListBoxRef.current && props.selectedKey) {
@@ -135,10 +156,18 @@ export function Select<T extends object>({
       </AnimatedFieldError>
       <Popover className="min-w-(--trigger-width)">
         <ListBox
+          onWheel={handleScroll}
           ref={actualListBoxRef}
           items={items}
           className={twMerge(
-            "outline-hidden p-1 overflow-auto",
+            "outline-hidden p-1 overflow-auto transition-colors",
+            "group",
+            "scrollbar-thin scrollbar-track-transparent",
+            `${
+              isScrolling
+                ? "scrollbar-thumb-brand-colour-4"
+                : "scrollbar-thumb-unavailable"
+            }`,
             listBoxClassNames
           )}
           // It ensures that the ListBox is clipped with a .75rem radius, even if the underlying content extends beyond that.
