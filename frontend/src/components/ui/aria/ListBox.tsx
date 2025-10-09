@@ -12,6 +12,8 @@ import {
 } from "react-aria-components";
 import { tv } from "tailwind-variants";
 import { composeTailwindRenderProps, focusRing } from "./utils";
+import { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 // interface ListBoxProps<T>
 //   extends Omit<AriaListBoxProps<T>, "layout" | "orientation"> {}
@@ -75,7 +77,8 @@ export const dropDownItemStyles = tv({
       true: "",
     },
     isFocused: {
-      true: "bg-brand-colour-2 text-white",
+      // true: "bg-brand-colour-2 text-white",
+      true: "bg-brand-colour-2",
     },
   },
   compoundVariants: [
@@ -87,7 +90,11 @@ export const dropDownItemStyles = tv({
   ],
 });
 
-export function DropdownItem(props: ListBoxItemProps) {
+export interface DropdownItemProps extends ListBoxItemProps {
+  rightSlot?: ReactNode;
+}
+
+export function DropdownItem(props: DropdownItemProps) {
   const textValue =
     props.textValue ||
     (typeof props.children === "string" ? props.children : undefined);
@@ -98,16 +105,31 @@ export function DropdownItem(props: ListBoxItemProps) {
       textValue={textValue}
       className={dropDownItemStyles}
     >
-      {composeRenderProps(props.children, (children, { isSelected }) => (
-        <>
-          <span className="flex items-center flex-1 gap-2 font-normal group-selected:font-semibold">
-            {children}
+      {composeRenderProps(props.children, (children, { isSelected }) => {
+        return (
+          <span
+            className={twMerge(
+              "flex items-center justify-between flex-1 gap-2 font-normal group-selected:font-semibold",
+              "*:flex *:items-center *:gap-2 *:group-focus:text-default-bg"
+            )}
+          >
+            <span>
+              {isSelected && (
+                <span className="w-1 h-[0.9rem] ml-1 rounded-full bg-brand-colour-1 group-focus:bg-default-bg" />
+              )}
+              {children}
+            </span>
+            {props.rightSlot && (
+              <span className="text-unavailable-text font-light">
+                {props.rightSlot}
+              </span>
+            )}
+            {isSelected && !props.rightSlot && (
+              <FaCheck width={4} height={4} className="order-2" />
+            )}
           </span>
-          <span className="flex items-center w-5">
-            {isSelected && <FaCheck width={4} height={4} />}
-          </span>
-        </>
-      ))}
+        );
+      })}
     </AriaListBoxItem>
   );
 }

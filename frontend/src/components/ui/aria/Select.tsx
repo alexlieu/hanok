@@ -4,11 +4,15 @@ import {
   SelectProps as AriaSelectProps,
   Button,
   ListBox,
-  ListBoxItemProps,
   SelectValue,
 } from "react-aria-components";
 import { AnimatedFieldError, Description } from "./Field";
-import { DropdownItem, DropdownSection, DropdownSectionProps } from "./ListBox";
+import {
+  DropdownItem,
+  DropdownItemProps,
+  DropdownSection,
+  DropdownSectionProps,
+} from "./ListBox";
 import { composeTailwindRenderProps } from "./utils";
 import { twMerge } from "tailwind-merge";
 import { ReactNode, RefObject, useState, useEffect, useRef } from "react";
@@ -16,6 +20,7 @@ import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
 import { selectButtonStyles } from "./styles/selectButtonStyles";
 import { Popover } from "./Popover";
+import { tv } from "tailwind-variants";
 
 export interface SelectProps<T extends object>
   extends Omit<AriaSelectProps<T>, "children"> {
@@ -28,6 +33,7 @@ export interface SelectProps<T extends object>
   buttonClassNames?: () => string;
   customSelectValue?: ReactNode;
   items?: Iterable<T>;
+  widePopover?: boolean;
   children: ReactNode | ((item: T) => ReactNode);
 }
 
@@ -45,6 +51,7 @@ export function Select<T extends object>({
   placeholder,
   children,
   items,
+  widePopover = false,
   ...props
 }: SelectProps<T>) {
   const [isFocused, setIsFocused] = useState(false);
@@ -102,6 +109,15 @@ export function Select<T extends object>({
     }
   }, [isOpen, props.selectedKey, actualListBoxRef]);
 
+  const popoverStyle = tv({
+    base: "min-w-(--trigger-width)",
+    variants: {
+      isWide: {
+        true: "w-63",
+      },
+    },
+  });
+
   return (
     <AriaSelect
       {...props}
@@ -154,7 +170,7 @@ export function Select<T extends object>({
       <AnimatedFieldError isInvalid={isInvalid}>
         {errorMessage}
       </AnimatedFieldError>
-      <Popover className="min-w-(--trigger-width)">
+      <Popover className={popoverStyle({ isWide: widePopover })}>
         <ListBox
           onWheel={handleScroll}
           ref={actualListBoxRef}
@@ -166,7 +182,7 @@ export function Select<T extends object>({
             `${
               isScrolling
                 ? "scrollbar-thumb-brand-colour-4"
-                : "scrollbar-thumb-unavailable"
+                : "scrollbar-thumb-default-scrollbar-thumb"
             }`,
             listBoxClassNames
           )}
@@ -181,7 +197,7 @@ export function Select<T extends object>({
   );
 }
 
-export function SelectItem(props: ListBoxItemProps) {
+export function SelectItem(props: DropdownItemProps) {
   return <DropdownItem {...props} />;
 }
 

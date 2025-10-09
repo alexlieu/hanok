@@ -137,12 +137,18 @@ export const PhoneField = memo(function PhoneField({
           }}
           customSelectValue={getCountryFlag()}
           onFocusChange={setIsFocused}
+          widePopover={true}
         >
           {Object.entries(groupedCountries).map(([letter, countries]) => (
             <SelectSection title={letter} key={letter}>
               {countries.map(({ name, phone, code }) => (
-                <SelectItem id={code} key={code} textValue={`${name} ${code}`}>
-                  {name} (+{phone})
+                <SelectItem
+                  id={code}
+                  key={code}
+                  textValue={`${name} ${code}`}
+                  rightSlot={<span>+{phone}</span>}
+                >
+                  <span className="fit">{name}</span>
                 </SelectItem>
               ))}
             </SelectSection>

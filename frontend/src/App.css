@@ -39,6 +39,7 @@
     --color-icon-disabled-bg: #E7E9EC;
     --color-icon-hover: #ADADAD;
     --color-icon-pressed: #636172;
+    --color-default-scrollbar-thumb: #C1BDC0;
 }
 
 .form-error {
