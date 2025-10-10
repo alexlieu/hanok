@@ -6,6 +6,7 @@ import {
   useState,
   useCallback,
   useRef,
+  useEffect,
 } from "react";
 import {
   Disclosure as AriaDisclosure,
@@ -208,14 +209,20 @@ export function DisclosurePanel({
   const panelRef = useRef<HTMLDivElement>(null);
   const { isExpanded } = useContext(DisclosureStateContext)!;
 
+  const wasExpanded = useRef<boolean>(isExpanded);
+
   const handleAnimationComplete = () => {
-    if (panelRef.current) {
+    if (!wasExpanded.current && panelRef.current) {
       panelRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
   };
+
+  useEffect(() => {
+    wasExpanded.current = isExpanded;
+  }, [isExpanded]);
 
   // Due to the overflow hidden styling on the div, the focus ring is being cutoff.
   // The workaround is to increase the width of the div beyond the width of its container and
