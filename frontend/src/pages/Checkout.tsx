@@ -93,13 +93,7 @@ const CheckoutPage: React.FC = () => {
     defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
   });
 
-  const {
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = methods;
-
-  console.log(errors);
+  const { handleSubmit, watch } = methods;
 
   const paymentMethod = watch("paymentMethod");
 
@@ -124,6 +118,7 @@ const CheckoutPage: React.FC = () => {
     <FormProvider {...methods}>
       <div className="min-h-screen flex justify-center">
         <div className="w-[80%] max-w-5xl">
+          {/* Header */}
           <div className="sticky top-0 z-10 bg-default-bg">
             <div className="mx-auto">
               <div className="flex items-center justify-between h-[4.5rem] relative">
@@ -145,12 +140,13 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
           <div className={`${isSmallScreen ? "space-y-6" : "flex gap-[4rem]"}`}>
+            {/* Order Summary */}
             <div
               className={`
                 ${
                   isSmallScreen
                     ? "order-1"
-                    : "lg:order-2 lg:sticky lg:top-32 lg:self-start lg:justify-start lg:flex-2/5"
+                    : "lg:order-2 md:sticky md:top-32 md:self-start md:justify-start md:flex-2/5"
                 }`}
             >
               <div className="rounded-sm shadow-sm border border-gray-200 p-6 space-y-[1.3rem]">

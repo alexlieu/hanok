@@ -1,4 +1,3 @@
-import { FaCheck } from "react-icons/fa";
 import {
   ListBox as AriaListBox,
   ListBoxItem as AriaListBoxItem,
@@ -123,9 +122,6 @@ export function DropdownItem(props: DropdownItemProps) {
               <span className="text-unavailable-text font-light">
                 {props.rightSlot}
               </span>
-            )}
-            {isSelected && !props.rightSlot && (
-              <FaCheck width={4} height={4} className="order-2" />
             )}
           </span>
         );

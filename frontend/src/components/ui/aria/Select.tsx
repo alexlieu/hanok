@@ -167,9 +167,7 @@ export function Select<T extends object>({
         />
       </Button>
       {description && <Description>{description}</Description>}
-      <AnimatedFieldError isInvalid={isInvalid}>
-        {errorMessage}
-      </AnimatedFieldError>
+      <AnimatedFieldError isInvalid={isInvalid} children={errorMessage} />
       <Popover className={popoverStyle({ isWide: widePopover })}>
         <ListBox
           onWheel={handleScroll}

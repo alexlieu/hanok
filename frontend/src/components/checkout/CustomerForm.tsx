@@ -24,7 +24,7 @@ const CustomerForm = () => {
 
   return (
     <>
-      <fieldset className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-[0.7rem]">
+      <fieldset className="grid grid-cols-1 lg:grid-cols-2 gap-[0.7rem]">
         <legend className="lowercase tracking-wide text-lg font-medium mb-2">
           contact details
         </legend>

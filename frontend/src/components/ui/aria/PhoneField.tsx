@@ -1,11 +1,7 @@
 import { tv } from "tailwind-variants";
-import {
-  ValidationResult,
-  TextFieldProps,
-  TextField,
-} from "react-aria-components";
+import { TextFieldProps, TextField } from "react-aria-components";
 import { memo, useId, useState } from "react";
-import { Description, FieldError, FieldGroup, Input } from "./Field";
+import { AnimatedFieldError, Description, FieldGroup, Input } from "./Field";
 import { Select, SelectItem, SelectSection } from "./Select";
 import {
   countries,
@@ -67,7 +63,7 @@ export interface PhoneFieldProps
   extends Omit<TextFieldProps, "value" | "onChange"> {
   label?: string;
   description?: string;
-  errorMessage?: string | ((validation: ValidationResult) => string);
+  errorMessage?: string;
   inputRef?: RefCallBack;
   phoneNumber: string | undefined;
   countryCode: CountryCodeUnion; // this needs to be initialized before runtime
@@ -168,7 +164,7 @@ export const PhoneField = memo(function PhoneField({
         />
       </FieldGroup>
       {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      <AnimatedFieldError isInvalid={isInvalid} children={errorMessage} />
     </TextField>
   );
 });

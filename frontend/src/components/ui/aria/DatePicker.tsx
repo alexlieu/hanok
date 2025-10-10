@@ -4,13 +4,12 @@ import {
   DatePickerProps as AriaDatePickerProps,
   DateRange,
   DateValue,
-  ValidationResult,
 } from "react-aria-components";
 import { Button } from "./Button";
 import { Calendar } from "./Calendar";
 import { DateInput } from "./DateField";
 import { Dialog } from "./Dialog";
-import { Description, FieldError, FieldGroup } from "./Field";
+import { AnimatedFieldError, Description, FieldGroup } from "./Field";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
@@ -21,7 +20,7 @@ export interface DatePickerProps<T extends DateValue>
   extends AriaDatePickerProps<T> {
   label?: string;
   description?: string;
-  errorMessage?: string | ((validation: ValidationResult) => string);
+  errorMessage?: string;
   inputRef?: RefCallBack;
   unavailableDates?: DateRange[];
 }
@@ -69,7 +68,7 @@ export const DatePicker = ({
         </Button>
       </FieldGroup>
       {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      <AnimatedFieldError isInvalid={isInvalid} children={errorMessage} />
       <Popover>
         <Dialog className="bg-default-bg outline-2 outline-gray-300">
           <Calendar unavailableDates={unavailableDates} />

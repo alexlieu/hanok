@@ -65,15 +65,16 @@ export function AnimatedFieldError({
   ...props
 }: AnimatedFieldErrorProps) {
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isInvalid && (
         <motion.span
+          key={children ? children.toString() : ""}
           {...(props as HTMLMotionProps<"span">)}
           className={twMerge(props.className, "text-error-red text-sm")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ ease: "easeOut", duration: 0.2 }}
+          transition={{ ease: "easeOut", duration: 0.15 }}
         >
           {children}
         </motion.span>

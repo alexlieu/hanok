@@ -1,6 +1,5 @@
 import { Label } from "../Field";
-import { motion } from "motion/react";
-import { CSSProperties } from "react";
+import { motion, Variants } from "motion/react";
 import { LuAsterisk } from "react-icons/lu";
 
 export interface CreateLabelProps {
@@ -12,6 +11,58 @@ export interface CreateLabelProps {
   isInvalid?: boolean;
 }
 
+// export function createLabel({
+//   label,
+//   id,
+//   htmlFor,
+//   isRequired,
+//   isFocused,
+//   isInvalid,
+// }: CreateLabelProps) {
+//   if (!label) return null;
+
+//   const brandColour = "var(--color-brand-colour-4)";
+//   const errorColour = "var(--color-error-red)";
+//   const initialTextColour = "#000000";
+//   const animatedTextColour = "#FFFFFF";
+
+//   const highlightColour = isInvalid ? errorColour : brandColour;
+
+//   const words = label.split(" ");
+//   const lastWord = words.pop();
+//   const mainLabel = words.length > 0 ? words.join(" ") + " " : "";
+
+//   return (
+//     <Label id={id} htmlFor={htmlFor}>
+//       <motion.span
+//         className="inline"
+//         style={{
+//           backgroundImage: `linear-gradient(to top, ${highlightColour}, ${highlightColour})`,
+//           backgroundPosition: "bottom",
+//           backgroundSize: "100% 0%",
+//           backgroundRepeat: "no-repeat",
+//         }}
+//         animate={{
+//           backgroundSize: isFocused ? "100% 100%" : "100% 0%",
+//           color: isFocused ? animatedTextColour : initialTextColour,
+//         }}
+//         transition={{
+//           backgroundSize: { ease: "easeOut", duration: 0.3 },
+//           color: { ease: "easeOut", duration: 0.2, delay: 0.05 },
+//         }}
+//       >
+//         {mainLabel}
+//         <span className="inline-block">
+//           {lastWord}
+//           {isRequired && (
+//             <LuAsterisk className="inline-block h-[0.8rem] w-[0.8rem] ml-1 align-baseline text-error-red" />
+//           )}
+//         </span>
+//       </motion.span>
+//     </Label>
+//   );
+// }
+
 export function createLabel({
   label,
   id,
@@ -21,24 +72,74 @@ export function createLabel({
   isInvalid,
 }: CreateLabelProps) {
   if (!label) return null;
-  // const words = label.split(" ");
-  // const firstWord = words.shift();
-  // const restOfString = words.join(" ");
+
+  const brandColor = "var(--color-brand-colour-4)";
+  const errorColor = "var(--color-error-red)";
+  const initialTextColor = "#000000";
+  const animatedTextColor = "#FFFFFF";
+  const highlightColor = isInvalid ? errorColor : brandColor;
+
+  const words = label.split(" ");
+  const lastWord = words.pop() || "";
+  const mainLabel = words.join(" ");
+
+  const animationVariants: Variants = {
+    focused: {
+      backgroundSize: "100% 100%",
+      color: animatedTextColor,
+      transition: {
+        backgroundSize: { ease: "easeOut", duration: 0.2 },
+        color: { ease: "easeOut", duration: 0.2 },
+      },
+    },
+    blurred: {
+      backgroundSize: "100% 0%",
+      color: initialTextColor,
+      transition: {
+        backgroundSize: { ease: "easeOut", duration: 0.2 },
+        color: { ease: "easeOut", duration: 0.2 },
+      },
+    },
+  };
+
+  const motionSpanStyle = {
+    backgroundImage: `linear-gradient(to top, ${highlightColor}, ${highlightColor})`,
+    backgroundPosition: "bottom",
+    backgroundRepeat: "no-repeat",
+  };
+
   return (
-    <Label
-      id={id}
-      htmlFor={htmlFor}
-      className="flex flex-row gap-[3px] justify-center items-center"
-    >
-      {animateBackgroundFill({
-        text: label,
-        animateFill: isFocused!,
-        lineWidth: "0px",
-        isInvalid: isInvalid,
-      })}
-      {isRequired && (
-        <LuAsterisk className="h-[0.8lh] w-[0.8lh] text-error-red" />
+    <Label id={id} htmlFor={htmlFor}>
+      {mainLabel && (
+        <motion.span
+          key={mainLabel}
+          className="inline"
+          style={motionSpanStyle}
+          variants={animationVariants}
+          initial="blurred"
+          animate={isFocused ? "focused" : "blurred"}
+        >
+          {mainLabel}
+          {lastWord ? " " : ""}
+        </motion.span>
       )}
+
+      <span className="inline-block">
+        <motion.span
+          key={label}
+          className="inline"
+          style={motionSpanStyle}
+          variants={animationVariants}
+          initial="blurred"
+          animate={isFocused ? "focused" : "blurred"}
+        >
+          {lastWord}
+        </motion.span>
+
+        {isRequired && (
+          <LuAsterisk className="inline-block h-[0.8rem] w-[0.8rem] ml-1 align-baseline text-error-red" />
+        )}
+      </span>
     </Label>
   );
 }
@@ -51,55 +152,9 @@ export function createNoFocusLabel({
   return (
     <Label>
       {label}
-      {isRequired && <span className="ml-0.5 text-error-red">*</span>}
+      {isRequired && (
+        <span className="h-[0.8lh] w-[0.8lh] text-error-red">*</span>
+      )}
     </Label>
-  );
-}
-
-interface backgroundFillProps {
-  text: string;
-  animateFill: boolean;
-  fill?: string;
-  isInvalid?: boolean;
-  lineWidth?: string;
-  left?: string;
-}
-
-function animateBackgroundFill({
-  text,
-  animateFill,
-  fill = "var(--color-brand-colour-4)",
-  isInvalid = false,
-  lineWidth = "4px",
-  left = "0px",
-}: backgroundFillProps) {
-  return (
-    <span className="inline-block relative w-fit h-fit">
-      <motion.span
-        style={
-          {
-            "--bottom": lineWidth,
-            "--left": left,
-            "--fill": fill,
-          } as CSSProperties
-        }
-        initial={{ height: lineWidth }}
-        animate={{
-          height: animateFill ? `calc(100% + ${lineWidth})` : lineWidth,
-        }}
-        transition={{ ease: "easeOut", duration: 0.3 }}
-        className={`absolute -left-[var(--left)] -bottom-[var(--bottom)] ${
-          isInvalid ? "bg-error-red" : `bg-[var(--fill)]`
-        } w-[calc(100%+var(--left)*2)]`}
-      />
-      <span className="invisible">{text}</span>
-      <span
-        className={`absolute left-0 transition-colors duration-250 ${
-          animateFill && "text-default-bg"
-        }`}
-      >
-        {text}
-      </span>
-    </span>
   );
 }

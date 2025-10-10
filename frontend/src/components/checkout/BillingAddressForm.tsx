@@ -76,11 +76,6 @@ const BillingAddressForm = () => {
     return checkIsCountry(selectedCountry, countries);
   };
 
-  const selectedProvince = useWatch({ name: "stateProvinceRegion", control });
-  if (!selectedProvince) {
-    console.log("selectedProvince", selectedProvince);
-  }
-
   useEffect(() => {
     fieldsToReset.forEach((field) => resetField(field));
   }, [selectedCountry, resetField]);

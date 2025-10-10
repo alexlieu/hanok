@@ -14,12 +14,7 @@ import { LuCircleX } from "react-icons/lu";
 const allLogos = ["Visa", "Mastercard", "Amex"];
 
 const CardDetailsForm: React.FC = () => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<PaymentFormData>();
-
-  console.log(errors);
+  const { control } = useFormContext<PaymentFormData>();
 
   const logoStyles = tv({
     base: "",

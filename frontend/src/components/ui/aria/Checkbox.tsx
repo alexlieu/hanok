@@ -3,11 +3,10 @@ import {
   CheckboxGroup as AriaCheckboxGroup,
   CheckboxGroupProps as AriaCheckboxGroupProps,
   CheckboxProps,
-  ValidationResult,
   composeRenderProps,
 } from "react-aria-components";
 import { tv } from "tailwind-variants";
-import { Description, FieldError } from "./Field";
+import { AnimatedFieldError, Description } from "./Field";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 import { ReactNode } from "react";
 import { createLabel } from "./utils/createLabel";
@@ -19,7 +18,7 @@ export interface CheckboxGroupProps
   label?: string;
   children?: ReactNode;
   description?: string;
-  errorMessage?: string | ((validation: ValidationResult) => string);
+  errorMessage?: string;
   inputRef?: RefCallBack;
 }
 
@@ -56,7 +55,7 @@ export function CheckboxGroup({
         children
       )}
       {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      <AnimatedFieldError isInvalid={props.isInvalid} children={errorMessage} />
     </AriaCheckboxGroup>
   );
 }
