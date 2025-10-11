@@ -13,7 +13,7 @@ import { AnimatedFieldError, Description, FieldGroup } from "./Field";
 import { Popover } from "./Popover";
 import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { createLabel } from "./utils/createLabel";
 
 export interface DatePickerProps<T extends DateValue>
@@ -25,7 +25,7 @@ export interface DatePickerProps<T extends DateValue>
   unavailableDates?: DateRange[];
 }
 
-export const DatePicker = ({
+export const DatePicker = memo(function DatePicker({
   label,
   description,
   errorMessage,
@@ -37,7 +37,7 @@ export const DatePicker = ({
   onChange,
   onBlur,
   ...props
-}: DatePickerProps<DateValue>) => {
+}: DatePickerProps<DateValue>) {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -76,4 +76,4 @@ export const DatePicker = ({
       </Popover>
     </AriaDatePicker>
   );
-};
+});

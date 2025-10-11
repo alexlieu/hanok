@@ -1,26 +1,28 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { CountryCodeUnion } from "../../schemas/PhoneSchema";
 import { DatePicker } from "../ui/aria/DatePicker";
-import { I18nProvider } from "react-aria-components";
+import { DateValue, I18nProvider } from "react-aria-components";
 import { useLoaderData } from "react-router-dom";
 import { CheckoutRequiredData } from "../../types/CheckoutType";
 import { TextField } from "../ui/aria/TextField";
-import { PhoneField } from "../ui/aria/PhoneField";
 import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
 import Tooltip from "../ui/Tooltip";
-import { DEFAULT_COUNTRY_CODE } from "../../schemas/BillingAddressSchema";
 import { isDateInRanges } from "../../utils/dateUtils";
+import { ControlledPhoneField } from "../ui/form/ControlledPhoneField";
+import { useCallback } from "react";
 
 const CustomerForm = () => {
   const {
     pickupRules: { firstValidDate, lastValidDate, unavailableDates },
   } = useLoaderData() as CheckoutRequiredData;
 
-  const {
-    control,
-    trigger,
-    formState: { errors, touchedFields, dirtyFields },
-  } = useFormContext();
+  const { control, trigger, formState } = useFormContext();
+
+  const { errors, touchedFields, dirtyFields } = formState;
+
+  const isDateUnavailable = useCallback(
+    (date: DateValue) => isDateInRanges(date, unavailableDates),
+    [unavailableDates]
+  );
 
   return (
     <>
@@ -64,6 +66,7 @@ const CustomerForm = () => {
                 if (touchedFields.email || dirtyFields.email)
                   trigger("updatePreference");
                 trigger("contact");
+                console.log("trigger:", typeof trigger);
               }}
               onBlur={onBlur}
               label="Email"
@@ -94,27 +97,12 @@ const CustomerForm = () => {
         <Controller
           name="phoneNumber"
           control={control}
-          render={({
-            field: { onChange, onBlur, value, ref },
-            fieldState: { invalid, error },
-          }) => (
-            <PhoneField
-              label="Phone Number"
-              isInvalid={!!(invalid || errors.contact)}
-              errorMessage={error?.message}
-              onBlur={onBlur}
-              inputRef={ref}
-              phoneNumber={value?.phoneNumber}
-              countryCode={value?.countryCode || DEFAULT_COUNTRY_CODE}
-              onCountryCodeChange={(newCountryCode: CountryCodeUnion) => {
-                onChange({ phoneNumber: "", countryCode: newCountryCode });
-              }}
-              onPhoneNumberChange={(newPhoneNumber: string) => {
-                onChange({ ...value, phoneNumber: newPhoneNumber });
-                if (touchedFields.phoneNumber || dirtyFields.phoneNumber)
-                  trigger("updatePreference");
-                trigger("contact");
-              }}
+          render={({ field, fieldState }) => (
+            <ControlledPhoneField
+              formState={formState}
+              field={field}
+              fieldState={fieldState}
+              trigger={trigger}
             />
           )}
         />
@@ -140,9 +128,7 @@ const CustomerForm = () => {
                 errorMessage={error?.message}
                 minValue={firstValidDate}
                 maxValue={lastValidDate}
-                isDateUnavailable={(date) =>
-                  isDateInRanges(date, unavailableDates)
-                }
+                isDateUnavailable={isDateUnavailable}
                 unavailableDates={unavailableDates}
                 isRequired
                 label="What is your preferred pickup date?"
