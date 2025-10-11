@@ -25,14 +25,37 @@ const BasketLineItem: React.FC<BasketLineItemProps> = ({ item }) => {
     });
   };
 
+  const EXIT_DURATION = 0.7;
+  const EXIT_DELAY = EXIT_DURATION * 0.7;
+
   return (
-    <motion.div layout className="overflow-hidden w-full">
+    <motion.div
+      layout
+      layoutId={`basket-item-${item.variantId}`}
+      initial={false}
+      exit={{
+        height: 0,
+        marginBottom: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
+        transition: {
+          duration: EXIT_DURATION,
+          ease: easeInOutExpo,
+          delay: EXIT_DELAY,
+        },
+      }}
+      className="overflow-hidden"
+    >
       <motion.div
-        layout
         initial={false}
         exit={{
           y: "-104%",
-          transition: { duration: 0.8, ease: easeInOutExpo },
+          transition: {
+            type: "spring",
+            damping: 50,
+            stiffness: 300,
+            duration: EXIT_DURATION,
+          },
         }}
         role="listitem"
         className={`flex items-center gap-4 p-4 border-b border border-indigo-600`}

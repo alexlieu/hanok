@@ -26,8 +26,8 @@ const MainNav: React.FC = () => {
               to={link}
               className={({ isActive }) =>
                 isActive
-                  ? "underline underline-offset-5"
-                  : `hover:underline underline-offset-5`
+                  ? "underline underline-offset-7 decoration-[3px]"
+                  : `hover:underline underline-offset-5 decoration-[3px]`
               }
               end
               onClick={() => setIsMenuOpen(false)}
@@ -56,7 +56,7 @@ const MainNav: React.FC = () => {
         </nav>
       ) : (
         <>
-          <nav className={`w-full border-b-1`}>
+          <nav className={`w-full`}>
             {getNavContent(
               "flex flex-row w-fit m-auto gap-10 text-[22px] font-dm-sans font-medium h-[110px]",
               true
