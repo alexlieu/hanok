@@ -82,9 +82,9 @@ export function Select<T extends object>({
   }, []);
 
   useEffect(() => {
-    if (isOpen && actualListBoxRef.current && props.selectedKey) {
+    if (isOpen && actualListBoxRef.current && props.value) {
       const selectedItem = actualListBoxRef.current?.querySelector<HTMLElement>(
-        `[data-key="${props.selectedKey}"]`
+        `[data-key="${props.value}"]`
       );
       if (selectedItem) {
         const listBox = actualListBoxRef.current;
@@ -107,7 +107,7 @@ export function Select<T extends object>({
         }
       }
     }
-  }, [isOpen, props.selectedKey, actualListBoxRef]);
+  }, [isOpen, props.value, actualListBoxRef]);
 
   const popoverStyle = tv({
     base: "min-w-(--trigger-width)",

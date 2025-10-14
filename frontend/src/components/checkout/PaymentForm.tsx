@@ -1,57 +1,75 @@
 import CardDetailsForm from "./CardDetailsForm";
-import {
-  Disclosure,
-  DisclosureGroup,
-  DisclosureHeader,
-  DisclosurePanel,
-} from "../ui/aria/Disclosure";
 import BillingAddressForm from "./BillingAddressForm";
+import { PAYMENT_METHODS } from "../../schemas/CustomerFormSchema";
 import {
-  PAYMENT_METHODS,
-  PaymentMethod,
-} from "../../schemas/CustomerFormSchema";
-import { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
+  DisclosureRadio,
+  DisclosureRadioGroup,
+  DisclosureRadioHeader,
+} from "../ui/aria/DisclosureRadio";
+import { Controller, useFormContext } from "react-hook-form";
 
 const PaymentForm = () => {
-  const { setValue, getValues } = useFormContext();
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
-    () => getValues("paymentMethod") || "card"
-  );
-  useEffect(() => {
-    setValue("paymentMethod", paymentMethod);
-  }, [paymentMethod, setValue]);
+  const { control } = useFormContext();
   return (
     <fieldset className="">
       <legend className="lowercase tracking-wide text-lg font-medium mb-2">
         payment method
       </legend>
-      <DisclosureGroup
-        className={"space-y-1"}
-        allowsMultipleExpanded={false}
-        requiresOneOpen={true}
-        defaultExpandedKeys={[paymentMethod]}
-        onExpandedChange={(keys) =>
-          setPaymentMethod(keys.values().next().value as PaymentMethod)
-        }
+      <Controller
+        name="paymentMethod"
+        control={control}
+        render={({ field: { onChange, value, ref } }) => (
+          <DisclosureRadioGroup
+            onChange={onChange}
+            value={value}
+            className="space-y-1"
+            isRequired={true}
+            aria-label="Payment Method"
+            inputRef={ref}
+          >
+            {PAYMENT_METHODS.map(({ value, label }) => (
+              <DisclosureRadio
+                value={value}
+                key={value}
+                panelContent={
+                  value === "card" && (
+                    <div className="space-y-6">
+                      <CardDetailsForm />
+                      <BillingAddressForm />
+                    </div>
+                  )
+                }
+              >
+                <DisclosureRadioHeader>{label}</DisclosureRadioHeader>
+              </DisclosureRadio>
+            ))}
+          </DisclosureRadioGroup>
+        )}
+      />
+      {/* <DisclosureRadioGroup
+        defaultValue="card"
+        onChange={(value) => console.log(value)}
+        className="space-y-1"
+        isRequired={true}
+        aria-label="Payment Method"
       >
         {PAYMENT_METHODS.map(({ value, label }) => (
-          <Disclosure id={value} key={value}>
-            <DisclosureHeader variant="tertiary">{label}</DisclosureHeader>
-            <DisclosurePanel
-              scrollIntoView={true}
-              className={`p-4 pt-0 ${value !== "card" && "hidden"}`}
-            >
-              {value === "card" && (
+          <DisclosureRadio
+            value={value}
+            key={value}
+            panelContent={
+              value === "card" && (
                 <div className="space-y-6">
                   <CardDetailsForm />
                   <BillingAddressForm />
                 </div>
-              )}
-            </DisclosurePanel>
-          </Disclosure>
+              )
+            }
+          >
+            <DisclosureRadioHeader>{label}</DisclosureRadioHeader>
+          </DisclosureRadio>
         ))}
-      </DisclosureGroup>
+      </DisclosureRadioGroup> */}
     </fieldset>
   );
 };

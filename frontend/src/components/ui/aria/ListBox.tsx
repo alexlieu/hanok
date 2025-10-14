@@ -104,28 +104,33 @@ export function DropdownItem(props: DropdownItemProps) {
       textValue={textValue}
       className={dropDownItemStyles}
     >
-      {composeRenderProps(props.children, (children, { isSelected }) => {
-        return (
-          <span
-            className={twMerge(
-              "flex items-center justify-between flex-1 gap-2 font-normal group-selected:font-semibold",
-              "*:flex *:items-center *:gap-2 *:group-focus:text-default-bg"
-            )}
-          >
-            <span>
-              {isSelected && (
-                <span className="w-1 h-[0.9rem] ml-1 rounded-full bg-brand-colour-1 group-focus:bg-default-bg" />
+      {composeRenderProps(
+        props.children,
+        (children, { isSelected, isFocused }) => {
+          return (
+            <span
+              className={twMerge(
+                "flex items-center justify-between flex-1 gap-2 font-normal",
+                "*:flex *:items-center *:gap-2",
+                isSelected && "font-semibold",
+                isFocused && "text-default-bg"
               )}
-              {children}
-            </span>
-            {props.rightSlot && (
-              <span className="text-unavailable-text font-light">
-                {props.rightSlot}
+            >
+              <span>
+                {isSelected && (
+                  <span className="w-1 h-[0.9rem] ml-1 rounded-full bg-brand-colour-1 group-focus:bg-default-bg" />
+                )}
+                {children}
               </span>
-            )}
-          </span>
-        );
-      })}
+              {props.rightSlot && (
+                <span className="text-unavailable-text font-light">
+                  {props.rightSlot}
+                </span>
+              )}
+            </span>
+          );
+        }
+      )}
     </AriaListBoxItem>
   );
 }

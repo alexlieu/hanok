@@ -91,12 +91,11 @@ const BillingAddressForm = () => {
         return (
           <Select
             label="Country"
-            defaultSelectedKey={"GB"}
             isInvalid={invalid}
             errorMessage={error?.message}
             inputRef={ref}
-            selectedKey={value}
-            onSelectionChange={onChange}
+            value={value}
+            onChange={onChange}
             buttonClassNames={selectButtonStyles}
             {...field}
           >
@@ -160,8 +159,8 @@ const BillingAddressForm = () => {
                   isInvalid={invalid}
                   errorMessage={error?.message}
                   inputRef={ref}
-                  selectedKey={value}
-                  onSelectionChange={onChange}
+                  value={value}
+                  onChange={onChange}
                   buttonClassNames={selectButtonStyles}
                   {...field}
                 >
@@ -283,8 +282,8 @@ const BillingAddressForm = () => {
                     isInvalid={invalid}
                     errorMessage={error?.message}
                     inputRef={ref}
-                    selectedKey={value}
-                    onSelectionChange={onChange}
+                    value={value}
+                    onChange={onChange}
                     buttonClassNames={selectButtonStyles}
                     {...field}
                   >

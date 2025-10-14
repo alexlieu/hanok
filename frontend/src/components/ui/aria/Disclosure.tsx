@@ -6,7 +6,7 @@ import {
   useState,
   useCallback,
   useRef,
-  useEffect,
+  createContext,
 } from "react";
 import {
   Disclosure as AriaDisclosure,
@@ -26,6 +26,9 @@ import { LuPlus } from "react-icons/lu";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { twMerge } from "tailwind-merge";
 import { BiChevronDown } from "react-icons/bi";
+
+const DisclosureGroupInteractionContext = createContext<boolean>(false);
+const DisclosureInteractionContext = createContext<boolean>(false);
 
 const disclosure = tv({
   base: "group min-w-64",
@@ -74,15 +77,25 @@ export interface DisclosureProps extends AriaDisclosureProps {
 export function Disclosure({ children, ...props }: DisclosureProps) {
   const isInGroup = useContext(DisclosureGroupStateContext) !== null;
   //                      ^^^^^^  what?
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   return (
-    <AriaDisclosure
-      {...props}
-      className={composeRenderProps(props.className, (className, renderProps) =>
-        disclosure({ ...renderProps, isInGroup, className })
-      )}
-    >
-      {children}
-    </AriaDisclosure>
+    <DisclosureInteractionContext.Provider value={hasUserInteracted}>
+      <AriaDisclosure
+        {...props}
+        className={composeRenderProps(
+          props.className,
+          (className, renderProps) =>
+            disclosure({ ...renderProps, isInGroup, className })
+        )}
+        onExpandedChange={() => {
+          if (!hasUserInteracted) {
+            setHasUserInteracted(true);
+          }
+        }}
+      >
+        {children}
+      </AriaDisclosure>
+    </DisclosureInteractionContext.Provider>
   );
 }
 
@@ -206,23 +219,25 @@ export function DisclosurePanel({
   scrollIntoView = false,
   ...props
 }: DisclosurePanelProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
   const { isExpanded } = useContext(DisclosureStateContext)!;
+  const isInGroup = useContext(DisclosureGroupStateContext) !== null;
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  const wasExpanded = useRef<boolean>(isExpanded);
+  const groupHasInteracted = useContext(DisclosureGroupInteractionContext);
+  const standaloneHasInteracted = useContext(DisclosureInteractionContext);
+
+  const hasBeenInteractedWith = isInGroup
+    ? groupHasInteracted
+    : standaloneHasInteracted;
 
   const handleAnimationComplete = () => {
-    if (!wasExpanded.current && panelRef.current) {
+    if (panelRef.current) {
       panelRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
   };
-
-  useEffect(() => {
-    wasExpanded.current = isExpanded;
-  }, [isExpanded]);
 
   // Due to the overflow hidden styling on the div, the focus ring is being cutoff.
   // The workaround is to increase the width of the div beyond the width of its container and
@@ -252,7 +267,9 @@ export function DisclosurePanel({
             },
           }}
           onAnimationComplete={
-            scrollIntoView ? handleAnimationComplete : undefined
+            scrollIntoView && hasBeenInteractedWith
+              ? handleAnimationComplete
+              : undefined
           }
           className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)]`}
         >
@@ -293,8 +310,14 @@ export function DisclosureGroup({
     ? controlledExpandedKeys
     : internalExpandedKeys;
 
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
   const handleExpandedChange = useCallback(
     (keys: Set<Key>) => {
+      if (!hasUserInteracted) {
+        setHasUserInteracted(true);
+      }
+
       if (requiresOneOpen && keys.size === 0) {
         return;
       }
@@ -307,17 +330,19 @@ export function DisclosureGroup({
         onExpandedChange(keys);
       }
     },
-    [requiresOneOpen, isControlled, onExpandedChange]
+    [requiresOneOpen, isControlled, onExpandedChange, hasUserInteracted]
   );
 
   return (
-    <AriaDisclosureGroup
-      {...props}
-      expandedKeys={expandedKeys}
-      onExpandedChange={handleExpandedChange}
-      className={composeTailwindRenderProps(props.className, "")}
-    >
-      {children}
-    </AriaDisclosureGroup>
+    <DisclosureGroupInteractionContext.Provider value={hasUserInteracted}>
+      <AriaDisclosureGroup
+        {...props}
+        expandedKeys={expandedKeys}
+        onExpandedChange={handleExpandedChange}
+        className={composeTailwindRenderProps(props.className, "")}
+      >
+        {children}
+      </AriaDisclosureGroup>
+    </DisclosureGroupInteractionContext.Provider>
   );
 }

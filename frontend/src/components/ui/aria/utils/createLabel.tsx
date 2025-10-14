@@ -147,13 +147,29 @@ export function createLabel({
 export function createNoFocusLabel({
   label,
   isRequired,
-}: Omit<CreateLabelProps, "isFocused">) {
+  id,
+  htmlFor,
+  className,
+}: Omit<CreateLabelProps, "isFocused"> & { className?: string }) {
   if (label === undefined) return;
+  const words = label.split(" ");
+  const lastWord = words.pop() || "";
+  const mainLabel = words.join(" ");
   return (
-    <Label>
-      {label}
-      {isRequired && (
-        <span className="h-[0.8lh] w-[0.8lh] text-error-red">*</span>
+    <Label id={id} htmlFor={htmlFor} className={className}>
+      {isRequired ? (
+        <>
+          {mainLabel}
+          {lastWord ? " " : ""}
+          <span className="inline-block">
+            {lastWord}
+            {isRequired && (
+              <LuAsterisk className="inline-block h-[0.8rem] w-[0.8rem] ml-1 align-baseline text-error-red" />
+            )}
+          </span>
+        </>
+      ) : (
+        <>label</>
       )}
     </Label>
   );

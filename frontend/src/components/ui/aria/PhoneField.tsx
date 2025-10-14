@@ -123,14 +123,13 @@ export const PhoneField = memo(function PhoneField({
       })}
       <FieldGroup className={`min-w-[208px] w-auto`}>
         <Select
+          name="country-code-select"
           aria-label="Country select for phone number"
           placeholder="Country"
-          selectedKey={countryCode}
+          value={countryCode}
+          onChange={(key) => onCountryCodeChange(key as CountryCodeUnion)}
           listBoxClassNames="max-h-[300px]"
           buttonClassNames={buttonStyles}
-          onSelectionChange={(key) => {
-            onCountryCodeChange(key as CountryCodeUnion);
-          }}
           customSelectValue={getCountryFlag()}
           onFocusChange={setIsFocused}
           widePopover={true}
