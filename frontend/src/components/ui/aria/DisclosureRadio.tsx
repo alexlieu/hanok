@@ -65,7 +65,11 @@ export const DisclosureRadioHeader = ({
       <SelectIndicatorIcon
         isSelected={!!isSelected}
         isDisabled={isDisabled}
-        className="w-[1rem] h-[1rem]"
+        className={twMerge([
+          "w-[1rem] h-[1rem]",
+          "group-focus-visible:outline-transparent group-focus-visible:ring-2",
+          "group-focus-visible:ring-brand-focus group-focus-visible:ring-offset-2 transition-shadow",
+        ])}
       />
       {children}
     </div>

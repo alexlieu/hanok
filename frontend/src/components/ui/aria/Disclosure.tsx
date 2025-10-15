@@ -25,7 +25,6 @@ import { composeTailwindRenderProps, focusRing } from "./utils";
 import { LuPlus } from "react-icons/lu";
 import { AnimatePresence, motion, Variants } from "motion/react";
 import { twMerge } from "tailwind-merge";
-import { BiChevronDown } from "react-icons/bi";
 
 const DisclosureGroupInteractionContext = createContext<boolean>(false);
 const DisclosureInteractionContext = createContext<boolean>(false);
@@ -101,16 +100,17 @@ export function Disclosure({ children, ...props }: DisclosureProps) {
 
 export interface DisclosureHeaderProps {
   children: ReactNode;
-  variant?: "primary" | "secondary" | "tertiary";
+  variant?: "primary";
 }
-
-const MotionPlus = motion.create(LuPlus);
 
 const iconVariants: Variants = {
   rest: {
     scale: 1,
   },
   hover: {
+    scale: 1.1,
+  },
+  focus: {
     scale: 1.1,
   },
   pressed: {
@@ -133,78 +133,53 @@ export function DisclosureHeader({
   const { isExpanded } = useContext(DisclosureStateContext)!;
   const isInGroup = useContext(DisclosureGroupStateContext) !== null;
 
-  const animationState = isExpanded ? "expanded" : "collapsed";
+  const baseAnimationState = isExpanded ? "expanded" : "collapsed";
 
   return (
     <Heading className="text-lg font-semibold">
-      <motion.div
-        initial="rest"
-        whileHover="hover"
-        whileTap="pressed"
-        className="w-fit"
+      <Button
+        slot="trigger"
+        className={(renderProps) =>
+          disclosureButton({ ...renderProps, isInGroup })
+        }
       >
-        <Button
-          slot="trigger"
-          className={(renderProps) =>
-            disclosureButton({ ...renderProps, isInGroup })
+        {({ isDisabled, isFocusVisible, isHovered, isPressed }) => {
+          // If a single animation state is set, it becomes an either/or situation when selecting animation states.
+          // A both/and situation is needed which is why an array of variant names need to be passed to the animate prop.
+          const animationStates = [baseAnimationState];
+          if (isPressed) {
+            animationStates.push("pressed");
+          } else if (isHovered) {
+            animationStates.push("hover");
+          } else if (isFocusVisible) {
+            animationStates.push("focus");
           }
-        >
-          {({ isDisabled }) => (
+          return (
             <>
               {variant === "primary" && (
-                <MotionPlus
-                  aria-hidden
-                  className={chevron({ isDisabled })}
-                  strokeWidth={3.5}
+                <motion.div
+                  className="flex items-center justify-center"
                   variants={iconVariants}
-                  animate={animationState}
+                  animate={animationStates}
                   transition={{
-                    rotate: {
-                      duration: 0.05,
-                      ease: "easeOut",
-                    },
-                    color: {
-                      duration: 0.2,
-                      ease: "easeOut",
-                    },
-                    scale: {
-                      duration: 0.01,
-                    },
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 20,
                   }}
                   initial={false}
-                />
-              )}
-              {variant === "tertiary" && (
-                <div className="flex-shrink-0 h-[0.9rem] w-[0.9rem] border-2 border-brand-colour-5 rounded-full flex items-center justify-center relative">
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.span
-                        initial={{ scale: 0.4, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.4, opacity: 0 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 30,
-                        }}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[0.5rem] w-[0.5rem] bg-brand-colour-2 rounded-full"
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
+                >
+                  <LuPlus
+                    aria-hidden
+                    className={chevron({ isDisabled })}
+                    strokeWidth={3.5}
+                  />
+                </motion.div>
               )}
               {children}
-              {variant === "secondary" && (
-                <BiChevronDown
-                  aria-hidden
-                  strokeWidth={2}
-                  color="var(--color-tooltip-bg)"
-                />
-              )}
             </>
-          )}
-        </Button>
-      </motion.div>
+          );
+        }}
+      </Button>
     </Heading>
   );
 }

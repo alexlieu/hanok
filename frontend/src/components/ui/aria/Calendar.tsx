@@ -160,6 +160,16 @@ export function Calendar<T extends DateValue>({
   );
 }
 
+const chevron = tv({
+  base: "transition-transform duration-150 delay-125",
+  variants: {
+    direction: {
+      left: "group-hover:-translate-x-[0.1rem]",
+      right: "group-hover:translate-x-[0.1rem]",
+    },
+  },
+});
+
 export function CalendarHeader() {
   const { direction } = useLocale();
   return (
@@ -169,18 +179,40 @@ export function CalendarHeader() {
         className="tracking-wide font-medium text-lg text-center"
       />
       <div className="flex gap-2">
-        <Button variant="icon" slot="previous" invisibleOnDisabled>
+        <Button
+          variant="icon"
+          slot="previous"
+          invisibleOnDisabled
+          className="group"
+        >
           {direction === "rtl" ? (
-            <FaChevronRight aria-hidden />
+            <FaChevronRight
+              aria-hidden
+              className={chevron({ direction: "right" })}
+            />
           ) : (
-            <FaChevronLeft aria-hidden />
+            <FaChevronLeft
+              aria-hidden
+              className={chevron({ direction: "left" })}
+            />
           )}
         </Button>
-        <Button variant="icon" slot="next" invisibleOnDisabled>
+        <Button
+          variant="icon"
+          slot="next"
+          invisibleOnDisabled
+          className="group"
+        >
           {direction === "rtl" ? (
-            <FaChevronLeft aria-hidden />
+            <FaChevronLeft
+              aria-hidden
+              className={chevron({ direction: "left" })}
+            />
           ) : (
-            <FaChevronRight aria-hidden />
+            <FaChevronRight
+              aria-hidden
+              className={chevron({ direction: "right" })}
+            />
           )}
         </Button>
       </div>

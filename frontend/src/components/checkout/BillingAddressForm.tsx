@@ -93,6 +93,7 @@ const BillingAddressForm = () => {
             label="Country"
             isInvalid={invalid}
             errorMessage={error?.message}
+            className="h-fit"
             inputRef={ref}
             value={value}
             onChange={onChange}
@@ -154,7 +155,7 @@ const BillingAddressForm = () => {
               return (
                 <Select
                   label="Province"
-                  className={"flex-1 min-w-0"}
+                  className={"flex-1 min-w-0 h-fit"}
                   isRequired
                   isInvalid={invalid}
                   errorMessage={error?.message}
@@ -277,7 +278,7 @@ const BillingAddressForm = () => {
                     label={
                       checkIsCountryForComponent(["US"]) ? "State" : "Province"
                     }
-                    className={"flex-1 min-w-0"}
+                    className={"flex-1 min-w-0 h-fit"}
                     isRequired
                     isInvalid={invalid}
                     errorMessage={error?.message}
