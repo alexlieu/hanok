@@ -9,15 +9,18 @@ import Tooltip from "../ui/Tooltip";
 import { isDateInRanges } from "../../utils/dateUtils";
 import { ControlledPhoneField } from "../ui/form/ControlledPhoneField";
 import { useCallback } from "react";
+import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 
 const CustomerForm = () => {
   const {
     pickupRules: { firstValidDate, lastValidDate, unavailableDates },
   } = useLoaderData() as CheckoutRequiredData;
 
-  const { control, trigger, formState } = useFormContext();
-
-  const { errors, touchedFields, dirtyFields } = formState;
+  const {
+    control,
+    trigger,
+    formState: { errors, touchedFields, dirtyFields },
+  } = useFormContext<CheckoutFormValues>();
 
   const isDateUnavailable = useCallback(
     (date: DateValue) => isDateInRanges(date, unavailableDates),
@@ -97,7 +100,7 @@ const CustomerForm = () => {
         <Controller
           name="phoneNumber"
           control={control}
-          render={({ field, fieldState }) => (
+          render={({ field, fieldState, formState }) => (
             <ControlledPhoneField
               formState={formState}
               field={field}
