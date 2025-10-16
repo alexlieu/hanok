@@ -59,7 +59,9 @@ const CustomerFormSchema = z
         .max(250, { error: "You've exceeded the character limit of 500." })
     ),
     contact: z.string().optional(),
-    paymentMethod: z.enum(PAYMENT_METHODS.map((method) => method.value)),
+    paymentMethod: z
+      .enum(PAYMENT_METHODS.map((method) => method.value))
+      .default("card"),
   })
   .superRefine(({ pickupDate, email, phoneNumber, updatePreference }, ctx) => {
     if (!pickupDate) {

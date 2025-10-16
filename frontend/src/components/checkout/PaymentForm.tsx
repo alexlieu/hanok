@@ -6,10 +6,32 @@ import {
   DisclosureRadioGroup,
   DisclosureRadioHeader,
 } from "../ui/aria/DisclosureRadio";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { useEffect } from "react";
 
 const PaymentForm = () => {
-  const { control } = useFormContext();
+  const { control, clearErrors } = useFormContext();
+  const paymentMethod = useWatch({ name: "paymentMethod", control });
+
+  // Clear validation errors for card and billing address fields when payment method is not "card"
+  // BUT keep the field values
+  useEffect(() => {
+    if (paymentMethod !== "card") {
+      clearErrors("cardNumber");
+      clearErrors("expiration");
+      clearErrors("cvv");
+      clearErrors("holderName");
+
+      clearErrors("country");
+      clearErrors("addressLine1");
+      clearErrors("addressLine2");
+      clearErrors("city");
+      clearErrors("stateProvinceRegion");
+      clearErrors("county");
+      clearErrors("postalCode");
+    }
+  }, [paymentMethod, clearErrors]);
+
   return (
     <fieldset className="">
       <legend className="lowercase tracking-wide text-lg font-medium mb-2">

@@ -1,10 +1,11 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "motion/react";
 import {
   createContext,
   CSSProperties,
   HTMLAttributes,
   ReactNode,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -90,55 +91,63 @@ const DisclosureRadioPanel = ({
 }: DisclosureRadioPanelProps) => {
   const hasUserInteracted = useContext(DisclosureRadioGroupInteractionContext);
   const panelRef = useRef<HTMLDivElement>(null);
+  const isInitialRender = useRef(true);
   const X_OFFSET_PX = 5;
+  // Display state is used to prevent the panel from affecting the render flow when it is hidden.
+  const [display, setDisplay] = useState<"block" | "hidden">(
+    isExpanded ? "block" : "hidden"
+  );
+
   const handleAnimationComplete = () => {
-    if (panelRef.current) {
+    if (isExpanded && panelRef.current) {
       panelRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
+    if (!isExpanded) {
+      setDisplay("hidden");
+    }
   };
+
+  useEffect(() => {
+    isInitialRender.current = false;
+  }, []);
+
   return (
-    <AnimatePresence initial={false}>
-      {isExpanded ? (
-        <motion.div
-          style={{ "--x-offset": `${X_OFFSET_PX}px` } as CSSProperties}
-          initial={{ height: 0, opacity: 0 }}
-          animate={{
-            height: "fit-content",
-            opacity: 1,
-            transition: {
-              height: { duration: 0.35, ease: "easeInOut" },
-              opacity: { duration: 0.45, ease: "easeInOut", delay: 0.1 },
-            },
-          }}
-          exit={{
-            height: 0,
-            opacity: 0,
-            transition: {
-              height: { duration: 0.3, ease: "easeInOut", delay: 0.1 },
-              opacity: { duration: 0.3, ease: "easeInOut" },
-            },
-          }}
-          onAnimationComplete={
-            scrollIntoView && hasUserInteracted
-              ? handleAnimationComplete
-              : undefined
-          }
-          className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)]`}
-        >
-          <div
-            ref={panelRef}
-            {...props}
-            className={twMerge(props.className, `py-2 px-[var(--x-offset)]`)}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            {children}
-          </div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+    <motion.div
+      ref={panelRef}
+      style={{ "--x-offset": `${X_OFFSET_PX}px` } as CSSProperties}
+      className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)] ${display}`}
+      onPointerDown={(e) => e.stopPropagation()}
+      animate={{
+        height: isExpanded ? "auto" : 0,
+        opacity: isExpanded ? 1 : 0,
+        pointerEvents: isExpanded ? "auto" : "none",
+      }}
+      transition={{
+        height: { duration: 0.35, ease: "easeInOut" },
+        opacity: { duration: 0.3, ease: "easeInOut" },
+      }}
+      initial={
+        isInitialRender.current && isExpanded
+          ? false
+          : { height: 0, opacity: 0 }
+      }
+      onAnimationStart={() => setDisplay("block")}
+      onAnimationComplete={
+        scrollIntoView && hasUserInteracted
+          ? handleAnimationComplete
+          : undefined
+      }
+    >
+      <div
+        {...props}
+        className={twMerge(props.className, `py-2 px-[var(--x-offset)]`)}
+      >
+        {children}
+      </div>
+    </motion.div>
   );
 };
 

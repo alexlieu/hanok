@@ -14,8 +14,11 @@ export const createCheckoutSchema = (
     unavailableDates,
     validDateRange
   );
-  const paymentSchema = createPaymentFormSchema(validStatesProvincesRegions);
-  return customerSchema.and(paymentSchema);
+  const { conditional: conditionalPaymentSchema } = createPaymentFormSchema(
+    validStatesProvincesRegions
+  );
+
+  return customerSchema.and(conditionalPaymentSchema);
 };
 
 export type CheckoutSchemaType = ReturnType<typeof createCheckoutSchema>;
