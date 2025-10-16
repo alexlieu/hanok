@@ -15,116 +15,70 @@ export const countryList = [
   { value: COUNTRY_CODES[3], label: "Korea" },
 ] as const;
 
+const getCountryLabel = (country: CountryCodeUnion): string => {
+  return countryList.find((c) => c.value === country)?.label ?? "";
+};
+
 export const BillingAddressSchema = z
   .object({
     country: CountryEnum,
-    addressLine1: z.string().optional(),
-    addressLine2: z.string().optional(),
-    city: z.string().optional(),
+    addressLine1: z
+      .string()
+      .min(1, "Address Line 1 is required.")
+      .min(3, "Entry is too short. Please provide at least 3 characters.")
+      .max(40, "Entry is too long. Please provide a maximum of 40 characters."),
+    addressLine2: z
+      .string()
+      .min(3, "Entry is too short. Please provide at least 3 characters.")
+      .max(30, "Entry is too long. Please provide a maximum of 30 characters.")
+      .optional()
+      .or(z.literal("")),
+    city: z
+      .string()
+      .min(1, "City is required.")
+      .min(3, "Entry is too short. Please provide at least 3 characters.")
+      .max(30, "Entry is too long. Please provide a maximum of 30 characters."),
     stateProvinceRegion: z.string().optional(),
-    county: z.string().optional(),
+    county: z
+      .string()
+      .min(4, "Entry is too short. Please provide at least 4 characters.")
+      .optional()
+      .or(z.literal("")),
     postalCode: z.string().optional(),
   })
-  .superRefine(
-    (
-      {
-        country,
-        addressLine1,
-        addressLine2,
-        city,
-        stateProvinceRegion,
-        county,
-        postalCode,
-      },
-      ctx
-    ) => {
-      function addCtxIssue(
-        message: string,
-        path: (keyof BillingAddressData)[]
-      ) {
-        ctx.addIssue({
-          code: "custom",
-          message: message,
-          path: path,
-        });
-      }
-      if (!postalCode) {
-        const message =
-          country === "US"
-            ? "ZIP Code is required"
-            : country === "GB"
-            ? "Postcode is required."
-            : "Postal Code is required.";
-        addCtxIssue(message, ["postalCode"]);
-      }
-      if (!addressLine1) {
-        addCtxIssue("Address Line 1 is required.", ["addressLine1"]);
-      } else {
-        const min = 3;
-        if (addressLine1.length < min) {
-          addCtxIssue(
-            `Entry is too short. Please provide at least ${min} characters.`,
-            ["addressLine1"]
-          );
-        }
-        const max = 40;
-        if (addressLine1.length > max) {
-          addCtxIssue(
-            `Entry is too long. Please provide ${max} characters or less.`,
-            ["addressLine1"]
-          );
-        }
-      }
-      if (addressLine2) {
-        const min = 3;
-        if (addressLine2.length < min) {
-          addCtxIssue(
-            `Entry is too short. Please provide at least ${min} characters.`,
-            ["addressLine2"]
-          );
-        }
-        const max = 30;
-        if (addressLine2.length > max) {
-          addCtxIssue(
-            `Entry is too long. Please provide a maximum of ${max} characters.`,
-            ["addressLine2"]
-          );
-        }
-      }
-      if (!city) {
-        addCtxIssue("Town or City is required.", ["city"]);
-      } else {
-        const min = 3;
-        if (city.length < min) {
-          addCtxIssue(
-            `Entry is too short. Please provide at least ${min} characters.`,
-            ["city"]
-          );
-        }
-        const max = 30;
-        if (city.length > max) {
-          addCtxIssue(
-            `Entry is too long. Please provide a maximum of ${max} characters.`,
-            ["city"]
-          );
-        }
-      }
-      if (["US", "CA", "KR"].includes(country) && !stateProvinceRegion) {
-        const message =
-          country === "US"
-            ? "State is required for US."
-            : `Province is required for ${country}.`;
-        ctx.addIssue({
-          code: "custom",
-          message: message,
-          path: ["stateProvinceRegion"],
-        });
-      }
-      if (["US", "CA", "KR"].includes(country) && county) {
-        addCtxIssue(`County should not be provided for ${country}.`, [
-          "country",
-        ]);
-      }
+  .superRefine(({ country, stateProvinceRegion, county, postalCode }, ctx) => {
+    function addCtxIssue(message: string, path: (keyof BillingAddressData)[]) {
+      ctx.addIssue({
+        code: "custom",
+        message: message,
+        path: path,
+      });
+    }
+
+    if (!postalCode) {
+      const message =
+        country === "US"
+          ? "ZIP Code is required"
+          : country === "GB"
+          ? "Postcode is required."
+          : "Postal Code is required.";
+      addCtxIssue(message, ["postalCode"]);
+    }
+
+    if (["US", "CA", "KR"].includes(country) && !stateProvinceRegion) {
+      const message =
+        country === "US"
+          ? "State is required for United States."
+          : `Province is required for ${getCountryLabel(country)}.`;
+      addCtxIssue(message, ["stateProvinceRegion"]);
+    }
+    if (["US", "CA", "KR"].includes(country) && county) {
+      addCtxIssue(
+        `County should not be provided for ${getCountryLabel(country)}.`,
+        ["country"]
+      );
+    }
+    if (postalCode) {
       switch (country) {
         case "GB": {
           const regexp = /^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|GIR ?0A{2})$/i;
@@ -163,7 +117,7 @@ export const BillingAddressSchema = z
         }
       }
     }
-  );
+  });
 
 export const createBillingAddressSchema = (
   validStatesProvincesRegions: ValidStatesProvincesRegions
@@ -176,7 +130,9 @@ export const createBillingAddressSchema = (
         ) {
           ctx.addIssue({
             code: "custom",
-            message: `Invalid province ${stateProvinceRegion} for ${country}.`,
+            message: `Invalid province ${stateProvinceRegion} for ${getCountryLabel(
+              country
+            )}.`,
             path: ["stateProvinceRegion"],
           });
         }
@@ -185,7 +141,9 @@ export const createBillingAddressSchema = (
         if (!validStatesProvincesRegions.US_STATES[stateProvinceRegion!]) {
           ctx.addIssue({
             code: "custom",
-            message: `Invalid state ${stateProvinceRegion} for ${country}.`,
+            message: `Invalid state ${stateProvinceRegion} for ${getCountryLabel(
+              country
+            )}.`,
             path: ["stateProvinceRegion"],
           });
         }
@@ -194,7 +152,9 @@ export const createBillingAddressSchema = (
         if (!validStatesProvincesRegions.CA_PROVINCES[stateProvinceRegion!]) {
           ctx.addIssue({
             code: "custom",
-            message: `Invalid province ${stateProvinceRegion} for ${country}.`,
+            message: `Invalid province ${stateProvinceRegion} for ${getCountryLabel(
+              country
+            )}.`,
             path: ["stateProvinceRegion"],
           });
         }
