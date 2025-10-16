@@ -37,6 +37,7 @@ const CustomerFormSchema = z
   .object({
     fullName: z
       .string()
+      .min(2, { message: "Please provide your full name." })
       .max(50)
       .transform((val) => val.replace(/\s+/g, " ")),
     email: z
@@ -46,119 +47,71 @@ const CustomerFormSchema = z
     phoneNumber: PhoneSchema.nullable(),
     pickupDate: z
       .instanceof(CalendarDate, { message: "Please enter a valid date." })
-      .optional()
-      .nullable(),
-    updatePreference: z.optional(z.array(z.enum(["sms", "email"]))),
+      .nullish(),
+    updatePreference: z.optional(
+      z
+        .array(z.enum(["sms", "email"]))
+        .min(1, { message: "Please select at least one update preference." })
+    ),
     specialInstructions: z.optional(
       z
         .string()
         .max(250, { error: "You've exceeded the character limit of 500." })
     ),
     contact: z.string().optional(),
-    paymentMethod: z
-      .enum(PAYMENT_METHODS.map((method) => method.value))
-      .optional(),
+    paymentMethod: z.enum(PAYMENT_METHODS.map((method) => method.value)),
   })
-  .superRefine(
-    (
-      {
-        fullName,
-        pickupDate,
-        email,
-        phoneNumber,
-        updatePreference,
-        paymentMethod,
-      },
-      ctx
-    ) => {
-      if (fullName.length < 2) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please provide your full name",
-          path: ["fullName"],
-        });
-      }
-
-      if (phoneNumber && !PhoneSchema.safeParse(phoneNumber).success) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please provide a valid phone number.",
-          path: ["phoneNumber"],
-        });
-      }
-
-      if (!pickupDate) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please enter a valid date.",
-          path: ["pickupDate"],
-        });
-      }
-
-      if (!updatePreference || updatePreference.length < 1) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please select at least one update preference.",
-          path: ["updatePreference"],
-        });
-      }
-
-      const hasEmail = email && email.trim().length !== 0;
-      const hasPhoneNumber =
-        phoneNumber?.phoneNumber &&
-        phoneNumber?.phoneNumber.trim().length !== 0;
-
-      if (!hasEmail && !hasPhoneNumber) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please provide either your email or phone number.",
-          path: ["contact"],
-        });
-      }
-
-      if (
-        updatePreference?.includes("email") &&
-        !hasEmail &&
-        updatePreference?.includes("sms") &&
-        !hasPhoneNumber
-      ) {
-        ctx.addIssue({
-          code: "custom",
-          message:
-            "Please provide an email and a phone number to receive both email and SMS updates.",
-          path: ["updatePreference"],
-        });
-      }
-
-      if (updatePreference?.includes("email") && !hasEmail) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please provide an email to receive email updates.",
-          path: ["updatePreference"],
-        });
-      }
-
-      if (updatePreference?.includes("sms") && !hasPhoneNumber) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please provide a phone number to receive SMS updates.",
-          path: ["updatePreference"],
-        });
-      }
-
-      if (
-        !paymentMethod ||
-        (paymentMethod &&
-          !PAYMENT_METHODS.some((method) => method.value === paymentMethod))
-      ) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please select a valid payment method.",
-          path: ["paymentMethod"],
-        });
-      }
+  .superRefine(({ pickupDate, email, phoneNumber, updatePreference }, ctx) => {
+    if (!pickupDate) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please enter a valid date.",
+        path: ["pickupDate"],
+      });
     }
-  );
+
+    const hasEmail = email && email.trim().length !== 0;
+    const hasPhoneNumber =
+      phoneNumber?.phoneNumber && phoneNumber?.phoneNumber.trim().length !== 0;
+
+    if (!hasEmail && !hasPhoneNumber) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please provide either your email or phone number.",
+        path: ["contact"],
+      });
+    }
+
+    if (
+      updatePreference?.includes("email") &&
+      !hasEmail &&
+      updatePreference?.includes("sms") &&
+      !hasPhoneNumber
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Please provide an email and a phone number to receive both email and SMS updates.",
+        path: ["updatePreference"],
+      });
+    }
+
+    if (updatePreference?.includes("email") && !hasEmail) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please provide an email to receive email updates.",
+        path: ["updatePreference"],
+      });
+    }
+
+    if (updatePreference?.includes("sms") && !hasPhoneNumber) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please provide a phone number to receive SMS updates.",
+        path: ["updatePreference"],
+      });
+    }
+  });
 
 const createCustomerFormSchema = (
   unavailableDates: DateRange[],

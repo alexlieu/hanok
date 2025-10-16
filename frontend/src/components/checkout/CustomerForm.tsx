@@ -19,7 +19,7 @@ const CustomerForm = () => {
   const {
     control,
     trigger,
-    formState: { errors, touchedFields, dirtyFields },
+    formState: { errors },
   } = useFormContext<CheckoutFormValues>();
 
   const isDateUnavailable = useCallback(
@@ -60,16 +60,19 @@ const CustomerForm = () => {
           render={({
             field: { onChange, onBlur, value, ref },
             fieldState: { invalid, error },
+            formState: { touchedFields, dirtyFields, submitCount },
           }) => (
             <TextField
               inputRef={ref}
               value={value}
               onChange={(e) => {
                 onChange(e);
-                if (touchedFields.email || dirtyFields.email)
+                if (
+                  (touchedFields.email || dirtyFields.email) &&
+                  submitCount > 0
+                )
                   trigger("updatePreference");
                 trigger("contact");
-                console.log("trigger:", typeof trigger);
               }}
               onBlur={onBlur}
               label="Email"
@@ -159,11 +162,19 @@ const CustomerForm = () => {
               isRequired
               label="How should we update you on your order?"
             >
-              <Checkbox value="sms" className="w-fit">
-                SMS
-              </Checkbox>
-              <Checkbox value="email" className="w-fit">
+              <Checkbox
+                value="email"
+                className="w-fit"
+                name="update-preference-email"
+              >
                 Email
+              </Checkbox>
+              <Checkbox
+                value="sms"
+                className="w-fit"
+                name="update-preference-sms"
+              >
+                SMS
               </Checkbox>
             </CheckboxGroup>
           )}

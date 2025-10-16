@@ -99,21 +99,21 @@ export const PhoneSchema = z
     countryCode: CountryCodeSchema,
     phoneNumber: z.union([z.string(), z.literal(undefined)]),
   })
-  .refine(
-    (data) => {
-      if (data.phoneNumber) {
-        return validatePhoneNumber(
-          data.phoneNumber,
-          data.countryCode as CountryCode
-        );
+  .superRefine(({ countryCode, phoneNumber }, ctx) => {
+    if (phoneNumber) {
+      const isValid = validatePhoneNumber(
+        phoneNumber,
+        countryCode as CountryCode
+      );
+      if (!isValid) {
+        ctx.addIssue({
+          code: "custom",
+          message: `Please provide a valid ${countryCode} phone number.`,
+          path: ["phoneNumber"],
+        });
       }
-      return true;
-    },
-    {
-      message: "Invalid phone number for selected country.",
-      path: ["phoneNumber"],
     }
-  )
+  })
   .transform((data) => {
     const cleanedPhoneNumber = data.phoneNumber?.trim();
     if (!cleanedPhoneNumber) {

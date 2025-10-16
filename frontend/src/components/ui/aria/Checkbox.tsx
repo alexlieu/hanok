@@ -93,6 +93,7 @@ const iconStyles =
 export function Checkbox(props: CheckboxProps) {
   return (
     <AriaCheckbox
+      name={props.name}
       {...props}
       className={composeRenderProps(props.className, (className, renderProps) =>
         checkboxStyles({ ...renderProps, className })
