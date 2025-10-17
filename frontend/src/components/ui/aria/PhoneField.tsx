@@ -13,6 +13,7 @@ import * as Flags from "country-flag-icons/react/3x2";
 import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
+import { CircleChevronDownIcon } from "../icons/CircleChevronDown";
 
 function getCountryFromCode(code: CountryCodeUnion) {
   return countries.find((c) => c.code === code) || countries[0];
@@ -52,7 +53,7 @@ const buttonStyles = tv({
     isDisabled: {
       true: "bg-stone-300",
     },
-    isFocused: {
+    isFocusVisible: {
       false: "inset-ring-0",
       true: "inset-ring-2 transition-shadow",
     },
@@ -85,16 +86,25 @@ export const PhoneField = memo(function PhoneField({
 }: PhoneFieldProps) {
   const countryDetails = getCountryFromCode(countryCode);
 
-  function getCountryFlag() {
+  function getCountryFlag(playAnimation: boolean) {
     const SelectedFlagComponent =
       countryCode && Flags[countryCode as keyof typeof Flags];
     return (
-      <>
+      <div>
         <SelectedFlagComponent
           title={countryDetails.name}
           className="h-5 border-[2px] border-brand-colour-5 rounded-xs"
         />
-      </>
+        <CircleChevronDownIcon
+          aria-hidden
+          className="absolute bottom-0.5 -right-0.5"
+          size="0.9rem"
+          fill="var(--color-default-bg)"
+          strokeWidth={3}
+          stroke="var(--color-brand-colour-5)"
+          playAnimation={playAnimation}
+        />
+      </div>
     );
   }
 
@@ -130,7 +140,10 @@ export const PhoneField = memo(function PhoneField({
           onChange={(key) => onCountryCodeChange(key as CountryCodeUnion)}
           listBoxClassNames="max-h-[300px]"
           buttonClassNames={buttonStyles}
-          customSelectValue={getCountryFlag()}
+          customSelectValue={({ isHovered, isFocused }) =>
+            getCountryFlag(isHovered || isFocused)
+          }
+          defaultChevron={false}
           onFocusChange={setIsFocused}
           widePopover={true}
         >

@@ -31,10 +31,13 @@ export interface SelectProps<T extends object>
   listBoxRef?: RefObject<HTMLDivElement | null>;
   listBoxClassNames?: string;
   buttonClassNames?: () => string;
-  customSelectValue?: ReactNode;
+  customSelectValue?:
+    | ReactNode
+    | ((renderProps: { isHovered: boolean; isFocused: boolean }) => ReactNode);
   items?: Iterable<T>;
   widePopover?: boolean;
   children: ReactNode | ((item: T) => ReactNode);
+  defaultChevron?: boolean;
 }
 
 export function Select<T extends object>({
@@ -52,6 +55,7 @@ export function Select<T extends object>({
   children,
   items,
   widePopover = false,
+  defaultChevron = true,
   ...props
 }: SelectProps<T>) {
   const [isFocused, setIsFocused] = useState(false);
@@ -134,37 +138,50 @@ export function Select<T extends object>({
       <Button
         className={buttonClassNames ? buttonClassNames : selectButtonStyles}
       >
-        <SelectValue className="flex-1 text-sm placeholder-shown:italic truncate">
-          {({ defaultChildren, isPlaceholder }) => {
-            return isPlaceholder ? (
-              <>
-                {placeholder ? (
+        {({ isHovered, isFocused }) => (
+          <>
+            <SelectValue className="flex-1 text-sm placeholder-shown:italic truncate">
+              {({ defaultChildren, isPlaceholder }) => {
+                return isPlaceholder ? (
                   <>
-                    <b>{placeholder}</b> selection
+                    {placeholder ? (
+                      <>
+                        <b>{placeholder}</b> selection
+                      </>
+                    ) : (
+                      <p className="font-light not-italic">Select...</p>
+                    )}
                   </>
                 ) : (
-                  <p className="font-light not-italic">Select...</p>
-                )}
-              </>
-            ) : (
-              <span
-                className="truncate"
-                title={
-                  typeof defaultChildren === "string"
-                    ? defaultChildren
-                    : undefined
-                }
-              >
-                {customSelectValue ? customSelectValue : defaultChildren}
-              </span>
-            );
-          }}
-        </SelectValue>
-        <LuChevronDown
-          stroke="var(--color-brand-colour-5)"
-          strokeWidth={3}
-          className="scale-115 group-disabled:text-gray-200"
-        />
+                  <span
+                    className="truncate"
+                    title={
+                      typeof defaultChildren === "string"
+                        ? defaultChildren
+                        : undefined
+                    }
+                  >
+                    {typeof customSelectValue === "function"
+                      ? customSelectValue({
+                          isHovered,
+                          isFocused,
+                        })
+                      : customSelectValue
+                      ? customSelectValue
+                      : defaultChildren}
+                  </span>
+                );
+              }}
+            </SelectValue>
+            {defaultChevron ? (
+              <LuChevronDown
+                stroke="var(--color-brand-colour-5)"
+                strokeWidth={3}
+                className="scale-115 group-disabled:text-gray-200"
+              />
+            ) : undefined}
+          </>
+        )}
       </Button>
       {description && <Description>{description}</Description>}
       <AnimatedFieldError isInvalid={isInvalid} children={errorMessage} />
