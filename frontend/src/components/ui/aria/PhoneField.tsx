@@ -141,7 +141,11 @@ export const PhoneField = memo(function PhoneField({
                   id={code}
                   key={code}
                   textValue={`${name} ${code}`}
-                  rightSlot={<span>+{phone}</span>}
+                  rightSlot={
+                    <span className="group-focus:text-default-bg">
+                      +{phone}
+                    </span>
+                  }
                 >
                   <span className="fit">{name}</span>
                 </SelectItem>
