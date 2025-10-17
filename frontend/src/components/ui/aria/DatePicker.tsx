@@ -1,4 +1,3 @@
-import { LuCalendar } from "react-icons/lu";
 import {
   DatePicker as AriaDatePicker,
   DatePickerProps as AriaDatePickerProps,
@@ -15,6 +14,7 @@ import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
 import { memo, useState } from "react";
 import { createLabel } from "./utils/createLabel";
+import { CalendarDaysIcon } from "../icons/CalendarDays";
 
 export interface DatePickerProps<T extends DateValue>
   extends AriaDatePickerProps<T> {
@@ -63,8 +63,17 @@ export const DatePicker = memo(function DatePicker({
           inputRef={inputRef}
           className="flex-1 min-w-[150px] px-2 py-1.5 text-sm"
         />
-        <Button variant="icon" className="w-6 mr-1 relative">
-          <LuCalendar aria-hidden className={`w-4 h-4`} strokeWidth={3} />
+        <Button variant="iconNoInteraction" className="mr-1 p-0">
+          {({ isHovered, isFocused }) => {
+            return (
+              <CalendarDaysIcon
+                aria-hidden
+                size={"1.2rem"}
+                strokeWidth={2}
+                playAnimation={isHovered || isFocused}
+              />
+            );
+          }}
         </Button>
       </FieldGroup>
       {description && <Description>{description}</Description>}
