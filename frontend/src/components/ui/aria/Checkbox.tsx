@@ -10,8 +10,11 @@ import { AnimatedFieldError, Description } from "./Field";
 import { composeTailwindRenderProps, focusRing } from "./utils";
 import { ReactNode } from "react";
 import { createLabel } from "./utils/createLabel";
-import { LuMinus as Minus, LuCheck as Check } from "react-icons/lu";
+import { LuMinus as Minus } from "react-icons/lu";
+import { CheckIcon as Check } from "../icons/Check";
 import { RefCallBack } from "react-hook-form";
+import { motion, Transition } from "motion/react";
+import { ClickBurstIcon } from "../icons/ClickBurst";
 
 export interface CheckboxGroupProps
   extends Omit<AriaCheckboxGroupProps, "children"> {
@@ -72,11 +75,11 @@ const checkboxStyles = tv({
 
 const boxStyles = tv({
   extend: focusRing,
-  base: "w-5 h-5 shrink-0 flex items-center justify-center border-2 border-brand-colour-5 transition",
+  base: "w-[1.5rem] h-[1.5rem] shrink-0 flex items-center justify-center border-2 border-brand-colour-5 transition",
   variants: {
     isSelected: {
-      false: "bg-transparent",
-      true: "bg-stone-200",
+      false: "",
+      true: "",
     },
     isInvalid: {
       true: "border-error-red",
@@ -90,6 +93,13 @@ const boxStyles = tv({
 const iconStyles =
   "w-4 h-4 text-brand-colour-5 group-disabled:text-unavailable-text";
 
+const pressedScale = 0.9;
+const scaleTransition: Transition = {
+  type: "spring",
+  stiffness: 400,
+  damping: 17,
+};
+
 export function Checkbox(props: CheckboxProps) {
   return (
     <AriaCheckbox
@@ -99,23 +109,72 @@ export function Checkbox(props: CheckboxProps) {
         checkboxStyles({ ...renderProps, className })
       )}
     >
-      {({ isSelected, isIndeterminate, ...renderProps }) => (
-        <>
-          <div
-            className={boxStyles({
-              isSelected: isSelected || isIndeterminate,
-              ...renderProps,
-            })}
-          >
-            {isIndeterminate ? (
-              <Minus aria-hidden className={iconStyles} />
-            ) : isSelected ? (
-              <Check aria-hidden className={iconStyles} />
-            ) : null}
-          </div>
-          {props.children}
-        </>
-      )}
+      {({ isSelected, isIndeterminate, isPressed, ...renderProps }) => {
+        const playSelectAnimation = !isSelected && isPressed;
+        return (
+          <>
+            <div className="relative" aria-hidden>
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                aria-hidden
+              >
+                <ClickBurstIcon
+                  playAnimation={isSelected}
+                  size="3rem"
+                  stroke="var(--color-brand-colour-1)"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+              </div>
+              <motion.div
+                variants={{
+                  normal: {
+                    scale: 1,
+                  },
+                  pressed: {
+                    scale: pressedScale,
+                    transition: scaleTransition,
+                  },
+                }}
+                initial="normal"
+                animate={playSelectAnimation ? "pressed" : "normal"}
+                className={boxStyles({
+                  isSelected: isSelected || isIndeterminate,
+                  ...renderProps,
+                })}
+                aria-hidden
+              >
+                <motion.div
+                  variants={{
+                    normal: {
+                      scale: 1,
+                    },
+                    pressed: {
+                      scale: 1 / pressedScale,
+                    },
+                  }}
+                  initial="normal"
+                  animate={playSelectAnimation ? "pressed" : "normal"}
+                  transition={scaleTransition}
+                  aria-hidden
+                >
+                  {isIndeterminate ? (
+                    <Minus aria-hidden className={iconStyles} />
+                  ) : (
+                    <Check
+                      playAnimation={isSelected}
+                      size={"1.25rem"}
+                      stroke="var(--color-brand-colour-5)"
+                      aria-hidden
+                    />
+                  )}
+                </motion.div>
+              </motion.div>
+            </div>
+            {props.children}
+          </>
+        );
+      }}
     </AriaCheckbox>
   );
 }
