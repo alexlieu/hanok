@@ -41,6 +41,7 @@
     --color-icon-hover: #ADADAD;
     --color-icon-pressed: #636172;
     --color-default-scrollbar-thumb: #C1BDC0;
+    --color-checkbox-hover-bg: #dadada;
 }
 
 .form-error {
