@@ -25,9 +25,10 @@ import { RefCallBack } from "react-hook-form";
 const DisclosureRadioContext = createContext<RadioRenderProps | null>(null);
 const DisclosureRadioGroupInteractionContext = createContext<boolean>(false);
 
-interface DisclosureRadioProps extends AriaRadioProps {
+interface DisclosureRadioProps extends Omit<AriaRadioProps, "className"> {
   children: ReactNode;
   panelContent?: ReactNode;
+  className?: string;
 }
 
 export const DisclosureRadio = (props: DisclosureRadioProps) => {
@@ -35,14 +36,16 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
   const isSelected = selectedValue === props.value;
   return (
     <>
-      <div className="w-fit">
-        <AriaRadio {...props} className={"group"}>
-          {(renderProps) => (
-            <DisclosureRadioContext.Provider value={renderProps}>
-              {props.children}
-            </DisclosureRadioContext.Provider>
-          )}
-        </AriaRadio>
+      <div className={props.className}>
+        <div className="w-full">
+          <AriaRadio {...props} className={"group"}>
+            {(renderProps) => (
+              <DisclosureRadioContext.Provider value={renderProps}>
+                {props.children}
+              </DisclosureRadioContext.Provider>
+            )}
+          </AriaRadio>
+        </div>
       </div>
       {props.panelContent && (
         <DisclosureRadioPanel isExpanded={isSelected}>
@@ -55,14 +58,16 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
 
 interface DisclosureRadioHeaderProps {
   children: ReactNode;
+  rightSlot?: () => ReactNode | ReactNode;
 }
 
 export const DisclosureRadioHeader = ({
   children,
+  rightSlot,
 }: DisclosureRadioHeaderProps) => {
   const { isSelected, isDisabled } = useContext(DisclosureRadioContext) ?? {};
   return (
-    <div className="flex gap-2 items-center w-fit">
+    <div className="flex gap-2 items-center w-full">
       <SelectIndicatorIcon
         isSelected={!!isSelected}
         isDisabled={isDisabled}
@@ -72,7 +77,10 @@ export const DisclosureRadioHeader = ({
           "group-focus-visible:ring-brand-focus group-focus-visible:ring-offset-2 transition-shadow",
         ])}
       />
-      {children}
+      <div className="flex items-center justify-between w-full">
+        {children}
+        {rightSlot && rightSlot()}
+      </div>
     </div>
   );
 };
@@ -126,8 +134,7 @@ const DisclosureRadioPanel = ({
         pointerEvents: isExpanded ? "auto" : "none",
       }}
       transition={{
-        height: { duration: 0.35, ease: "easeInOut" },
-        opacity: { duration: 0.3, ease: "easeInOut" },
+        height: { duration: 0.3, ease: "easeInOut" },
       }}
       initial={
         isInitialRender.current && isExpanded

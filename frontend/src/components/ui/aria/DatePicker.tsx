@@ -69,7 +69,7 @@ export const DatePicker = memo(function DatePicker({
               <CalendarDaysIcon
                 aria-hidden
                 size={"1.2rem"}
-                strokeWidth={2}
+                strokeWidth={2.3}
                 playAnimation={isHovered || isFocused}
               />
             );

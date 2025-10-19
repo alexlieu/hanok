@@ -1,5 +1,4 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { PaymentFormData } from "../../schemas/PaymentFormSchema";
 import { TextField } from "../ui/aria/TextField";
 import { tv } from "tailwind-variants";
 import { getIssuingBank, issuingBank } from "../../schemas/CardSchema";
@@ -10,14 +9,21 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FaRegCreditCard } from "react-icons/fa6";
 import { LuCircleX } from "react-icons/lu";
+import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 
-const allLogos = ["Visa", "Mastercard", "Amex"];
+interface CardDetailsFormProps {
+  issuingBank: issuingBank;
+  activeCards: string[];
+}
 
-const CardDetailsForm: React.FC = () => {
-  const { control } = useFormContext<PaymentFormData>();
+const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
+  issuingBank,
+  activeCards,
+}) => {
+  const { control } = useFormContext<CheckoutFormValues>();
 
   const logoStyles = tv({
-    base: "",
+    base: "h-[1.1rem] w-auto",
   });
 
   const [isInitialMount, setIsInitialMount] = useState(true);
@@ -26,20 +32,10 @@ const CardDetailsForm: React.FC = () => {
     setIsInitialMount(false);
   }, []);
 
-  const [issuingBank, setIssuingBank] = useState<issuingBank>(undefined);
-
-  const presentLogos =
-    issuingBank === undefined
-      ? allLogos
-      : allLogos.filter((logo) => logo === issuingBank);
-
   return (
     <>
       <fieldset>
-        <legend
-          title="Card details"
-          className="lowercase tracking-wide text-lg font-medium mb-2"
-        >
+        <legend title="Card details" className="sr-only">
           Card details
         </legend>
         <div className="grid grid-cols-2 gap-3">
@@ -91,7 +87,6 @@ const CardDetailsForm: React.FC = () => {
                   formattedInput =
                     filteredInput.match(/.{1,4}/g)?.join(" ") || "";
                 }
-                setIssuingBank(localIssuingBank);
                 onChange(formattedInput);
               };
               return (
@@ -149,35 +144,33 @@ const CardDetailsForm: React.FC = () => {
                             />
                           </motion.span>
                         ) : (
-                          <motion.div
+                          <motion.ul
+                            className="flex flex-row justify-center items-center h-full gap-3 absolute top-0 right-2"
                             key={issuingBank || "all"}
-                            initial={{ opacity: 0 }}
+                            initial="none"
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute h-full top-0 right-2"
                           >
-                            <ul className="flex flex-row justify-center items-center h-full gap-3">
-                              {presentLogos.map((logo) => (
-                                <motion.li
-                                  key={logo}
-                                  variants={logoVariants}
-                                  initial={isInitialMount ? false : "hidden"}
-                                  animate="visible"
-                                  exit="exit"
-                                >
-                                  {logo === "Visa" && (
-                                    <Visa className={logoStyles()} />
-                                  )}
-                                  {logo === "Mastercard" && (
-                                    <Mastercard className={logoStyles()} />
-                                  )}
-                                  {logo === "Amex" && (
-                                    <Amex className={logoStyles()} />
-                                  )}
-                                </motion.li>
-                              ))}
-                            </ul>
-                          </motion.div>
+                            {activeCards.map((logo) => (
+                              <motion.li
+                                key={logo}
+                                variants={logoVariants}
+                                initial={isInitialMount ? false : "hidden"}
+                                animate="visible"
+                                exit="exit"
+                              >
+                                {logo === "Visa" && (
+                                  <Visa className={logoStyles()} />
+                                )}
+                                {logo === "Mastercard" && (
+                                  <Mastercard className={logoStyles()} />
+                                )}
+                                {logo === "Amex" && (
+                                  <Amex className={logoStyles()} />
+                                )}
+                              </motion.li>
+                            ))}
+                          </motion.ul>
                         )}
                       </AnimatePresence>
                     );
