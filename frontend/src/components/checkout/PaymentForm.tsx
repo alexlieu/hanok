@@ -24,7 +24,8 @@ const PaymentForm = () => {
   const paymentMethod = useWatch({ name: "paymentMethod", control });
   const cardNumber = useWatch({ name: "cardNumber", control });
   const issuingBank = getIssuingBank(cardNumber);
-  const activeCards = getActiveCards(issuingBank);
+  const activeCards =
+    paymentMethod === "card" ? getActiveCards(issuingBank) : allLogos;
 
   // Clear validation errors for card and billing address fields when payment method is not "card"
   // BUT keep the field values

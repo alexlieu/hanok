@@ -21,6 +21,8 @@ import OrderSummary from "./OrderSummary";
 import { Form } from "react-aria-components";
 import CheckoutForm from "./CheckoutForm";
 import { twMerge } from "tailwind-merge";
+import { OrderRequest } from "../../types/order.types";
+import { PaymentMethod as ApiPaymentMethod } from "../../types/order.types";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -92,6 +94,41 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
   const onSubmit: SubmitHandler<CheckoutFormValues> = (
     data: CheckoutFormValues
   ) => {
+    const payload: OrderRequest = {
+      customerName: data.fullName,
+      email: data.email || undefined,
+      phoneNumber: data.phoneNumber?.phoneNumber || undefined,
+      specialInstructions: data.specialInstructions || undefined,
+      pickupDate: data.pickupDate!.toString(),
+      orderItems: items.map((item) => ({
+        productVariantId: item.variantId,
+        quantity: item.quantity,
+        notes: undefined, // TODO: Add notes to the order item
+      })),
+      payment: {
+        total: total,
+        paymentMethod: data.paymentMethod.toUpperCase() as ApiPaymentMethod,
+        cardDetails:
+          data.paymentMethod === "card"
+            ? {
+                cardNo: data.cardNumber!,
+                cardholderName: data.holderName!,
+                expiryDate: data.expiration!,
+                cvv: data.cvv!,
+                billingAddress: {
+                  addressLine1: data.addressLine1!,
+                  addressLine2: data.addressLine2 || undefined,
+                  city: data.city!,
+                  stateProvinceRegion: data.stateProvinceRegion || undefined,
+                  county: data.county || undefined,
+                  postalCode: data.postalCode!,
+                  countryCode: data.country!,
+                },
+              }
+            : undefined,
+      },
+    };
+    console.log(payload);
     console.log("Form submitted successfully: ", data);
     alert("Form submitted successfully!");
   };
