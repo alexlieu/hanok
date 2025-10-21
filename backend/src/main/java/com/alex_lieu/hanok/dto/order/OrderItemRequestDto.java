@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public record OrderItemRequestDto(
         @NotNull(message = "{variant.id.notnull}") @Positive(message = "{variant.id.positive}")
-        long produceVariantId,
+        long productVariantId,
 
         @Range(min = 1, max = 10, message = "{orderitem.quantity.range}")
         int quantity,

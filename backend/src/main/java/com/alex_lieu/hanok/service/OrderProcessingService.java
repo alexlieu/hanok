@@ -39,7 +39,7 @@ public class OrderProcessingService {
     }
 
     public OrderItem convertToOrderItem(OrderItemRequestDto dto) {
-        ProductVariant product = productService.getActiveProductVariantById(dto.produceVariantId());
+        ProductVariant product = productService.getActiveProductVariantById(dto.productVariantId());
         return OrderItem.builder()
                 .variant(product)
                 .unitPrice(product.getPrice())

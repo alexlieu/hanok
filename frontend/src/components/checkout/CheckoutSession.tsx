@@ -23,6 +23,8 @@ import CheckoutForm from "./CheckoutForm";
 import { twMerge } from "tailwind-merge";
 import { OrderRequest } from "../../types/order.types";
 import { PaymentMethod as ApiPaymentMethod } from "../../types/order.types";
+import { createOrder } from "../../services/order.service";
+import { ApiError, isBackendError } from "../../utils/api/apiClient";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -91,7 +93,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
 
   const { handleSubmit } = methods;
 
-  const onSubmit: SubmitHandler<CheckoutFormValues> = (
+  const onSubmit: SubmitHandler<CheckoutFormValues> = async (
     data: CheckoutFormValues
   ) => {
     const payload: OrderRequest = {
@@ -128,9 +130,27 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
             : undefined,
       },
     };
-    console.log(payload);
-    console.log("Form submitted successfully: ", data);
-    alert("Form submitted successfully!");
+    try {
+      if (
+        payload.payment.paymentMethod !== "CARD" &&
+        payload.payment.paymentMethod !== "CASH"
+      ) {
+        payload.payment.paymentToken = `tok_test_${payload.payment.paymentMethod.toLowerCase()}_pay_success`;
+      }
+      const response = await createOrder(
+        payload,
+        payload.payment.paymentMethod
+      );
+      console.log("Order created successfully: ", response);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        console.error("Backend error details: ", error.data);
+        console.error("HTTP status: ", error.status);
+        if (isBackendError(error.data)) {
+          console.error("Specific validation errors: ", error.data.errors);
+        }
+      }
+    }
   };
 
   const onError: SubmitErrorHandler<CheckoutFormValues> = (
