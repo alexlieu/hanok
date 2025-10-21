@@ -69,7 +69,7 @@ const CustomerForm = () => {
                 onChange(e);
                 if (
                   (touchedFields.email || dirtyFields.email) &&
-                  submitCount > 0
+                  (submitCount > 0 || dirtyFields.updatePreference)
                 )
                   trigger("updatePreference");
                 trigger("contact");
@@ -109,6 +109,7 @@ const CustomerForm = () => {
               field={field}
               fieldState={fieldState}
               trigger={trigger}
+              hasContactError={!!errors.contact}
             />
           )}
         />

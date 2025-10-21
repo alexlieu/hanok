@@ -106,6 +106,7 @@ export function Checkbox(props: CheckboxProps) {
         isIndeterminate,
         isFocusVisible,
         isHovered,
+        isPressed,
         ...renderProps
       }) => {
         return (
@@ -128,7 +129,7 @@ export function Checkbox(props: CheckboxProps) {
               }}
               className="p-1"
             >
-              <div
+              <motion.div
                 className={boxStyles({
                   isFocusVisible: isFocusVisible,
                   isSelected: isSelected || isIndeterminate,
@@ -139,6 +140,16 @@ export function Checkbox(props: CheckboxProps) {
                   }`,
                   ...renderProps,
                 })}
+                variants={{
+                  normal: {
+                    scale: 1,
+                  },
+                  pressed: {
+                    scale: 0.95,
+                  },
+                }}
+                initial="none"
+                animate={isPressed ? "pressed" : "normal"}
                 aria-hidden
               >
                 <div
@@ -164,7 +175,7 @@ export function Checkbox(props: CheckboxProps) {
                     aria-hidden
                   />
                 )}
-              </div>
+              </motion.div>
             </motion.div>
             {props.children}
           </>

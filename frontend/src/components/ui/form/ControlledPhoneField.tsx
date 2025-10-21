@@ -15,6 +15,7 @@ interface ControlledPhoneFieldProps {
   field: ControllerRenderProps<CheckoutFormValues, "phoneNumber">;
   fieldState: ControllerFieldState;
   trigger: UseFormTrigger<CheckoutFormValues>;
+  hasContactError: boolean;
 }
 
 export const ControlledPhoneField = memo(
@@ -23,6 +24,7 @@ export const ControlledPhoneField = memo(
     field,
     fieldState,
     trigger,
+    hasContactError: contactError,
   }: ControlledPhoneFieldProps) => {
     const { onChange, onBlur, value, ref } = field;
     const { invalid } = fieldState;
@@ -37,7 +39,7 @@ export const ControlledPhoneField = memo(
         onChange({ ...value, phoneNumber: newPhoneNumber });
         if (
           (touchedFields.phoneNumber || dirtyFields.phoneNumber) &&
-          submitCount > 0
+          (submitCount > 0 || dirtyFields.updatePreference)
         )
           trigger("updatePreference");
         trigger("contact");
@@ -47,7 +49,7 @@ export const ControlledPhoneField = memo(
     return (
       <PhoneField
         label="Phone Number"
-        isInvalid={!!(invalid || errors.contact)}
+        isInvalid={!!(invalid || contactError)}
         errorMessage={errors?.phoneNumber?.phoneNumber?.message}
         onBlur={onBlur}
         inputRef={ref}
