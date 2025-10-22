@@ -63,8 +63,11 @@ export const api = {
 
 export function isBackendError(
   data: unknown
-): data is { errors: { field: string; message: string }[] } {
+): data is { validationErrors: Record<string, string>[] } {
   if (typeof data !== "object" || data === null) return false;
-  if (!("errors" in data)) return false;
-  return Array.isArray((data as { errors: unknown }).errors);
+  if (!("validationErrors" in data)) return false;
+  const errors = (data as { validationErrors: unknown }).validationErrors;
+  return (
+    typeof errors === "object" && errors !== null && !Array.isArray(errors)
+  );
 }

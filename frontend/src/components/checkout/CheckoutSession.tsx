@@ -147,7 +147,10 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
         console.error("Backend error details: ", error.data);
         console.error("HTTP status: ", error.status);
         if (isBackendError(error.data)) {
-          console.error("Specific validation errors: ", error.data.errors);
+          console.error(
+            "Specific validation errors: ",
+            error.data.validationErrors
+          );
         }
       }
     }
