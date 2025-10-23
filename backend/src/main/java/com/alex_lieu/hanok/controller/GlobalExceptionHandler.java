@@ -25,7 +25,9 @@ import org.springframework.web.servlet.View;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -39,50 +41,48 @@ public class GlobalExceptionHandler {
         this.error = error;
     }
 
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
-//            DataIntegrityViolationException ex
-//    ) {
-//        String errorMessage = "A conflict occurred with the current state of the resource";
-//        if (ex.getCause() instanceof ConstraintViolationException) {
-//            errorMessage = "A constraint was violated. Please check your input.";
-//        }
-//        ErrorResponse errorResponse = new ErrorResponse(
-//                HttpStatus.CONFLICT.value(),
-//                errorMessage + "|||" + ex.getMessage(),
-//                Instant.now()
-//        );
-//        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
-//    }
+    // @ExceptionHandler(DataIntegrityViolationException.class)
+    // public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+    // DataIntegrityViolationException ex
+    // ) {
+    // String errorMessage = "A conflict occurred with the current state of the
+    // resource";
+    // if (ex.getCause() instanceof ConstraintViolationException) {
+    // errorMessage = "A constraint was violated. Please check your input.";
+    // }
+    // ErrorResponse errorResponse = new ErrorResponse(
+    // HttpStatus.CONFLICT.value(),
+    // errorMessage + "|||" + ex.getMessage(),
+    // Instant.now()
+    // );
+    // return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    // }
 
-//    @ExceptionHandler(PersistenceException.class)
-//    public ResponseEntity<ErrorResponse> handlePersistenceException(
-//            PersistenceException ex
-//    ) {
-//        ErrorResponse errorResponse = new ErrorResponse(
-//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                ex.getMessage(),
-//                Instant.now()
-//        );
-//        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    // @ExceptionHandler(PersistenceException.class)
+    // public ResponseEntity<ErrorResponse> handlePersistenceException(
+    // PersistenceException ex
+    // ) {
+    // ErrorResponse errorResponse = new ErrorResponse(
+    // HttpStatus.INTERNAL_SERVER_ERROR.value(),
+    // ex.getMessage(),
+    // Instant.now()
+    // );
+    // return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    // }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalStateException(
-            IllegalStateException ex
-    ) {
+            IllegalStateException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "The request cannot be processed due to the current state of the application" + "|||" + ex.getMessage(),
-                Instant.now()
-        );
+                Instant.now());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ErrorReply> handleServiceException(
-            ServiceException ex, WebRequest request
-    ) {
+            ServiceException ex, WebRequest request) {
         String errorMessage;
         String errorCode;
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -108,20 +108,21 @@ public class GlobalExceptionHandler {
 
     //
     // BELOW IS THE UPDATED EXCEPTION HANDLERS USING ERROR_REPLY
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     @ExceptionHandler(PaymentFailedException.class)
     public ResponseEntity<ErrorReply> handlePaymentFailedException(PaymentFailedException ex, WebRequest request) {
-//        logger.error("Payment failed: {}", ex.getMessage(), ex); // Log the exception with full stack trace
+        // logger.error("Payment failed: {}", ex.getMessage(), ex); // Log the exception
+        // with full stack trace
         ErrorReply errorReply = ErrorReply.builder()
                 .timestamp(ex.getTimestamp() != null ? ex.getTimestamp() : LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST)
@@ -135,8 +136,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(OrderPlacementFailedException.class)
-    public ResponseEntity<ErrorReply> handleOrderPlacementFailedException(OrderPlacementFailedException ex, WebRequest request) {
-//        logger.error("Payment failed: {}", ex.getMessage(), ex); // Log the exception with full stack trace
+    public ResponseEntity<ErrorReply> handleOrderPlacementFailedException(OrderPlacementFailedException ex,
+            WebRequest request) {
+        // logger.error("Payment failed: {}", ex.getMessage(), ex); // Log the exception
+        // with full stack trace
         ErrorReply errorReply = ErrorReply.builder()
                 .timestamp(ex.getTimestamp() != null ? ex.getTimestamp() : LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST)
@@ -180,8 +183,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorReply>
-    handleProductNotFoundException(ProductNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleProductNotFoundException(ProductNotFoundException ex, WebRequest request) {
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND)
@@ -196,8 +198,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductVariantNotFoundException.class)
-    public ResponseEntity<ErrorReply>
-    handleProductVariantNotFoundException(ProductVariantNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleProductVariantNotFoundException(ProductVariantNotFoundException ex,
+            WebRequest request) {
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND)
@@ -212,7 +214,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductCreateFailedException.class)
-    public ResponseEntity<ErrorReply> handleProductCreateFailedException(ProductCreateFailedException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleProductCreateFailedException(ProductCreateFailedException ex,
+            WebRequest request) {
         String errorMessage;
         String errorCode;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -245,7 +248,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductUpdateFailedException.class)
-    public ResponseEntity<ErrorReply> handleProductUpdateFailedException(ProductUpdateFailedException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleProductUpdateFailedException(ProductUpdateFailedException ex,
+            WebRequest request) {
         String errorMessage;
         String errorCode;
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -274,10 +278,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
-
     @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<ErrorReply>
-    handleCustomerNotFoundException(CustomerNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleCustomerNotFoundException(CustomerNotFoundException ex,
+            WebRequest request) {
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND)
@@ -292,8 +295,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorReply>
-    handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST)
@@ -308,8 +310,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UnsupportedOperationException.class)
-    public ResponseEntity<ErrorReply>
-    handleUnsupportedOperationException(UnsupportedOperationException ex, WebRequest request) {
+    public ResponseEntity<ErrorReply> handleUnsupportedOperationException(UnsupportedOperationException ex,
+            WebRequest request) {
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST)
@@ -324,13 +326,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorReply> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ErrorReply> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
+            WebRequest request) {
+        Map<String, List<String>> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             if (error instanceof FieldError) {
                 String fieldName = ((FieldError) error).getField();
                 String errorMessage = error.getDefaultMessage();
-                errors.put(fieldName, errorMessage);
+                if (errors.containsKey(fieldName)) {
+                    errors.get(fieldName).add(errorMessage);
+                } else {
+                    List<String> errorList = new ArrayList<>();
+                    errorList.add(errorMessage);
+                    errors.put(fieldName, errorList);
+                }
             }
         });
         ErrorReply errorResponse = ErrorReply.builder()
@@ -348,11 +357,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorReply> handleConstraintViolation(
-            ConstraintViolationException ex, WebRequest request
-    ) {
-        Map<String, String> errors = new HashMap<>();
+            ConstraintViolationException ex, WebRequest request) {
+        Map<String, List<String>> errors = new HashMap<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+            String fieldName = violation.getPropertyPath().toString();
+            if (errors.containsKey(fieldName)) {
+                errors.get(fieldName).add(violation.getMessage());
+            } else {
+                List<String> errorList = new ArrayList<>();
+                errorList.add(violation.getMessage());
+                errors.put(fieldName, errorList);
+            }
         }
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
@@ -370,8 +385,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorReply> handleDataIntegrityViolation(
-            DataIntegrityViolationException ex, WebRequest request
-    ) {
+            DataIntegrityViolationException ex, WebRequest request) {
         String errorMessage;
         String errorCode;
         Throwable rootCause = ex.getRootCause();
@@ -405,8 +419,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PersistenceException.class)
     public ResponseEntity<ErrorReply> handlePersistenceException(
-            PersistenceException ex, WebRequest request
-    ) {
+            PersistenceException ex, WebRequest request) {
         String errorMessage;
         String errorCode;
         HttpStatus httpStatus;
