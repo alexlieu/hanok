@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.dto.validation.ValidationError;
 import com.alex_lieu.hanok.exceptions.CustomerNotFoundException;
 import com.alex_lieu.hanok.exceptions.order.OrderPlacementFailedException;
 import com.alex_lieu.hanok.exceptions.order.PaymentFailedException;
@@ -25,10 +26,7 @@ import org.springframework.web.servlet.View;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -221,8 +219,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         Throwable rootCause = ex.getCause() != null ? ex.getCause().getCause() : null;
         if (rootCause instanceof org.hibernate.exception.ConstraintViolationException cve) {
-            org.hibernate.exception.ConstraintViolationException cve2 = (org.hibernate.exception.ConstraintViolationException) cve;
-            if (cve2.getConstraintName() != null && cve2.getConstraintName().toLowerCase().contains("unique")) {
+            if (cve.getConstraintName() != null && cve.getConstraintName().toLowerCase().contains("unique")) {
                 errorMessage = "Failed to create product. A product with the same unique identifier already exists.";
                 errorCode = "UNIQUE_CONSTRAINT_VIOLATION";
                 status = HttpStatus.CONFLICT;
@@ -328,18 +325,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorReply> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
             WebRequest request) {
-        Map<String, List<String>> errors = new HashMap<>();
+        Map<String, List<ValidationError>> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            if (error instanceof FieldError) {
-                String fieldName = ((FieldError) error).getField();
-                String errorMessage = error.getDefaultMessage();
-                if (errors.containsKey(fieldName)) {
-                    errors.get(fieldName).add(errorMessage);
-                } else {
-                    List<String> errorList = new ArrayList<>();
-                    errorList.add(errorMessage);
-                    errors.put(fieldName, errorList);
-                }
+            if (error instanceof FieldError fieldError) {
+                String fieldName = fieldError.getField();
+                ValidationError validationError = ValidationError.builder()
+                        .code(fieldError.getCode())
+                        .message(fieldError.getDefaultMessage())
+                        .parameters(extractParameters(fieldError))
+                        .build();
+                errors.computeIfAbsent(fieldName, key -> new ArrayList<>()).add(validationError);
             }
         });
         ErrorReply errorResponse = ErrorReply.builder()
@@ -355,19 +350,39 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    private Map<String, Object> extractParameters(FieldError fieldError) {
+        Map<String, Object> params = new HashMap<>();
+
+        Object rejectedValue = fieldError.getRejectedValue();
+        if (rejectedValue != null) {
+            params.put("actual", rejectedValue.toString());
+        }
+
+        if (Objects.requireNonNull(fieldError.getCode()).contains("Size")) {
+            Object[] args = fieldError.getArguments();
+            if (args != null && args.length >= 3) {
+                params.put("min", args[2]);
+                params.put("max", args[1]);
+            }
+        }
+
+        return params;
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorReply> handleConstraintViolation(
             ConstraintViolationException ex, WebRequest request) {
-        Map<String, List<String>> errors = new HashMap<>();
+        Map<String, List<ValidationError>> errors = new HashMap<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             String fieldName = violation.getPropertyPath().toString();
-            if (errors.containsKey(fieldName)) {
-                errors.get(fieldName).add(violation.getMessage());
-            } else {
-                List<String> errorList = new ArrayList<>();
-                errorList.add(violation.getMessage());
-                errors.put(fieldName, errorList);
-            }
+
+            ValidationError validationError = ValidationError.builder()
+                    .code(violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName())
+                    .message(violation.getMessage())
+                    .parameters(extractConstraintViolationParameters(violation))
+                    .build();
+
+            errors.computeIfAbsent(fieldName, key -> new ArrayList<>()).add(validationError);
         }
         ErrorReply errorResponse = ErrorReply.builder()
                 .timestamp(LocalDateTime.now())
@@ -381,6 +396,20 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    private Map<String, Object> extractConstraintViolationParameters(ConstraintViolation<?> violation) {
+        Map<String, Object> params = new HashMap<>();
+
+        violation.getConstraintDescriptor().getAttributes().forEach((key, value) -> {
+            if (value != null) {
+                params.put(key, value);
+            }
+        });
+
+        params.put("actual", violation.getInvalidValue());
+
+        return params;
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

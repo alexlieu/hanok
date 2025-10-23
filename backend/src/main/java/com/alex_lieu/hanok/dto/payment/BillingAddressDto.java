@@ -38,7 +38,7 @@ public record BillingAddressDto(
         @NotBlank(message = "{billing.country.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
         @Size(min = 2, max = 2, message = "{billing.country.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         @CountryCode(groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        String countryCode
+        String country
 
 ) implements Serializable {
 }

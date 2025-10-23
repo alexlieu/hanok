@@ -97,7 +97,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
     data: CheckoutFormValues
   ) => {
     const payload: OrderRequest = {
-      customerName: data.fullName,
+      fullName: data.fullName,
       email: data.email || undefined,
       phoneNumber: data.phoneNumber?.phoneNumber || undefined,
       specialInstructions: data.specialInstructions || undefined,
@@ -113,9 +113,9 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
         cardDetails:
           data.paymentMethod === "card"
             ? {
-                cardNo: data.cardNumber!,
-                cardholderName: data.holderName!,
-                expiryDate: data.expiration!,
+                cardNumber: data.cardNumber!,
+                holderName: data.holderName!,
+                expiration: data.expiration!,
                 cvv: data.cvv!,
                 billingAddress: {
                   addressLine1: data.addressLine1!,
@@ -124,7 +124,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
                   stateProvinceRegion: data.stateProvinceRegion || undefined,
                   county: data.county || undefined,
                   postalCode: data.postalCode!,
-                  countryCode: data.country!,
+                  country: data.country!,
                 },
               }
             : undefined,

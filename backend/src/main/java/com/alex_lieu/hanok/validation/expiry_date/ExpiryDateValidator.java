@@ -23,12 +23,12 @@ public class ExpiryDateValidator implements ConstraintValidator<ValidExpiryDate,
             YearMonth now = YearMonth.now();
             if (expiryYearMonth.isBefore(now)) {
                 context.buildConstraintViolationWithTemplate("Expiry date has already passed")
-                        .addPropertyNode("expiryDate").addConstraintViolation();
+                        .addPropertyNode("expiration").addConstraintViolation();
                 return false;
             }
         } catch (DateTimeParseException e) {
             context.buildConstraintViolationWithTemplate("Expiry date should be formatted as MM/YY")
-                    .addPropertyNode("expiryDate")
+                    .addPropertyNode("expiration")
                     .addConstraintViolation();
             return false;
         }

@@ -2,7 +2,6 @@ package com.alex_lieu.hanok.dto.payment;
 
 import com.alex_lieu.hanok.validation.expiry_date.ValidExpiryDate;
 import com.alex_lieu.hanok.validation.groups.ValidationGroups;
-import com.alex_lieu.hanok.validation.orders.ValidCustomerName;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,15 +15,16 @@ public record CardDetailsRequestDto(
         @NotBlank(message = "{card.number.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
         @Pattern(regexp = "^(\\d{4}\\s){3}\\d{4}$", message = "{card.request.number.digits}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         @Size(min = 19, max = 19, message = "{card.number.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        String cardNo,
+        String cardNumber,
 
         @NotBlank(message = "{card.holder-name.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
-        @ValidCustomerName(nameFor = ValidCustomerName.NameForType.CARD, groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        String cardholderName,
+        @Size(min = 2, max = 100, message = "{card.holder-name.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "{card.holder-name.pattern}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        String holderName,
 
         @NotBlank(message = "{card.request.expiry.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
         @ValidExpiryDate(groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        String expiryDate,
+        String expiration,
 
         @NotBlank(message = "{card.cvv.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
         @Size(min = 3, max = 4, message = "{card.cvv.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})

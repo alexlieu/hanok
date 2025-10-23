@@ -41,7 +41,7 @@ public class PaymentService {
                 .county(dto.county())
                 .city(dto.city())
                 .postalCode(dto.postalCode())
-                .countryCode(dto.countryCode())
+                .countryCode(dto.country())
                 .stateProvinceRegion(dto.stateProvinceRegion())
                 .build();
     }
@@ -54,14 +54,14 @@ public class PaymentService {
             YearMonth expiryMonthYear;
             CardDetailsRequestDto cardDetailsRequestDto = dto.cardDetails();
             try {
-                expiryMonthYear = YearMonth.parse(cardDetailsRequestDto.expiryDate(), DateTimeFormatter.ofPattern("MM/uu"));
+                expiryMonthYear = YearMonth.parse(cardDetailsRequestDto.expiration(), DateTimeFormatter.ofPattern("MM/uu"));
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("Invalid expiry date format");
             }
             String expiryMonth = String.format("%02d", expiryMonthYear.getMonthValue());
             String expiryYear = String.valueOf(expiryMonthYear.getYear());
             gatewayResponse = paymentGatewayClient.processCardPayment(
-                    cardDetailsRequestDto.cardNo().replace(" ", ""),
+                    cardDetailsRequestDto.cardNumber().replace(" ", ""),
                     cardDetailsRequestDto.cvv(),
                     expiryMonth,
                     expiryYear,
@@ -73,7 +73,7 @@ public class PaymentService {
                     .token(gatewayResponse.token())
                     .expiryMonth(expiryMonth)
                     .expiryYear(expiryYear)
-                    .holderName(cardDetailsRequestDto.cardholderName())
+                    .holderName(cardDetailsRequestDto.holderName())
                     .billingAddress(convertToBillingAddress(dto.cardDetails().billingAddress()))
                     .build();
         } else if (dto.paymentMethod().equals(PaymentMethod.APPLE) || dto.paymentMethod()

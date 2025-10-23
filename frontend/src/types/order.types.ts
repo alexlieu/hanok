@@ -5,7 +5,7 @@ export type PaymentMethod = Uppercase<
 >;
 
 export interface OrderRequest {
-  customerName: string;
+  fullName: string;
   orderItems: OrderItemRequest[];
   payment: PaymentRequest;
   pickupDate: string;
@@ -29,9 +29,9 @@ export interface PaymentRequest {
 }
 
 export interface CardDetailsRequest {
-  cardNo: string;
-  cardholderName: string;
-  expiryDate: string;
+  cardNumber: string;
+  holderName: string;
+  expiration: string;
   cvv: string;
   billingAddress: BillingAddressRequest;
 }
@@ -39,7 +39,7 @@ export interface CardDetailsRequest {
 export interface BillingAddressRequest {
   addressLine1: string;
   postalCode: string;
-  countryCode: string;
+  country: string;
   addressLine2?: string;
   stateProvinceRegion?: string;
   county?: string;

@@ -26,14 +26,14 @@ public class PhoneNumberValidator implements ConstraintValidator<ValidPhoneNumbe
                 context.disableDefaultConstraintViolation();
                 String messageTemplate = context.getDefaultConstraintMessageTemplate();
                 String errorMessage = messageTemplate.replace("{country}", countryName);
-                context.buildConstraintViolationWithTemplate(errorMessage).addPropertyNode("countryCode")
+                context.buildConstraintViolationWithTemplate(errorMessage).addPropertyNode("country")
                         .addConstraintViolation();
             }
             return isValid;
         } catch (NumberParseException e) {
             context.disableDefaultConstraintViolation();
             String errorMessage = "Phone number could not be parsed. Please ensure it contains only digits and a valid country code.";
-            context.buildConstraintViolationWithTemplate(errorMessage).addPropertyNode("countryCode")
+            context.buildConstraintViolationWithTemplate(errorMessage).addPropertyNode("country")
                     .addConstraintViolation();
             return false;
         }
