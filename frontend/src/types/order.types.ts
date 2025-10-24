@@ -80,3 +80,20 @@ export interface ProductVariantConfig {
   size: string;
   flavour: string;
 }
+
+export interface ValidationError {
+  code: string;
+  message: string;
+  parameters: Record<string, unknown>;
+}
+
+export interface BackendErrorResponse {
+  timestamp: string;
+  status: string;
+  statusCode: number;
+  error: string;
+  message?: string;
+  path: string;
+  code: string;
+  validationErrors?: Record<string, ValidationError[]>;
+}

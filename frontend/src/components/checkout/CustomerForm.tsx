@@ -10,6 +10,7 @@ import { isDateInRanges } from "../../utils/dateUtils";
 import { ControlledPhoneField } from "../ui/form/ControlledPhoneField";
 import { useCallback } from "react";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
+import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 
 const CustomerForm = () => {
   const {
@@ -21,6 +22,8 @@ const CustomerForm = () => {
     trigger,
     formState: { errors },
   } = useFormContext<CheckoutFormValues>();
+
+  const serverErrors = useServerErrors();
 
   const isDateUnavailable = useCallback(
     (date: DateValue) => isDateInRanges(date, unavailableDates),
@@ -39,20 +42,25 @@ const CustomerForm = () => {
           render={({
             field: { onChange, onBlur, value, ref },
             fieldState: { invalid, error },
-          }) => (
-            <TextField
-              inputRef={ref}
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              label="Full name"
-              maxLength={50}
-              isRequired
-              isInvalid={invalid}
-              errorMessage={error?.message}
-              className="lg:col-span-2"
-            />
-          )}
+          }) => {
+            const zodError = error?.message;
+            const serverError = serverErrors.fullName?.[0]?.message;
+            const errorMessage = zodError || serverError;
+            return (
+              <TextField
+                inputRef={ref}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                label="Full name"
+                maxLength={50}
+                isRequired
+                isInvalid={invalid || !!serverError}
+                errorMessage={errorMessage}
+                className="lg:col-span-2"
+              />
+            );
+          }}
         />
         <Controller
           name="email"

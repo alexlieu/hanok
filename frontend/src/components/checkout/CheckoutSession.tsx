@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   CheckoutFormValues,
   createCheckoutSchema,
@@ -21,10 +21,15 @@ import OrderSummary from "./OrderSummary";
 import { Form } from "react-aria-components";
 import CheckoutForm from "./CheckoutForm";
 import { twMerge } from "tailwind-merge";
-import { OrderRequest } from "../../types/order.types";
+import { OrderRequest, ValidationError } from "../../types/order.types";
 import { PaymentMethod as ApiPaymentMethod } from "../../types/order.types";
 import { createOrder } from "../../services/order.service";
-import { ApiError, isBackendError } from "../../utils/api/apiClient";
+import {
+  ApiError,
+  isBackendError,
+  transformBackendErrors,
+} from "../../utils/api/apiClient";
+import { ServerErrorProvider } from "../../contexts/ServerErrorProvider";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -93,9 +98,14 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
 
   const { handleSubmit } = methods;
 
+  const [serverErrors, setServerErrors] = useState<
+    Record<string, ValidationError[]>
+  >({});
+
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (
     data: CheckoutFormValues
   ) => {
+    setServerErrors({});
     const payload: OrderRequest = {
       fullName: data.fullName,
       email: data.email || undefined,
@@ -144,13 +154,11 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       console.log("Order created successfully: ", response);
     } catch (error) {
       if (error instanceof ApiError) {
-        console.error("Backend error details: ", error.data);
-        console.error("HTTP status: ", error.status);
         if (isBackendError(error.data)) {
-          console.error(
-            "Specific validation errors: ",
+          const transformedErrors = transformBackendErrors(
             error.data.validationErrors
           );
+          setServerErrors(transformedErrors);
         }
       }
     }
@@ -163,25 +171,27 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
   };
 
   return (
-    <FormProvider {...methods}>
-      <div
-        className={twMerge(
-          "order-1 lg:order-2 md:sticky md:top-32 md:self-start md:justify-start md:flex-2/5",
-          "rounded-sm shadow-sm border border-gray-200 p-6 space-y-[1.3rem]"
-        )}
-      >
-        <OrderSummary items={items} total={total} />
-      </div>
-      <div className="order-2 lg:order-1 lg:flex-3/5">
-        <Form
-          id="checkout-form"
-          onSubmit={handleSubmit(onSubmit, onError)}
-          className="space-y-8"
-          validationBehavior="aria"
+    <ServerErrorProvider value={serverErrors}>
+      <FormProvider {...methods}>
+        <div
+          className={twMerge(
+            "order-1 lg:order-2 md:sticky md:top-32 md:self-start md:justify-start md:flex-2/5",
+            "rounded-sm shadow-sm border border-gray-200 p-6 space-y-[1.3rem]"
+          )}
         >
-          <CheckoutForm />
-        </Form>
-      </div>
-    </FormProvider>
+          <OrderSummary items={items} total={total} />
+        </div>
+        <div className="order-2 lg:order-1 lg:flex-3/5">
+          <Form
+            id="checkout-form"
+            onSubmit={handleSubmit(onSubmit, onError)}
+            className="space-y-8"
+            validationBehavior="aria"
+          >
+            <CheckoutForm />
+          </Form>
+        </div>
+      </FormProvider>
+    </ServerErrorProvider>
   );
 };
