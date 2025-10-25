@@ -18,9 +18,8 @@ export const cleanPostalCode = (
     cleanedInput = input.match(/[0-9]/g)?.join("");
   }
   if (checkIsCountry(selectedCountry, ["KR"])) {
-    if (cleanedInput && cleanedInput.length > 3) {
-      cleanedInput =
-        cleanedInput.substring(0, 3) + "-" + cleanedInput.substring(3, 6);
+    if (cleanedInput && cleanedInput.length > 5) {
+      cleanedInput = cleanedInput.substring(0, 5);
     }
   }
   if (checkIsCountry(selectedCountry, ["US"])) {
@@ -63,6 +62,7 @@ export const getPostalCodeMaxLength = (
   selectedCountry: (typeof COUNTRY_CODES)[number]
 ): number => {
   if (checkIsCountry(selectedCountry, ["GB"])) return 8;
-  if (checkIsCountry(selectedCountry, ["CA", "KR"])) return 7;
+  if (checkIsCountry(selectedCountry, ["CA"])) return 7;
+  if (checkIsCountry(selectedCountry, ["KR"])) return 5;
   return 10;
 };

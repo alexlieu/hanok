@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { FaRegCreditCard } from "react-icons/fa6";
 import { LuCircleX } from "react-icons/lu";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
+import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 
 interface CardDetailsFormProps {
   issuingBank: issuingBank;
@@ -21,6 +22,7 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
   activeCards,
 }) => {
   const { control } = useFormContext<CheckoutFormValues>();
+  const serverErrors = useServerErrors();
 
   const logoStyles = tv({
     base: "h-[1.1rem] w-auto",
@@ -46,6 +48,10 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
               field: { ref, ...field },
               fieldState: { invalid, error },
             }) => {
+              const zodError = error?.message;
+              const serverError = serverErrors.holderName?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
               return (
                 <TextField
                   label="Holder Name"
@@ -53,8 +59,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   inputRef={ref}
                   maxLength={50}
                   className={"col-span-2"}
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
                   {...field}
                 />
               );
@@ -89,6 +95,10 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                 }
                 onChange(formattedInput);
               };
+              const zodError = error?.message;
+              const serverError = serverErrors.cardNumber?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
               return (
                 <TextField
                   placeholder="1234 1234 1234 1234"
@@ -100,8 +110,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   isRequired
                   aria-label="Card number field"
                   maxLength={issuingBank === "Amex" ? 17 : 19}
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
                   className={"col-span-2"}
                   contentInField={(() => {
                     const duration = 0.08;
@@ -199,6 +209,10 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                       )}/${filteredInput.substring(2, 4)}`;
                 onChange(finalValue);
               };
+              const zodError = error?.message;
+              const serverError = serverErrors.expiration?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
               return (
                 <TextField
                   label="Expiration date"
@@ -210,8 +224,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   isRequired
                   aria-label="Card expiration date field"
                   maxLength={5}
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
                 />
               );
             }}
@@ -226,6 +240,10 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
               const handleFormatCVV = (rawInput: string) => {
                 onChange(rawInput.replace(/\D/g, ""));
               };
+              const zodError = error?.message;
+              const serverError = serverErrors.cvv?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
               return (
                 <TextField
                   label="CVV"
@@ -237,8 +255,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   isRequired
                   aria-label="Card CVV field"
                   maxLength={4}
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
                 />
               );
             }}

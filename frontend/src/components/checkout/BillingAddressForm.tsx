@@ -19,6 +19,7 @@ import {
   getPostalCodeMaxLength,
 } from "../../utils/postalCodeUtils";
 import { checkIsCountry } from "../../utils/countryUtils";
+import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 
 const selectButtonStyles = tv({
   extend: defaultSelectButtonStyles,
@@ -69,6 +70,7 @@ const BillingAddressForm = () => {
   const {
     validStatesProvincesRegions: { KR_PROVINCES, US_STATES, CA_PROVINCES },
   } = useLoaderData() as CheckoutRequiredData;
+  const serverErrors = useServerErrors();
 
   const checkIsCountryForComponent = (
     countries: (typeof COUNTRY_CODES)[number][]
@@ -88,11 +90,15 @@ const BillingAddressForm = () => {
         field: { ref, onChange, value, ...field },
         fieldState: { invalid, error },
       }) => {
+        const zodError = error?.message;
+        const serverError = serverErrors.country?.[0]?.message;
+        const errorMessage = zodError || serverError;
+        const invalidState = !!(invalid || serverError);
         return (
           <Select
             label="Country"
-            isInvalid={invalid}
-            errorMessage={error?.message}
+            isInvalid={invalidState}
+            errorMessage={errorMessage}
             className="h-fit"
             inputRef={ref}
             value={value}
@@ -111,6 +117,124 @@ const BillingAddressForm = () => {
     />
   );
 
+  const cityTextField = (
+    <Controller
+      name="city"
+      control={control}
+      render={({
+        field: { ref, ...field },
+        fieldState: { invalid, error },
+      }) => {
+        const zodError = error?.message;
+        const serverError = serverErrors.city?.[0]?.message;
+        const errorMessage = zodError || serverError;
+        const invalidState = !!(invalid || serverError);
+        return (
+          <TextField
+            className={"flex-1"}
+            label={"Town or City"}
+            placeholder={"Town or City"}
+            maxLength={30}
+            inputRef={ref}
+            isRequired
+            isInvalid={invalidState}
+            errorMessage={errorMessage}
+            {...field}
+          />
+        );
+      }}
+    />
+  );
+
+  const createStateProvinceRegionSelectField = () => {
+    const config = (() => {
+      switch (selectedCountry) {
+        case "KR":
+          return { label: "Province", options: KR_PROVINCES };
+        case "US":
+          return { label: "State", options: US_STATES };
+        case "CA":
+          return { label: "Province", options: CA_PROVINCES };
+        default:
+          return null;
+      }
+    })();
+    if (!config) return null;
+    return (
+      <Controller
+        name="stateProvinceRegion"
+        control={control}
+        render={({
+          field: { ref, onChange, value, ...field },
+          fieldState: { invalid, error },
+        }) => {
+          const zodError = error?.message;
+          const serverError = serverErrors.stateProvinceRegion?.[0]?.message;
+          const errorMessage = zodError || serverError;
+          const invalidState = !!(invalid || serverError);
+          return (
+            <Select
+              label={config.label}
+              className={"flex-1 min-w-0 h-fit"}
+              isRequired
+              isInvalid={invalidState}
+              errorMessage={errorMessage}
+              inputRef={ref}
+              value={value}
+              onChange={onChange}
+              buttonClassNames={selectButtonStyles}
+              {...field}
+            >
+              {config.options instanceof Set
+                ? Array.from(config.options).map((value) => (
+                    <SelectItem key={value} id={value}>
+                      {value}
+                    </SelectItem>
+                  ))
+                : Object.entries(config.options).map(([key, value]) => (
+                    <SelectItem key={key} id={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+            </Select>
+          );
+        }}
+      />
+    );
+  };
+
+  const postalCodeTextField = (
+    <Controller
+      name="postalCode"
+      control={control}
+      render={({
+        field: { ref, onChange, ...field },
+        fieldState: { invalid, error },
+      }) => {
+        const zodError = error?.message;
+        const serverError = serverErrors.postalCode?.[0]?.message;
+        const errorMessage = zodError || serverError;
+        const invalidState = !!(invalid || serverError);
+        return (
+          <TextField
+            label={countryFieldConfigs[selectedCountry].postalCode?.label}
+            placeholder={countryFieldConfigs[selectedCountry].postalCode?.label}
+            onChange={(input) =>
+              cleanPostalCode(input, selectedCountry, onChange)
+            }
+            isRequired
+            inputRef={ref}
+            maxLength={getPostalCodeMaxLength(selectedCountry)}
+            isInvalid={invalidState}
+            errorMessage={errorMessage}
+            className={`flex-1`}
+            {...field}
+          />
+        );
+      }}
+    />
+  );
+
   return (
     <fieldset className="grid grid-cols-1 lg:grid-cols-2 gap-[0.7rem]">
       <legend className="lowercase tracking-wide text-lg font-medium mb-2">
@@ -118,84 +242,9 @@ const BillingAddressForm = () => {
       </legend>
       {checkIsCountryForComponent(["KR"]) && (
         <>
-          <Controller
-            name="postalCode"
-            control={control}
-            render={({
-              field: { ref, onChange, ...field },
-              fieldState: { invalid, error },
-            }) => {
-              return (
-                <TextField
-                  label={countryFieldConfigs[selectedCountry].postalCode?.label}
-                  placeholder={
-                    countryFieldConfigs[selectedCountry].postalCode?.label
-                  }
-                  onChange={(input) =>
-                    cleanPostalCode(input, selectedCountry, onChange)
-                  }
-                  isRequired
-                  inputRef={ref}
-                  maxLength={getPostalCodeMaxLength(selectedCountry)}
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
-                  className={`flex-1`}
-                  {...field}
-                />
-              );
-            }}
-          />
-          <Controller
-            name="stateProvinceRegion"
-            control={control}
-            render={({
-              field: { ref, onChange, value, ...field },
-              fieldState: { invalid, error },
-            }) => {
-              return (
-                <Select
-                  label="Province"
-                  className={"flex-1 min-w-0 h-fit"}
-                  isRequired
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
-                  inputRef={ref}
-                  value={value}
-                  onChange={onChange}
-                  buttonClassNames={selectButtonStyles}
-                  {...field}
-                >
-                  {Array.from(KR_PROVINCES).map((value) => (
-                    <SelectItem key={value} id={value}>
-                      {value}
-                    </SelectItem>
-                  ))}
-                </Select>
-              );
-            }}
-          />
-          <Controller
-            name="city"
-            control={control}
-            render={({
-              field: { ref, ...field },
-              fieldState: { invalid, error },
-            }) => {
-              return (
-                <TextField
-                  className={"flex-1"}
-                  label={"Town or City"}
-                  placeholder={"Town or City"}
-                  maxLength={30}
-                  inputRef={ref}
-                  isRequired
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
-                  {...field}
-                />
-              );
-            }}
-          />
+          {postalCodeTextField}
+          {createStateProvinceRegionSelectField()}
+          {cityTextField}
           {countrySelectField}
         </>
       )}
@@ -206,16 +255,20 @@ const BillingAddressForm = () => {
           field: { ref, ...field },
           fieldState: { invalid, error },
         }) => {
+          const zodError = error?.message;
+          const serverError = serverErrors.addressLine1?.[0]?.message;
+          const errorMessage = zodError || serverError;
+          const invalidState = !!(invalid || serverError);
           return (
             <TextField
               label="Address line 1"
               placeholder="Address line 1"
               maxLength={40}
               inputRef={ref}
-              isInvalid={invalid}
+              isInvalid={invalidState}
               isRequired
               className="lg:col-start-1"
-              errorMessage={error?.message}
+              errorMessage={errorMessage}
               {...field}
             />
           );
@@ -228,14 +281,18 @@ const BillingAddressForm = () => {
           field: { ref, ...field },
           fieldState: { invalid, error },
         }) => {
+          const zodError = error?.message;
+          const serverError = serverErrors.addressLine2?.[0]?.message;
+          const errorMessage = zodError || serverError;
+          const invalidState = !!(invalid || serverError);
           return (
             <TextField
               label="Apartment, suite, etc. (optional)"
               placeholder="Apartment, suite, etc. (optional)"
               maxLength={30}
               inputRef={ref}
-              isInvalid={invalid}
-              errorMessage={error?.message}
+              isInvalid={invalidState}
+              errorMessage={errorMessage}
               {...field}
             />
           );
@@ -243,92 +300,10 @@ const BillingAddressForm = () => {
       />
       {!checkIsCountryForComponent(["KR"]) && (
         <>
-          <Controller
-            name="city"
-            control={control}
-            render={({
-              field: { ref, ...field },
-              fieldState: { invalid, error },
-            }) => {
-              return (
-                <TextField
-                  className={"flex-1"}
-                  label={"Town or City"}
-                  placeholder={"Town or City"}
-                  maxLength={30}
-                  inputRef={ref}
-                  isRequired
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
-                  {...field}
-                />
-              );
-            }}
-          />
-          {checkIsCountryForComponent(["US", "CA"]) && (
-            <Controller
-              name="stateProvinceRegion"
-              control={control}
-              render={({
-                field: { ref, onChange, value, ...field },
-                fieldState: { invalid, error },
-              }) => {
-                return (
-                  <Select
-                    label={
-                      checkIsCountryForComponent(["US"]) ? "State" : "Province"
-                    }
-                    className={"flex-1 min-w-0 h-fit"}
-                    isRequired
-                    isInvalid={invalid}
-                    errorMessage={error?.message}
-                    inputRef={ref}
-                    value={value}
-                    onChange={onChange}
-                    buttonClassNames={selectButtonStyles}
-                    {...field}
-                  >
-                    {Object.entries(
-                      checkIsCountryForComponent(["US"])
-                        ? US_STATES
-                        : CA_PROVINCES
-                    ).map(([key, value]) => (
-                      <SelectItem key={key} id={key}>
-                        {value}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                );
-              }}
-            />
-          )}
-          <Controller
-            name="postalCode"
-            control={control}
-            render={({
-              field: { ref, onChange, ...field },
-              fieldState: { invalid, error },
-            }) => {
-              return (
-                <TextField
-                  label={countryFieldConfigs[selectedCountry].postalCode?.label}
-                  placeholder={
-                    countryFieldConfigs[selectedCountry].postalCode?.label
-                  }
-                  isRequired
-                  inputRef={ref}
-                  maxLength={getPostalCodeMaxLength(selectedCountry)}
-                  onChange={(input) =>
-                    cleanPostalCode(input, selectedCountry, onChange)
-                  }
-                  isInvalid={invalid}
-                  errorMessage={error?.message}
-                  className={`flex-1`}
-                  {...field}
-                />
-              );
-            }}
-          />
+          {cityTextField}
+          {checkIsCountryForComponent(["US", "CA"]) &&
+            createStateProvinceRegionSelectField()}
+          {postalCodeTextField}
           {checkIsCountryForComponent(["GB"]) && (
             <Controller
               name="county"
@@ -337,13 +312,17 @@ const BillingAddressForm = () => {
                 field: { ref, ...field },
                 fieldState: { invalid, error },
               }) => {
+                const zodError = error?.message;
+                const serverError = serverErrors.county?.[0]?.message;
+                const errorMessage = zodError || serverError;
+                const invalidState = !!(invalid || serverError);
                 return (
                   <TextField
                     label={countryFieldConfigs["GB"].county?.label}
                     placeholder={countryFieldConfigs["GB"].county?.label}
                     inputRef={ref}
-                    isInvalid={invalid}
-                    errorMessage={error?.message}
+                    isInvalid={invalidState}
+                    errorMessage={errorMessage}
                     {...field}
                   />
                 );

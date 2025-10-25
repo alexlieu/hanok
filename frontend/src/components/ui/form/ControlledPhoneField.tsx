@@ -9,6 +9,7 @@ import { PhoneField } from "../aria/PhoneField";
 import { DEFAULT_COUNTRY_CODE } from "../../../schemas/BillingAddressSchema";
 import { CountryCodeUnion } from "../../../schemas/PhoneSchema";
 import { CheckoutFormValues } from "../../../schemas/CheckoutSchema";
+import { useServerErrors } from "../../../utils/hooks/features/checkout/useServerErrors";
 
 interface ControlledPhoneFieldProps {
   formState: FormState<CheckoutFormValues>;
@@ -28,12 +29,14 @@ export const ControlledPhoneField = memo(
   }: ControlledPhoneFieldProps) => {
     const { onChange, onBlur, value, ref } = field;
     const { invalid } = fieldState;
+
     const handleCountryCodeChange = useCallback(
       (newCountryCode: CountryCodeUnion) => {
         onChange({ phoneNumber: "", countryCode: newCountryCode });
       },
       [onChange]
     );
+
     const handlePhoneNumberChange = useCallback(
       (newPhoneNumber: string) => {
         onChange({ ...value, phoneNumber: newPhoneNumber });
@@ -46,11 +49,17 @@ export const ControlledPhoneField = memo(
       },
       [onChange, value, touchedFields, dirtyFields, submitCount, trigger]
     );
+
+    const serverErrors = useServerErrors();
+    const serverError = serverErrors.phoneNumber?.[0]?.message;
+    const errorMessage =
+      errors?.phoneNumber?.phoneNumber?.message || serverError;
+    const invalidState = !!(invalid || contactError || serverError);
     return (
       <PhoneField
         label="Phone Number"
-        isInvalid={!!(invalid || contactError)}
-        errorMessage={errors?.phoneNumber?.phoneNumber?.message}
+        isInvalid={invalidState}
+        errorMessage={errorMessage}
         onBlur={onBlur}
         inputRef={ref}
         phoneNumber={value?.phoneNumber}
