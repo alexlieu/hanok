@@ -161,11 +161,12 @@ export function Calendar<T extends DateValue>({
 }
 
 const chevron = tv({
-  base: "transition-transform duration-150 delay-125",
+  base: "transition-transform",
   variants: {
     direction: {
-      left: "group-hover:-translate-x-[0.1rem]",
-      right: "group-hover:translate-x-[0.1rem]",
+      left: "group-hover:animate-point-left-hover group-focus-visible:animate-point-left-hover group-pressed:translate-x-[-0.1rem]",
+      right:
+        "group-hover:animate-point-right-hover group-focus-visible:animate-point-right-hover group-pressed:translate-x-[0.1rem]",
     },
   },
 });

@@ -11,6 +11,18 @@
     --focus-glow-color: #bbdafa;
 }
 
+@keyframes point-left-hover {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-0.15rem); }
+    100% { transform: translateX(-0.1rem); }
+}
+
+@keyframes point-right-hover {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(0.15rem); }
+    100% { transform: translateX(0.1rem); }
+}
+
 @theme {
     --font-m-plus: "M PLUS Rounded 1c", "sans-serif";
     --font-dongle: Dongle, "sans-serif";
@@ -42,6 +54,9 @@
     --color-icon-pressed: #636172;
     --color-default-scrollbar-thumb: #C1BDC0;
     --color-checkbox-hover-bg: #dadada;
+
+    --animate-point-left-hover: point-left-hover 0.5s cubic-bezier(0.35, 0.91, 0.33, 0.97) forwards;
+    --animate-point-right-hover: point-right-hover 0.5s cubic-bezier(0.35, 0.91, 0.33, 0.97) forwards;
 }
 
 .form-error {
