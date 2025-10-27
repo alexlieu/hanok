@@ -10,6 +10,7 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @AtLeastOneRequired(fields = {"phoneNumber", "email"}, groups = {ValidationGroups.OrderChecks.class,
         ValidationGroups.FormatAndLogicChecks.class})
@@ -47,4 +48,17 @@ public record OrderRequestDto(
         LocalDate pickupDate
 
 ) implements Serializable {
+    // The JSON deserializer will call this canonical constructor, so that the data is normalised before the validation annotations are checked.
+    // This prevents "dirty" data from "dirty" requests.
+    public OrderRequestDto(String fullName, String customerId, String phoneNumber, String email, List<OrderItemRequestDto> orderItems, String specialInstructions, PaymentRequestDto payment, LocalDate pickupDate) {
+        this.fullName = Optional.ofNullable(fullName).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
+        this.customerId = Optional.ofNullable(customerId).map(String::trim).orElse(null);
+        this.phoneNumber = Optional.ofNullable(phoneNumber).map(s -> s.trim().replaceAll("[\\s\\-().]", ""))
+                .orElse(null);
+        this.email = Optional.ofNullable(email).map(String::trim).map(String::toLowerCase).orElse(null);
+        this.specialInstructions = Optional.ofNullable(specialInstructions).map(String::trim).orElse(null);
+        this.pickupDate = pickupDate;
+        this.orderItems = orderItems;
+        this.payment = payment;
+    }
 }

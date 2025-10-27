@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 public record CardDetailsRequestDto(
 
@@ -35,4 +36,11 @@ public record CardDetailsRequestDto(
         BillingAddressDto billingAddress
 
 ) implements Serializable {
+    public CardDetailsRequestDto(String cardNumber, String holderName, String expiration, String cvv, BillingAddressDto billingAddress) {
+        this.cardNumber = Optional.ofNullable(cardNumber).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
+        this.holderName = Optional.ofNullable(holderName).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
+        this.expiration = Optional.ofNullable(expiration).map(String::trim).orElse(null);
+        this.cvv = Optional.ofNullable(cvv).map(String::trim).orElse(null);
+        this.billingAddress = billingAddress;
+    }
 }

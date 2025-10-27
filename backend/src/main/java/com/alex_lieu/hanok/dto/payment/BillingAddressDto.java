@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 @ValidStateProvinceRegionDto(groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
 public record BillingAddressDto(
@@ -49,4 +50,21 @@ public record BillingAddressDto(
         String country
 
 ) implements Serializable {
+    private String normaliseString(String input) {
+        return Optional.ofNullable(input).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
+    }
+
+    private String normaliseCodeString(String input) {
+        return Optional.ofNullable(input).map(String::trim).map(String::toUpperCase).orElse(null);
+    }
+
+    public BillingAddressDto(String addressLine1, String addressLine2, String stateProvinceRegion, String county, String city, String postalCode, String country) {
+        this.addressLine1 = normaliseString(addressLine1);
+        this.addressLine2 = normaliseString(addressLine2);
+        this.stateProvinceRegion = normaliseString(stateProvinceRegion);
+        this.county = normaliseString(county);
+        this.city = normaliseString(city);
+        this.postalCode = normaliseCodeString(postalCode);
+        this.country = normaliseCodeString(country);
+    }
 }
