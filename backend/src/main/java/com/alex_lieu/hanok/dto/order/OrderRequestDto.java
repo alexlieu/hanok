@@ -16,7 +16,11 @@ import java.util.List;
 public record OrderRequestDto(
         @NotBlank(message = "{order.request.customer-name.not-blank}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.PreConditionChecks.class})
         @Size(min = 2, max = 100, message = "{order.request.customer-name.size}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "{order.request.customer-name.pattern}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        // \p{C} is a regex token that means any Unicode control character.
+        // This includes newlines, tabs, carriage returns, null bytes, and other invisible/non-printable characters.
+        // This is included in a minimal disallowed list as a security measure to prevent injection attacks against protocols and systems that use control characters as separators.
+        // We want to be as permissive as possible with names.
+        @Pattern(regexp = "^[^\\p{Cntrl}]+$", message = "{order.request.customer-name.pattern}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String fullName,
 
         @Positive(message = "{person.id.positive}", groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})

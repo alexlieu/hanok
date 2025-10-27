@@ -19,7 +19,7 @@ public record CardDetailsRequestDto(
 
         @NotBlank(message = "{card.holder-name.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
         @Size(min = 2, max = 100, message = "{card.holder-name.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' ]+$", message = "{card.holder-name.pattern}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
+        @Pattern(regexp = "^[^\\p{Cntrl}0-9]+$", message = "{card.holder-name.pattern}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String holderName,
 
         @NotBlank(message = "{card.request.expiry.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})

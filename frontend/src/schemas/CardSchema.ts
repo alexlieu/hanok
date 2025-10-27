@@ -83,7 +83,10 @@ export const CardSchema = z.object({
       { message: "Your card's expiration date is in the past." }
     ),
   cvv: z.string().regex(/^\d{3,4}$/, "CVV must be 3 or 4 digits"),
-  holderName: z.string().min(1, "Holder name is required"),
+  holderName: z
+    .string()
+    .min(1, "Holder name is required")
+    .transform((val) => val.trim().replace(/\s+/g, " ")),
 });
 
 export type CardInformation = z.infer<typeof CardSchema>;

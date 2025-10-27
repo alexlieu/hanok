@@ -45,7 +45,7 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
             name="holderName"
             control={control}
             render={({
-              field: { ref, ...field },
+              field: { onChange, onBlur, value, ref, ...field },
               fieldState: { invalid, error },
             }) => {
               const zodError = error?.message;
@@ -61,6 +61,12 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   className={"col-span-2"}
                   isInvalid={invalidState}
                   errorMessage={errorMessage}
+                  value={value}
+                  onChange={onChange}
+                  onBlur={() => {
+                    onChange(value?.trim().replace(/\s+/g, " "));
+                    onBlur();
+                  }}
                   {...field}
                 />
               );

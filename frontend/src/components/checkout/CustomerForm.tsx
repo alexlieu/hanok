@@ -49,7 +49,10 @@ const CustomerForm = () => {
                 inputRef={ref}
                 value={value}
                 onChange={onChange}
-                onBlur={onBlur}
+                onBlur={() => {
+                  onChange(value.trim().replace(/\s+/g, " "));
+                  onBlur();
+                }}
                 label="Full name"
                 maxLength={50}
                 isRequired

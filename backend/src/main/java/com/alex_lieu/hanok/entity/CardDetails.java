@@ -42,7 +42,7 @@ public class CardDetails {
 
     @NotBlank(message = "{card.holder-name.not-blank}")
     @Size(min = 2, max = 100, message = "{card.holder-name.size}")
-    @Pattern(regexp = "^(?!.*[0-9])(?=.*\\s)[\\p{L}\\p{M}\\p{Pd}' .]+$", message = "{card.holder-name.pattern}")
+    @Pattern(regexp = "^[^\\p{Cntrl}0-9]+$", message = "{card.holder-name.pattern}")
     private String holderName;
 
     @Valid

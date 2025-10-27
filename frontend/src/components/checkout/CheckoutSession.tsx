@@ -159,6 +159,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
             error.data.validationErrors
           );
           setServerErrors(transformedErrors);
+          console.log("Server errors: ", transformedErrors);
         }
       }
     }

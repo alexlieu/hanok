@@ -38,8 +38,8 @@ const CustomerFormSchema = z
     fullName: z
       .string()
       .min(2, { message: "Please provide your full name." })
-      .max(50)
-      .transform((val) => val.replace(/\s+/g, " ")),
+      .max(100)
+      .transform((val) => val.trim().replace(/\s+/g, " ")),
     email: z
       .email({ error: "Please provide a valid email address." })
       .optional()
