@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidExpiryDate {
-    String message() default "Card expiry date has already passed or is invalid";
+    String message() default "Card expiry date has already passed";
 
     Class<?>[] groups() default {};
 

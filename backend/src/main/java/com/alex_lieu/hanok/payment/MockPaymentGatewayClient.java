@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.YearMonth;
 import java.util.UUID;
 
 @Service
@@ -15,8 +16,7 @@ public class MockPaymentGatewayClient implements PaymentGatewayClient {
     public PaymentGatewayResponse processCardPayment(
             String cardNo,
             String cvv,
-            String expiryMonth,
-            String expiryYear,
+            YearMonth expiration,
             BigDecimal total,
             String currency
     ) {

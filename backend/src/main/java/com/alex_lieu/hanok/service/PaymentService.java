@@ -16,9 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 @Service
 public class PaymentService {
@@ -51,28 +48,18 @@ public class PaymentService {
         CardDetails persistableCardDetails = null;
         TokenizedPaymentDetails persistableTokenizedPaymentDetails = null;
         if (dto.paymentMethod().equals(PaymentMethod.CARD)) {
-            YearMonth expiryMonthYear;
             CardDetailsRequestDto cardDetailsRequestDto = dto.cardDetails();
-            try {
-                expiryMonthYear = YearMonth.parse(cardDetailsRequestDto.expiration(), DateTimeFormatter.ofPattern("MM/uu"));
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid expiry date format");
-            }
-            String expiryMonth = String.format("%02d", expiryMonthYear.getMonthValue());
-            String expiryYear = String.valueOf(expiryMonthYear.getYear());
             gatewayResponse = paymentGatewayClient.processCardPayment(
                     cardDetailsRequestDto.cardNumber().replace(" ", ""),
                     cardDetailsRequestDto.cvv(),
-                    expiryMonth,
-                    expiryYear,
+                    cardDetailsRequestDto.expiration(),
                     finalTotal,
                     "GBP"
             );
             persistableCardDetails = CardDetails.builder()
                     .lastFour(gatewayResponse.lastFourDigits())
                     .token(gatewayResponse.token())
-                    .expiryMonth(expiryMonth)
-                    .expiryYear(expiryYear)
+                    .expiration(cardDetailsRequestDto.expiration())
                     .holderName(cardDetailsRequestDto.holderName())
                     .billingAddress(convertToBillingAddress(dto.cardDetails().billingAddress()))
                     .build();

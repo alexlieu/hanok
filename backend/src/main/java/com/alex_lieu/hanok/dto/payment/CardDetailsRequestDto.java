@@ -2,6 +2,7 @@ package com.alex_lieu.hanok.dto.payment;
 
 import com.alex_lieu.hanok.validation.expiry_date.ValidExpiryDate;
 import com.alex_lieu.hanok.validation.groups.ValidationGroups;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.time.YearMonth;
 import java.util.Optional;
 
 public record CardDetailsRequestDto(
@@ -23,24 +25,27 @@ public record CardDetailsRequestDto(
         @Pattern(regexp = "^[^\\p{Cntrl}0-9]+$", message = "{card.holder-name.pattern}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String holderName,
 
-        @NotBlank(message = "{card.request.expiry.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
+        @NotNull(message = "{card.request.expiry.not-null}", groups = {ValidationGroups.PreConditionChecks.class, ValidationGroups.CardChecks.class})
         @ValidExpiryDate(groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        String expiration,
+        @JsonFormat(pattern = "MM/yy") // This tells Jackson that the incoming string is expected to be in MM/yy format and parse it into a YearMonth object
+        YearMonth expiration,
 
         @NotBlank(message = "{card.cvv.not-blank}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.PreConditionChecks.class})
         @Size(min = 3, max = 4, message = "{card.cvv.size}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         @Pattern(regexp = "^[0-9]+$", message = "{card.cvv.digits}", groups = {ValidationGroups.CardChecks.class, ValidationGroups.FormatAndLogicChecks.class})
         String cvv,
 
-        @Valid @NotNull(message = "{card.address.not-null}", groups = {ValidationGroups.CardChecks.class})
+        @Valid
+        @NotNull(message = "{card.address.not-null}", groups = {ValidationGroups.CardChecks.class})
         BillingAddressDto billingAddress
 
 ) implements Serializable {
-    public CardDetailsRequestDto(String cardNumber, String holderName, String expiration, String cvv, BillingAddressDto billingAddress) {
+    public CardDetailsRequestDto(String cardNumber, String holderName, YearMonth expiration, String cvv,
+                                 BillingAddressDto billingAddress) {
         this.cardNumber = Optional.ofNullable(cardNumber).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
         this.holderName = Optional.ofNullable(holderName).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
-        this.expiration = Optional.ofNullable(expiration).map(String::trim).orElse(null);
         this.cvv = Optional.ofNullable(cvv).map(String::trim).orElse(null);
+        this.expiration = expiration;
         this.billingAddress = billingAddress;
     }
 }
