@@ -1,9 +1,9 @@
 import { z } from "zod/v4";
 
-function luhnAlgorithm(cardNo: string) {
-  if (/^[0-9]*$/.test(cardNo.replace(/\D/g, "")) === false) return false;
-  const checkDigit = Number(cardNo[cardNo.length - 1]);
-  const payload = cardNo.substring(0, cardNo.length - 1).replace(/\D/g, "");
+function luhnAlgorithm(input: string) {
+  const cleanedInput = input.replace(/\D/g, "");
+  const checkDigit = Number(cleanedInput[cleanedInput.length - 1]);
+  const payload = cleanedInput.substring(0, cleanedInput.length - 1);
   const digitsReversed = payload.split("").reverse();
   let sum: number = 0;
   for (let step = 0; step < digitsReversed.length; step++) {
@@ -48,12 +48,15 @@ function validateBIN(cardNo: string) {
 }
 
 export const CardSchema = z.object({
-  cardNumber: z.string().refine(
-    (val) => {
-      return validateBIN(val) && luhnAlgorithm(val);
-    },
-    { message: "Your card number is invalid." }
-  ),
+  cardNumber: z
+    .string()
+    .refine(
+      (val) => {
+        return validateBIN(val) && luhnAlgorithm(val);
+      },
+      { message: "Your card number is invalid." }
+    )
+    .transform((val) => val.trim().replace(/\D/g, "")),
   expiration: z
     .string()
     .regex(
