@@ -42,7 +42,8 @@ const CustomerForm = () => {
             fieldState: { invalid, error },
           }) => {
             const zodError = error?.message;
-            const serverError = serverErrors.fullName?.[0]?.message;
+            const serverError =
+              serverErrors.validationErrors.fullName?.[0]?.message;
             const errorMessage = zodError || serverError;
             return (
               <TextField
@@ -71,7 +72,8 @@ const CustomerForm = () => {
             fieldState: { invalid, error },
           }) => {
             const zodError = error?.message;
-            const serverError = serverErrors.email?.[0]?.message;
+            const serverError =
+              serverErrors.validationErrors.email?.[0]?.message;
             const contactError = errors.contact?.message;
             const errorMessage = zodError || serverError || contactError;
             const invalidState = !!(invalid || serverError || contactError);
@@ -137,7 +139,8 @@ const CustomerForm = () => {
               fieldState: { invalid, error },
             }) => {
               const zodError = error?.message;
-              const serverError = serverErrors.pickupDate?.[0]?.message;
+              const serverError =
+                serverErrors.validationErrors.pickupDate?.[0]?.message;
               const errorMessage = zodError || serverError;
               const invalidState = !!(invalid || serverError);
               return (
@@ -167,7 +170,8 @@ const CustomerForm = () => {
             fieldState: { invalid, error },
           }) => {
             const zodError = error?.message;
-            const serverError = serverErrors.updatePreference?.[0]?.message;
+            const serverError =
+              serverErrors.validationErrors.updatePreference?.[0]?.message;
             const errorMessage = zodError || serverError;
             const invalidState = !!(invalid || serverError);
             return (

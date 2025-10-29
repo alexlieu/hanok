@@ -91,7 +91,7 @@ const BillingAddressForm = () => {
         fieldState: { invalid, error },
       }) => {
         const zodError = error?.message;
-        const serverError = serverErrors.country?.[0]?.message;
+        const serverError = serverErrors.validationErrors.country?.[0]?.message;
         const errorMessage = zodError || serverError;
         const invalidState = !!(invalid || serverError);
         return (
@@ -126,7 +126,7 @@ const BillingAddressForm = () => {
         fieldState: { invalid, error },
       }) => {
         const zodError = error?.message;
-        const serverError = serverErrors.city?.[0]?.message;
+        const serverError = serverErrors.validationErrors.city?.[0]?.message;
         const errorMessage = zodError || serverError;
         const invalidState = !!(invalid || serverError);
         return (
@@ -169,7 +169,8 @@ const BillingAddressForm = () => {
           fieldState: { invalid, error },
         }) => {
           const zodError = error?.message;
-          const serverError = serverErrors.stateProvinceRegion?.[0]?.message;
+          const serverError =
+            serverErrors.validationErrors.stateProvinceRegion?.[0]?.message;
           const errorMessage = zodError || serverError;
           const invalidState = !!(invalid || serverError);
           return (
@@ -212,7 +213,8 @@ const BillingAddressForm = () => {
         fieldState: { invalid, error },
       }) => {
         const zodError = error?.message;
-        const serverError = serverErrors.postalCode?.[0]?.message;
+        const serverError =
+          serverErrors.validationErrors.postalCode?.[0]?.message;
         const errorMessage = zodError || serverError;
         const invalidState = !!(invalid || serverError);
         return (
@@ -256,7 +258,8 @@ const BillingAddressForm = () => {
           fieldState: { invalid, error },
         }) => {
           const zodError = error?.message;
-          const serverError = serverErrors.addressLine1?.[0]?.message;
+          const serverError =
+            serverErrors.validationErrors.addressLine1?.[0]?.message;
           const errorMessage = zodError || serverError;
           const invalidState = !!(invalid || serverError);
           return (
@@ -282,7 +285,8 @@ const BillingAddressForm = () => {
           fieldState: { invalid, error },
         }) => {
           const zodError = error?.message;
-          const serverError = serverErrors.addressLine2?.[0]?.message;
+          const serverError =
+            serverErrors.validationErrors.addressLine2?.[0]?.message;
           const errorMessage = zodError || serverError;
           const invalidState = !!(invalid || serverError);
           return (
@@ -313,7 +317,8 @@ const BillingAddressForm = () => {
                 fieldState: { invalid, error },
               }) => {
                 const zodError = error?.message;
-                const serverError = serverErrors.county?.[0]?.message;
+                const serverError =
+                  serverErrors.validationErrors.county?.[0]?.message;
                 const errorMessage = zodError || serverError;
                 const invalidState = !!(invalid || serverError);
                 return (

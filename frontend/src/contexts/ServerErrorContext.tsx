@@ -1,6 +1,12 @@
 import { createContext } from "react";
-import { ValidationError } from "../types/order.types";
+import { CodedError, ValidationError } from "../types/order.types";
 
-export type ServerErrorState = Record<string, ValidationError[]>;
+export type ServerErrorState = {
+  validationErrors: Record<string, ValidationError[]>;
+  codedError: CodedError | null;
+};
 
-export const ServerErrorContext = createContext<ServerErrorState>({});
+export const ServerErrorContext = createContext<ServerErrorState>({
+  validationErrors: {},
+  codedError: null,
+});

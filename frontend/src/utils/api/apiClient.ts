@@ -1,5 +1,5 @@
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
-import { ValidationError } from "../../types/order.types";
+import { CodedError, ValidationError } from "../../types/order.types";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
@@ -64,7 +64,7 @@ export const api = {
   ) => apiClient<T>(endpoint, { ...config, method: "POST", body }),
 };
 
-export const transformBackendErrors = (
+export const transformValidationBackendErrors = (
   serverErrors: Record<string, ValidationError[]>
 ) => {
   const transformed: Record<string, ValidationError[]> = {};
@@ -76,7 +76,7 @@ export const transformBackendErrors = (
   return transformed;
 };
 
-export function isBackendError(data: unknown): data is {
+export function isValidationBackendError(data: unknown): data is {
   validationErrors: Record<
     string,
     Array<{
@@ -92,4 +92,9 @@ export function isBackendError(data: unknown): data is {
   return (
     typeof errors === "object" && errors !== null && !Array.isArray(errors)
   );
+}
+
+export function isCodedBackendError(data: unknown): data is CodedError {
+  if (typeof data !== "object" || data === null) return false;
+  return "code" in data && !("validationErrors" in data);
 }

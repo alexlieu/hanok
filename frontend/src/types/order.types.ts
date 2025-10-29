@@ -87,6 +87,16 @@ export interface ValidationError {
   parameters: Record<string, unknown>;
 }
 
+export interface CodedError {
+  timestamp: string;
+  status: string;
+  statusCode: number;
+  error: string;
+  message: string;
+  path: string;
+  code: string;
+}
+
 export interface BackendErrorResponse {
   timestamp: string;
   status: string;

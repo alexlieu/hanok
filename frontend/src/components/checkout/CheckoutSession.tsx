@@ -21,15 +21,17 @@ import OrderSummary from "./OrderSummary";
 import { Form } from "react-aria-components";
 import CheckoutForm from "./CheckoutForm";
 import { twMerge } from "tailwind-merge";
-import { OrderRequest, ValidationError } from "../../types/order.types";
+import { CodedError, OrderRequest } from "../../types/order.types";
 import { PaymentMethod as ApiPaymentMethod } from "../../types/order.types";
 import { createOrder } from "../../services/order.service";
 import {
   ApiError,
-  isBackendError,
-  transformBackendErrors,
+  isCodedBackendError,
+  isValidationBackendError,
+  transformValidationBackendErrors,
 } from "../../utils/api/apiClient";
 import { ServerErrorProvider } from "../../contexts/ServerErrorProvider";
+import { ServerErrorState } from "../../contexts/ServerErrorContext";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -98,14 +100,21 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
 
   const { handleSubmit } = methods;
 
-  const [serverErrors, setServerErrors] = useState<
-    Record<string, ValidationError[]>
-  >({});
+  const [serverErrors, setServerErrors] = useState<ServerErrorState>({
+    validationErrors: {},
+    codedError: null,
+  });
+
+  const clearServerErrors = () => {
+    setServerErrors({
+      validationErrors: {},
+      codedError: null,
+    });
+  };
 
   const onSubmit: SubmitHandler<CheckoutFormValues> = async (
     data: CheckoutFormValues
   ) => {
-    setServerErrors({});
     const payload: OrderRequest = {
       fullName: data.fullName,
       email: data.email || undefined,
@@ -152,14 +161,26 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
         payload.payment.paymentMethod
       );
       console.log("Order created successfully: ", response);
+      clearServerErrors();
     } catch (error) {
       if (error instanceof ApiError) {
-        if (isBackendError(error.data)) {
-          const transformedErrors = transformBackendErrors(
+        console.log(error);
+        if (isValidationBackendError(error.data)) {
+          const transformedErrors = transformValidationBackendErrors(
             error.data.validationErrors
           );
-          setServerErrors(transformedErrors);
+          setServerErrors((prev) => ({
+            ...prev,
+            validationErrors: transformedErrors,
+          }));
           console.log("Server errors: ", transformedErrors);
+        }
+        if (isCodedBackendError(error.data)) {
+          setServerErrors((prev) => ({
+            ...prev,
+            codedError: error.data as CodedError,
+          }));
+          console.log("Coded error: ", error.data);
         }
       }
     }

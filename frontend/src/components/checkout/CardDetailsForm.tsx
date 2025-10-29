@@ -11,6 +11,7 @@ import { FaRegCreditCard } from "react-icons/fa6";
 import { LuCircleX } from "react-icons/lu";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
+import { BACKEND_ERROR_CODES } from "../../constants/errorCodes";
 
 interface CardDetailsFormProps {
   issuingBank: issuingBank;
@@ -41,6 +42,24 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
           Card details
         </legend>
         <div className="grid grid-cols-2 gap-3">
+          {serverErrors.codedError?.code ===
+            BACKEND_ERROR_CODES.INSUFFICIENT_FUNDS && (
+            <AnimatePresence>
+              <motion.p
+                className="col-span-2 text-error-red text-sm"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1, x: [0, -1, 1, -1, 1, 0] },
+                  exit: { opacity: 0 },
+                }}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                {serverErrors.codedError.message}
+              </motion.p>
+            </AnimatePresence>
+          )}
           <Controller
             name="holderName"
             control={control}
@@ -49,7 +68,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
               fieldState: { invalid, error },
             }) => {
               const zodError = error?.message;
-              const serverError = serverErrors.holderName?.[0]?.message;
+              const serverError =
+                serverErrors.validationErrors.holderName?.[0]?.message;
               const errorMessage = zodError || serverError;
               const invalidState = !!(invalid || serverError);
               return (
@@ -102,7 +122,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                 onChange(formattedInput);
               };
               const zodError = error?.message;
-              const serverError = serverErrors.cardNumber?.[0]?.message;
+              const serverError =
+                serverErrors.validationErrors.cardNumber?.[0]?.message;
               const errorMessage = zodError || serverError;
               const invalidState = !!(invalid || serverError);
               return (
@@ -216,7 +237,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                 onChange(finalValue);
               };
               const zodError = error?.message;
-              const serverError = serverErrors.expiration?.[0]?.message;
+              const serverError =
+                serverErrors.validationErrors.expiration?.[0]?.message;
               const errorMessage = zodError || serverError;
               const invalidState = !!(invalid || serverError);
               return (
@@ -247,7 +269,8 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                 onChange(rawInput.replace(/\D/g, ""));
               };
               const zodError = error?.message;
-              const serverError = serverErrors.cvv?.[0]?.message;
+              const serverError =
+                serverErrors.validationErrors.cvv?.[0]?.message;
               const errorMessage = zodError || serverError;
               const invalidState = !!(invalid || serverError);
               return (
