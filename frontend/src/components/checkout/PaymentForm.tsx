@@ -14,55 +14,23 @@ import Amex from "../../assets/checkout_logos/amex.svg?react";
 import Paypal from "../../assets/checkout_logos/payment-types/paypal-logo-alternative.svg?react";
 import Apple from "../../assets/checkout_logos/payment-types/apple-pay-logo.svg?react";
 import Google from "../../assets/checkout_logos/payment-types/google-pay-logo.svg?react";
-import { LayoutGroup, motion, Variants } from "motion/react";
+import { LayoutGroup, motion, Transition, Variants } from "motion/react";
 import { getIssuingBank } from "../../schemas/CardSchema";
 import { allLogos, getActiveCards } from "../../utils/cardUtils";
 import { tv } from "tailwind-variants";
 
-const disclosureGroupVariants = tv({
-  base: "border-x-2 border-x-brand-colour-5 border-y-2 border-y-transparent transition-[border-radius] transition-colors -my-[0.2rem] data-[expanded=false]:hover:bg-brand-colour-1/10 data-[expanded=false]:hover:border-brand-colour-1",
-  variants: {
-    isExpanded: { true: "border-2 border-brand-colour-5 my-5" },
-    isAboveExpanded: {
-      true: "border-b-2 border-t-2 border-b-brand-colour-5 border-t-transparent",
-    },
-    isBelowExpanded: {
-      true: "border-t-2 border-b-2 border-t-brand-colour-5 border-b-transparent",
-    },
-    isTop: {
-      true: "border-t-2 border-b-2 border-t-brand-colour-5 border-b-transparent",
-    },
-    isBottom: {
-      true: "border-b-2 border-t-2 border-b-brand-colour-5 border-t-transparent",
-    },
+const panelTransition: Transition = {
+  default: {
+    type: "spring",
+    stiffness: 400,
+    damping: 15,
+    mass: 1,
+    delay: 0.05,
   },
-  compoundVariants: [
-    {
-      isTop: true,
-      isAboveExpanded: true,
-      className: "border-2 border-t-brand-colour-5 border-b-brand-colour-5",
-    },
-    {
-      isBottom: true,
-      isBelowExpanded: true,
-      className: "border-2 border-t-brand-colour-5 border-b-brand-colour-5",
-    },
-    {
-      isTop: true,
-      isExpanded: true,
-      className:
-        "border-2 border-t-brand-colour-5 border-b-brand-colour-5 mt-0",
-    },
-    {
-      isBottom: true,
-      isExpanded: true,
-      className:
-        "border-2 border-t-brand-colour-5 border-b-brand-colour-5 mb-0",
-    },
-  ],
-});
+};
 
-const getBorderRadius = ({
+// Helper function to get animated border styles (similar to Tailwind Variants)
+const getAnimatedBorderStyle = ({
   isExpanded,
   isAboveExpanded,
   isBelowExpanded,
@@ -75,23 +43,73 @@ const getBorderRadius = ({
   isTop: boolean;
   isBottom: boolean;
 }) => {
-  const roundedVal = "0.75rem"; // 0.75 rem is xl value
-  const rounded = roundedVal;
-  const rounded_t = `${roundedVal} ${roundedVal} 0 0`;
-  const rounded_b = `0 0 ${roundedVal} ${roundedVal}`;
+  const roundedVal = "0.5rem"; // 0.75rem
+  const defaultBackgroundColor = "#e8e8e8";
+
   if (isExpanded) {
-    return rounded;
+    return {
+      borderTopLeftRadius: roundedVal,
+      borderTopRightRadius: roundedVal,
+      borderBottomRightRadius: roundedVal,
+      borderBottomLeftRadius: roundedVal,
+      backgroundColor: defaultBackgroundColor,
+    };
   }
+
+  let borderTopLeft = "0px";
+  let borderTopRight = "0px";
+  let borderBottomRight = "0px";
+  let borderBottomLeft = "0px";
+
   if ((isTop && isAboveExpanded) || (isBottom && isBelowExpanded)) {
-    return rounded;
+    borderTopLeft = roundedVal;
+    borderTopRight = roundedVal;
+    borderBottomRight = roundedVal;
+    borderBottomLeft = roundedVal;
+  } else if (isTop || isBelowExpanded) {
+    borderTopLeft = roundedVal;
+    borderTopRight = roundedVal;
+  } else if (isBottom || isAboveExpanded) {
+    borderBottomRight = roundedVal;
+    borderBottomLeft = roundedVal;
   }
-  if (isTop || isBelowExpanded) {
-    return rounded_t;
+
+  return {
+    borderTopLeftRadius: borderTopLeft,
+    borderTopRightRadius: borderTopRight,
+    borderBottomRightRadius: borderBottomRight,
+    borderBottomLeftRadius: borderBottomLeft,
+    backgroundColor: defaultBackgroundColor,
+  };
+};
+
+const getMarginStyles = ({
+  isExpanded,
+  isAboveExpanded,
+  isBelowExpanded,
+  isTop,
+  isBottom,
+}: {
+  isExpanded: boolean;
+  isAboveExpanded: boolean;
+  isBelowExpanded: boolean;
+  isTop: boolean;
+  isBottom: boolean;
+}) => {
+  if (isExpanded) {
+    return {
+      marginTop: isTop ? 0 : 10,
+      marginBottom: isBottom ? 0 : 10,
+    };
   }
-  if (isBottom || isAboveExpanded) {
-    return rounded_b;
-  }
-  return "0px";
+  const showTop = isTop || isBelowExpanded;
+  const showBottom = isBottom || isAboveExpanded;
+  const marginTop = showTop ? 0 : -2;
+  const marginBottom = showBottom ? 0 : -2;
+  return {
+    marginTop,
+    marginBottom,
+  };
 };
 
 const PaymentForm = () => {
@@ -136,7 +154,6 @@ const PaymentForm = () => {
           <DisclosureRadioGroup
             onChange={onChange}
             value={value}
-            className=""
             isRequired={true}
             aria-label="Payment Method"
             inputRef={ref}
@@ -150,7 +167,14 @@ const PaymentForm = () => {
                   expandedIndex !== -1 && index === expandedIndex + 1;
                 const isTop = index === 0;
                 const isBottom = index === PAYMENT_METHODS.length - 1;
-                const borderRadius = getBorderRadius({
+                const borderStyle = getAnimatedBorderStyle({
+                  isExpanded,
+                  isAboveExpanded,
+                  isBelowExpanded,
+                  isTop,
+                  isBottom,
+                });
+                const marginStyles = getMarginStyles({
                   isExpanded,
                   isAboveExpanded,
                   isBelowExpanded,
@@ -159,32 +183,18 @@ const PaymentForm = () => {
                 });
                 return (
                   <motion.div
-                    data-expanded={isExpanded}
-                    layout
-                    className={disclosureGroupVariants({
-                      isExpanded,
-                      isAboveExpanded,
-                      isBelowExpanded,
-                      isTop,
-                      isBottom,
-                    })}
-                    style={{ borderRadius }}
-                    transition={{
-                      layout: {
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 15,
-                      },
-                    }}
+                    key={value}
+                    initial={false}
+                    layout="position"
+                    animate={borderStyle}
+                    transition={panelTransition}
+                    style={marginStyles}
                   >
                     <DisclosureRadio
                       className={`${
-                        isExpanded
-                          ? "border-b-2 border-b-brand-colour-5"
-                          : "text-brand-colour-5"
-                      } py-2 px-3 rounded-t-xl`}
+                        isExpanded ? "bg-[#dbdbdb]" : "text-brand-colour-5"
+                      } py-2 px-3 rounded-t-[0.5rem]`}
                       value={value}
-                      key={value}
                       panelContent={
                         value === "card" ? (
                           <div className="space-y-6 px-5 py-7">

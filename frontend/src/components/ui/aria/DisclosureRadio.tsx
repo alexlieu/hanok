@@ -21,6 +21,7 @@ import { twMerge } from "tailwind-merge";
 import { SelectIndicatorIcon } from "../icons/SelectIndicatorIcon";
 import { createNoFocusLabel } from "./utils/createLabel";
 import { RefCallBack } from "react-hook-form";
+import { Transition } from "framer-motion";
 
 const DisclosureRadioContext = createContext<RadioRenderProps | null>(null);
 const DisclosureRadioGroupInteractionContext = createContext<boolean>(false);
@@ -29,6 +30,7 @@ interface DisclosureRadioProps extends Omit<AriaRadioProps, "className"> {
   children: ReactNode;
   panelContent?: ReactNode;
   className?: string;
+  panelTransition?: Transition;
 }
 
 export const DisclosureRadio = (props: DisclosureRadioProps) => {
@@ -48,7 +50,10 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
         </div>
       </div>
       {props.panelContent && (
-        <DisclosureRadioPanel isExpanded={isSelected}>
+        <DisclosureRadioPanel
+          isExpanded={isSelected}
+          transition={props.panelTransition}
+        >
           {props.panelContent}
         </DisclosureRadioPanel>
       )}
@@ -89,12 +94,17 @@ interface DisclosureRadioPanelProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   scrollIntoView?: boolean;
   isExpanded: boolean;
+  transition?: Transition;
 }
 
 const DisclosureRadioPanel = ({
   children,
   scrollIntoView = true,
   isExpanded,
+  transition = {
+    ease: "easeOut",
+    duration: 0.3,
+  },
   ...props
 }: DisclosureRadioPanelProps) => {
   const hasUserInteracted = useContext(DisclosureRadioGroupInteractionContext);
@@ -133,9 +143,7 @@ const DisclosureRadioPanel = ({
         opacity: isExpanded ? 1 : 0,
         pointerEvents: isExpanded ? "auto" : "none",
       }}
-      transition={{
-        height: { duration: 0.3, ease: "easeInOut" },
-      }}
+      transition={transition}
       initial={
         isInitialRender.current && isExpanded
           ? false
