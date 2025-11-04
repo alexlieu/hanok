@@ -132,6 +132,25 @@ const DisclosureRadioPanel = ({
     isInitialRender.current = false;
   }, []);
 
+  const { onKeyDown: propsOnKeyDown, ...restProps } = props;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Stop arrow key events from bubbling to RadioGroup when they originate from text inputs
+    // This prevents the RadioGroup interpreting arrow keys as navigation commands when focused on a text input.
+    if (
+      (e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown") &&
+      (e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement)
+    ) {
+      e.stopPropagation();
+    }
+    // Call any existing onKeyDown handler from props
+    propsOnKeyDown?.(e);
+  };
+
   return (
     <motion.div
       ref={panelRef}
@@ -157,8 +176,9 @@ const DisclosureRadioPanel = ({
       }
     >
       <div
-        {...props}
+        {...restProps}
         className={twMerge(props.className, `py-2 px-[var(--x-offset)]`)}
+        onKeyDown={handleKeyDown}
       >
         {children}
       </div>
