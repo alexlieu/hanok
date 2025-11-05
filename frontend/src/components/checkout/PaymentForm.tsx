@@ -197,14 +197,10 @@ const PaymentForm = () => {
                     style={marginStyles}
                   >
                     <DisclosureRadio
-                      className={`${
-                        isExpanded ? "bg-[#dbdbdb]" : "text-brand-colour-5"
-                      } py-2 px-3 rounded-t-[0.5rem]`}
                       value={value}
                       panelContent={
                         value === "card" ? (
-                          <div className={`space-y-6 px-5 pt-3 pb-7`}>
-                            {/* rounded-sm shadow-sm border border-gray-200 */}
+                          <div className="px-5 pt-3 pb-7 space-y-6">
                             <CardDetailsForm
                               issuingBank={issuingBank}
                               activeCards={activeCards}
@@ -229,6 +225,11 @@ const PaymentForm = () => {
                       }
                     >
                       <DisclosureRadioHeader
+                        className={`py-2 px-3 rounded-t-[0.5rem] ${
+                          isExpanded
+                            ? "bg-[#dbdbdb] border-b-2 border-b-brand-colour-5/30"
+                            : "text-brand-colour-5"
+                        }`}
                         rightSlot={() => {
                           const logoStyles = tv({
                             base: "h-[1.25rem] w-auto",

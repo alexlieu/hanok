@@ -21,7 +21,7 @@ import { twMerge } from "tailwind-merge";
 import { SelectIndicatorIcon } from "../icons/SelectIndicatorIcon";
 import { createNoFocusLabel } from "./utils/createLabel";
 import { RefCallBack } from "react-hook-form";
-import { Transition } from "framer-motion";
+import { Transition, Variants } from "framer-motion";
 
 const DisclosureRadioContext = createContext<RadioRenderProps | null>(null);
 const DisclosureRadioGroupInteractionContext = createContext<boolean>(false);
@@ -64,29 +64,61 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
 interface DisclosureRadioHeaderProps {
   children: ReactNode;
   rightSlot?: () => ReactNode | ReactNode;
+  className?: string;
 }
+
+const headerVariant: Variants = {
+  normal: {
+    x: 0,
+  },
+  hover: (isSelected: boolean) => ({
+    x: isSelected ? 0 : 3,
+  }),
+};
+
+const headerTransition: Transition = {
+  type: "spring",
+  stiffness: 500,
+  damping: 20,
+};
 
 export const DisclosureRadioHeader = ({
   children,
   rightSlot,
+  className,
 }: DisclosureRadioHeaderProps) => {
   const { isSelected, isDisabled } = useContext(DisclosureRadioContext) ?? {};
   return (
-    <div className="flex gap-2 items-center w-full">
-      <SelectIndicatorIcon
-        isSelected={!!isSelected}
-        isDisabled={isDisabled}
-        className={twMerge([
-          "w-[1rem] h-[1rem]",
-          "group-focus-visible:outline-transparent group-focus-visible:ring-2",
-          "group-focus-visible:ring-brand-focus group-focus-visible:ring-offset-2 transition-shadow",
-        ])}
-      />
-      <div className="flex items-center justify-between w-full">
-        {children}
+    <motion.div
+      className={twMerge("flex gap-2 items-center w-full", className)}
+      whileHover={"hover"}
+    >
+      <motion.span
+        variants={headerVariant}
+        transition={headerTransition}
+        custom={!!isSelected}
+      >
+        <SelectIndicatorIcon
+          isSelected={!!isSelected}
+          isDisabled={isDisabled}
+          className={twMerge([
+            "w-[1rem] h-[1rem]",
+            "group-focus-visible:outline-transparent group-focus-visible:ring-2",
+            "group-focus-visible:ring-brand-focus group-focus-visible:ring-offset-2 transition-shadow",
+          ])}
+        />
+      </motion.span>
+      <motion.span className="flex items-center justify-between w-full">
+        <motion.span
+          variants={headerVariant}
+          transition={headerTransition}
+          custom={!!isSelected}
+        >
+          {children}
+        </motion.span>
         {rightSlot && rightSlot()}
-      </div>
-    </div>
+      </motion.span>
+    </motion.div>
   );
 };
 
