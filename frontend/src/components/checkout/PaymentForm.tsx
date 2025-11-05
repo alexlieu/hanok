@@ -153,14 +153,14 @@ const PaymentForm = () => {
         name="paymentMethod"
         control={control}
         render={({ field: { onChange, value, ref } }) => (
-          <DisclosureRadioGroup
-            onChange={onChange}
-            value={value}
-            isRequired={true}
-            aria-label="Payment Method"
-            inputRef={ref}
-          >
-            <LayoutGroup>
+          <LayoutGroup id="payment-methods-group">
+            <DisclosureRadioGroup
+              onChange={onChange}
+              value={value}
+              isRequired={true}
+              aria-label="Payment Method"
+              inputRef={ref}
+            >
               {PAYMENT_METHODS.map(({ value, label }, index) => {
                 const isExpanded = expandedIndex === index;
                 const isAboveExpanded =
@@ -188,6 +188,7 @@ const PaymentForm = () => {
                     key={value}
                     initial={false}
                     layout="position"
+                    layoutDependency={expandedIndex}
                     animate={borderStyle}
                     transition={panelTransition}
                     style={marginStyles}
@@ -277,8 +278,8 @@ const PaymentForm = () => {
                   </motion.div>
                 );
               })}
-            </LayoutGroup>
-          </DisclosureRadioGroup>
+            </DisclosureRadioGroup>
+          </LayoutGroup>
         )}
       />
     </fieldset>
