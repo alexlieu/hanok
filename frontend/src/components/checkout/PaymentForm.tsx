@@ -23,8 +23,8 @@ const panelTransition: Transition = {
   default: {
     type: "spring",
     stiffness: 400,
-    damping: 15,
-    mass: 1,
+    damping: 25,
+    mass: 1.7,
     delay: 0.05,
   },
 };
@@ -43,7 +43,7 @@ const getAnimatedBorderStyle = ({
   isTop: boolean;
   isBottom: boolean;
 }) => {
-  const roundedVal = "0.5rem"; // 0.75rem
+  const roundedVal = "0.5rem";
   const defaultBackgroundColor = "#e8e8e8";
 
   if (isExpanded) {
@@ -53,6 +53,7 @@ const getAnimatedBorderStyle = ({
       borderBottomRightRadius: roundedVal,
       borderBottomLeftRadius: roundedVal,
       backgroundColor: defaultBackgroundColor,
+      x: 5,
     };
   }
 
@@ -80,6 +81,7 @@ const getAnimatedBorderStyle = ({
     borderBottomRightRadius: borderBottomRight,
     borderBottomLeftRadius: borderBottomLeft,
     backgroundColor: defaultBackgroundColor,
+    x: 0,
   };
 };
 
@@ -197,7 +199,7 @@ const PaymentForm = () => {
                       value={value}
                       panelContent={
                         value === "card" ? (
-                          <div className="space-y-6 px-5 py-7">
+                          <div className={`space-y-6 px-5 pt-3 pb-7`}>
                             {/* rounded-sm shadow-sm border border-gray-200 */}
                             <CardDetailsForm
                               issuingBank={issuingBank}

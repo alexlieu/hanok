@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import {
   CheckoutFormValues,
   createCheckoutSchema,
@@ -32,6 +32,7 @@ import {
 } from "../../utils/api/apiClient";
 import { ServerErrorProvider } from "../../contexts/ServerErrorProvider";
 import { ServerErrorState } from "../../contexts/ServerErrorContext";
+// import { TEST_CHECKOUT_FORM_VALUES } from "../../constants/testData";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -96,6 +97,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
     reValidateMode: "onChange",
     criteriaMode: "all",
     defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
+    // defaultValues: TEST_CHECKOUT_FORM_VALUES,
   });
 
   const { handleSubmit } = methods;
@@ -103,12 +105,18 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
   const [serverErrors, setServerErrors] = useState<ServerErrorState>({
     validationErrors: {},
     codedError: null,
+    playErrorAnimation: false,
   });
+
+  const handleErrorAnimationComplete = useCallback(() => {
+    setServerErrors((prev) => ({ ...prev, playErrorAnimation: false }));
+  }, []);
 
   const clearServerErrors = () => {
     setServerErrors({
       validationErrors: {},
       codedError: null,
+      playErrorAnimation: false,
     });
   };
 
@@ -172,6 +180,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
           setServerErrors((prev) => ({
             ...prev,
             validationErrors: transformedErrors,
+            playErrorAnimation: true,
           }));
           console.log("Server errors: ", transformedErrors);
         }
@@ -179,6 +188,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
           setServerErrors((prev) => ({
             ...prev,
             codedError: error.data as CodedError,
+            playErrorAnimation: true,
           }));
           console.log("Coded error: ", error.data);
         }
@@ -193,7 +203,12 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
   };
 
   return (
-    <ServerErrorProvider value={serverErrors}>
+    <ServerErrorProvider
+      value={{
+        ...serverErrors,
+        onErrorAnimationComplete: handleErrorAnimationComplete,
+      }}
+    >
       <FormProvider {...methods}>
         <div
           className={twMerge(

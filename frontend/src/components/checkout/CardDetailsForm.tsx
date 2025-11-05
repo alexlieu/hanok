@@ -12,6 +12,7 @@ import { LuCircleX } from "react-icons/lu";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 import { BACKEND_ERROR_CODES } from "../../constants/errorCodes";
+import ServerErrorMessage from "../ui/ServerErrorMessage";
 
 interface CardDetailsFormProps {
   issuingBank: issuingBank;
@@ -35,31 +36,24 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
     setIsInitialMount(false);
   }, []);
 
+  const showCardError =
+    serverErrors.codedError?.code === BACKEND_ERROR_CODES.INSUFFICIENT_FUNDS ||
+    serverErrors.codedError?.code ===
+      BACKEND_ERROR_CODES.TOKEN_PROCESSING_FAILED ||
+    serverErrors.codedError?.code ===
+      BACKEND_ERROR_CODES.PAYMENT_METHOD_NOT_SUPPORTED;
+
   return (
     <>
       <fieldset>
         <legend title="Card details" className="sr-only">
           Card details
         </legend>
+        <ServerErrorMessage
+          show={showCardError}
+          message={serverErrors.codedError?.message}
+        />
         <div className="grid grid-cols-2 gap-3">
-          {serverErrors.codedError?.code ===
-            BACKEND_ERROR_CODES.INSUFFICIENT_FUNDS && (
-            <AnimatePresence>
-              <motion.p
-                className="col-span-2 text-error-red text-sm"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: { opacity: 1, x: [0, -1, 1, -1, 1, 0] },
-                  exit: { opacity: 0 },
-                }}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-              >
-                {serverErrors.codedError.message}
-              </motion.p>
-            </AnimatePresence>
-          )}
           <Controller
             name="holderName"
             control={control}
