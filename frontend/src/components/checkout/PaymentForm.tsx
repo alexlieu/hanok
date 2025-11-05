@@ -18,6 +18,8 @@ import { LayoutGroup, motion, Transition, Variants } from "motion/react";
 import { getIssuingBank } from "../../schemas/CardSchema";
 import { allLogos, getActiveCards } from "../../utils/cardUtils";
 import { tv } from "tailwind-variants";
+import TokenPaymentIcon from "../ui/icons/TokenPaymentIcon";
+import { useWindowDimensions } from "../../utils/hooks/useWindowDimensions";
 
 const panelTransition: Transition = {
   default: {
@@ -115,6 +117,7 @@ const getMarginStyles = ({
 };
 
 const PaymentForm = () => {
+  const { width: windowWidth } = useWindowDimensions();
   const { control, clearErrors } = useFormContext();
   const paymentMethod = useWatch({ name: "paymentMethod", control });
   const expandedIndex = PAYMENT_METHODS.findIndex(
@@ -209,9 +212,18 @@ const PaymentForm = () => {
                             <BillingAddressForm />
                           </div>
                         ) : (
-                          <div className="px-5 py-7">
-                            You're pure, you're kind, mature, divine. <br /> You
-                            might be too good for me, unattainble.
+                          <div className="py-3">
+                            <TokenPaymentIcon
+                              className={`m-auto ${
+                                windowWidth < 1023 && windowWidth > 767
+                                  ? "-scale-x-100 w-1/2"
+                                  : "w-1/3"
+                              }`}
+                            />
+                            <p className="text-center mt-4">
+                              Click "Pay with {value}" to complete your
+                              purchase.
+                            </p>
                           </div>
                         )
                       }
