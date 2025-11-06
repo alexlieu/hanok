@@ -1,15 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
+
+interface Dimensions {
+  width: number;
+  height: number;
+}
 
 export const useWindowDimensions = () => {
-  const [dimensions, setDimensions] = useState({
+  const [dimensions, setDimensions] = useState<Dimensions>({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  useEffect(() => {
-    const handleResize = () => {
+  useLayoutEffect(() => {
+    function handleResize() {
       setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    };
+    }
     window.addEventListener("resize", handleResize);
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   return dimensions;

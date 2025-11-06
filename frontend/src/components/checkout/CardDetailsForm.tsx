@@ -13,6 +13,11 @@ import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 import { BACKEND_ERROR_CODES } from "../../constants/errorCodes";
 import ServerErrorMessage from "../ui/ServerErrorMessage";
+import { useWindowDimensions } from "../../utils/hooks/useWindowDimensions";
+import {
+  CARD_SVG_BOUNDARIES,
+  PAYMENT_STACK_BOUNDARIES,
+} from "../../constants/windowBoundaries";
 
 interface CardDetailsFormProps {
   issuingBank: issuingBank;
@@ -23,6 +28,13 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
   issuingBank,
   activeCards,
 }) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const singleColumn =
+    windowWidth <= PAYMENT_STACK_BOUNDARIES.upper &&
+    windowWidth >= PAYMENT_STACK_BOUNDARIES.lower;
+  const hideCardSvg =
+    windowWidth <= CARD_SVG_BOUNDARIES.upper &&
+    windowWidth >= CARD_SVG_BOUNDARIES.lower;
   const { control } = useFormContext<CheckoutFormValues>();
   const serverErrors = useServerErrors();
 
@@ -153,27 +165,38 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                         transition: { duration: duration },
                       },
                     };
+                    const invalidCardSvg = (
+                      <motion.span
+                        className="absolute flex justify-center items-center right-3 top-0 h-full"
+                        key="invalid"
+                        variants={logoVariants}
+                        initial={isInitialMount ? false : "hidden"}
+                        animate="visible"
+                        exit="exit"
+                      >
+                        <FaRegCreditCard
+                          fill="var(--color-error-red)"
+                          className="scale-150 relative"
+                        />
+                        <LuCircleX
+                          stroke="var(--color-error-red)"
+                          strokeWidth={3}
+                          className="absolute scale-70 bg-default-bg rounded-full -right-2 bottom-1"
+                        />
+                      </motion.span>
+                    );
+                    const showInvalidSvg = invalid && value === "";
                     return (
                       <AnimatePresence mode="wait">
-                        {invalid && value === "" ? (
-                          <motion.span
-                            className="absolute flex justify-center items-center right-3 top-0 h-full"
-                            key="invalid"
-                            variants={logoVariants}
-                            initial={isInitialMount ? false : "hidden"}
-                            animate="visible"
-                            exit="exit"
-                          >
-                            <FaRegCreditCard
-                              fill="var(--color-error-red)"
-                              className="scale-150 relative"
-                            />
-                            <LuCircleX
-                              stroke="var(--color-error-red)"
-                              strokeWidth={3}
-                              className="absolute scale-70 bg-default-bg rounded-full -right-2 bottom-1"
-                            />
-                          </motion.span>
+                        // The card SVGs are hidden when the window width is
+                        less than 900px so that it doesn't overlap with the text
+                        in the input field.
+                        {hideCardSvg ? (
+                          showInvalidSvg ? (
+                            invalidCardSvg
+                          ) : undefined
+                        ) : showInvalidSvg ? (
+                          invalidCardSvg
                         ) : (
                           <motion.ul
                             className="flex flex-row justify-center items-center h-full gap-3 absolute top-0 right-2"
@@ -248,6 +271,7 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   maxLength={5}
                   isInvalid={invalidState}
                   errorMessage={errorMessage}
+                  className={singleColumn ? "col-span-2" : "col-span-1"}
                 />
               );
             }}
@@ -280,6 +304,7 @@ const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
                   maxLength={4}
                   isInvalid={invalidState}
                   errorMessage={errorMessage}
+                  className={singleColumn ? "col-span-2" : "col-span-1"}
                 />
               );
             }}

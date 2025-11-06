@@ -20,6 +20,7 @@ import { allLogos, getActiveCards } from "../../utils/cardUtils";
 import { tv } from "tailwind-variants";
 import TokenPaymentIcon from "../ui/icons/TokenPaymentIcon";
 import { useWindowDimensions } from "../../utils/hooks/useWindowDimensions";
+import { WINDOW_BOUNDARIES } from "../../constants/windowBoundaries";
 
 const panelTransition: Transition = {
   default: {
@@ -38,15 +39,18 @@ const getAnimatedBorderStyle = ({
   isBelowExpanded,
   isTop,
   isBottom,
+  windowWidth,
 }: {
   isExpanded: boolean;
   isAboveExpanded: boolean;
   isBelowExpanded: boolean;
   isTop: boolean;
   isBottom: boolean;
+  windowWidth: number;
 }) => {
   const roundedVal = "0.5rem";
   const defaultBackgroundColor = "#e8e8e8";
+  const noTranslation = windowWidth < WINDOW_BOUNDARIES.LARGE;
 
   if (isExpanded) {
     return {
@@ -55,7 +59,7 @@ const getAnimatedBorderStyle = ({
       borderBottomRightRadius: roundedVal,
       borderBottomLeftRadius: roundedVal,
       backgroundColor: defaultBackgroundColor,
-      x: 5,
+      x: noTranslation ? 0 : 5,
     };
   }
 
@@ -178,6 +182,7 @@ const PaymentForm = () => {
                   isBelowExpanded,
                   isTop,
                   isBottom,
+                  windowWidth,
                 });
                 const marginStyles = getMarginStyles({
                   isExpanded,
