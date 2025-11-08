@@ -40,11 +40,11 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
   const { selectedValue } = useContext(RadioGroupStateContext) ?? {};
   const isSelected = selectedValue === props.value;
 
-  const headerRef = useRef<HTMLDivElement>(null);
+  const disclosureRadioRef = useRef<HTMLDivElement>(null);
 
   const handleScrollTo = () => {
-    if (headerRef.current) {
-      headerRef.current.scrollIntoView({
+    if (disclosureRadioRef.current) {
+      disclosureRadioRef.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
       });
@@ -64,7 +64,7 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
 
   return (
     <div
-      ref={headerRef}
+      ref={disclosureRadioRef}
       style={{
         scrollMarginTop: scrollMarginTopValue,
         scrollMarginBottom: scrollMarginBottomValue,
@@ -124,10 +124,25 @@ export const DisclosureRadioHeader = ({
   className,
 }: DisclosureRadioHeaderProps) => {
   const { isSelected, isDisabled } = useContext(DisclosureRadioContext) ?? {};
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  const handleClick = () => {
+    if (isSelected && headerRef.current) {
+      headerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
   return (
     <motion.div
-      className={twMerge("flex gap-2 items-center w-full", className)}
+      className={twMerge(
+        "flex gap-2 items-center w-full scroll-mt-2",
+        className
+      )}
       whileHover={"hover"}
+      ref={headerRef}
+      onClick={handleClick}
     >
       <motion.span
         variants={headerVariant}
