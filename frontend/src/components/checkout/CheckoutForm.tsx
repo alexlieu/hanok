@@ -12,9 +12,9 @@ const CheckoutForm: React.FC = () => {
     <div className="flex flex-col w-full space-y-[1.3rem]">
       <CustomerForm />
       <PaymentForm />
-      <Disclosure>
+      <Disclosure scrollMarginBottom={"1.5rem"} scrollTo>
         <DisclosureHeader>Add Special Instructions</DisclosureHeader>
-        <DisclosurePanel scrollIntoView>
+        <DisclosurePanel>
           <Controller
             name="specialInstructions"
             control={control}

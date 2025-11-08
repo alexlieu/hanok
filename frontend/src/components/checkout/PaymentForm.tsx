@@ -177,7 +177,8 @@ const PaymentForm = () => {
                     value={value}
                     panelTransition={panelTransition}
                     disableScrollTo={false}
-                    scrollOffset="4.5rem" // Sticky header height: 4.5rem = 72px
+                    scrollMarginBottom={"1rem"}
+                    scrollMarginTop={"1rem"}
                     panelContent={
                       value === "card" ? (
                         <div className="px-5 pt-3 pb-7 space-y-6">

@@ -32,7 +32,8 @@ interface DisclosureRadioProps extends Omit<AriaRadioProps, "className"> {
   panelContent?: ReactNode;
   panelTransition?: Transition;
   disableScrollTo?: boolean;
-  scrollOffset?: number | string;
+  scrollMarginTop?: number | string;
+  scrollMarginBottom?: number | string;
 }
 
 export const DisclosureRadio = (props: DisclosureRadioProps) => {
@@ -45,23 +46,32 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
     if (headerRef.current) {
       headerRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "start",
+        block: "nearest",
       });
     }
   };
 
-  const scrollMarginTopValue =
-    props.scrollOffset && props.scrollOffset !== 0
-      ? typeof props.scrollOffset === "string"
-        ? props.scrollOffset
-        : `${props.scrollOffset}px`
+  function scrollMarginValue(value: number | string | undefined) {
+    return value && value !== 0
+      ? typeof value === "string"
+        ? value
+        : `${value}px`
       : undefined;
+  }
+
+  const scrollMarginTopValue = scrollMarginValue(props.scrollMarginTop);
+  const scrollMarginBottomValue = scrollMarginValue(props.scrollMarginBottom);
 
   return (
-    <>
+    <div
+      ref={headerRef}
+      style={{
+        scrollMarginTop: scrollMarginTopValue,
+        scrollMarginBottom: scrollMarginBottomValue,
+      }}
+    >
       <div
         className={props.className}
-        ref={headerRef}
         style={{ scrollMarginTop: scrollMarginTopValue }}
       >
         <div className="w-full">
@@ -83,7 +93,7 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
           {props.panelContent}
         </DisclosureRadioPanel>
       )}
-    </>
+    </div>
   );
 };
 

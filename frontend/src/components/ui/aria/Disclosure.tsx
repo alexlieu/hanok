@@ -29,6 +29,15 @@ import { twMerge } from "tailwind-merge";
 const DisclosureGroupInteractionContext = createContext<boolean>(false);
 const DisclosureInteractionContext = createContext<boolean>(false);
 
+interface DisclosureScrollContextType {
+  scrollTo?: boolean;
+  handleScrollTo: () => void;
+}
+const DisclosureScrollContext = createContext<DisclosureScrollContextType>({
+  scrollTo: false,
+  handleScrollTo: () => {},
+});
+
 const disclosure = tv({
   base: "group min-w-64",
   variants: {
@@ -71,20 +80,55 @@ export interface DisclosureProps extends AriaDisclosureProps {
   /** @default 'primary' **/
   variant?: "primary" | "secondary";
   children: ReactNode;
+  scrollTo?: boolean;
+  scrollMarginBottom?: string | number;
 }
 
-export function Disclosure({ children, ...props }: DisclosureProps) {
+export function Disclosure({
+  children,
+  scrollTo = false,
+  scrollMarginBottom,
+  ...props
+}: DisclosureProps) {
   const isInGroup = useContext(DisclosureGroupStateContext) !== null;
   //                      ^^^^^^  what?
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  const disclosureRef = useRef<HTMLDivElement>(null);
+
+  const scrollMarginBottomValue =
+    scrollMarginBottom && scrollMarginBottom !== 0
+      ? typeof scrollMarginBottom === "string"
+        ? scrollMarginBottom
+        : `${scrollMarginBottom}px`
+      : undefined;
+
+  const handleScrollTo = () => {
+    if (disclosureRef.current) {
+      disclosureRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  };
+
   return (
     <DisclosureInteractionContext.Provider value={hasUserInteracted}>
       <AriaDisclosure
+        ref={disclosureRef}
         {...props}
+        style={{
+          ...(props.style as CSSProperties),
+          scrollMarginBottom: scrollMarginBottomValue,
+        }}
         className={composeRenderProps(
           props.className,
           (className, renderProps) =>
-            disclosure({ ...renderProps, isInGroup, className })
+            disclosure({
+              ...renderProps,
+              isInGroup,
+              className,
+            })
         )}
         onExpandedChange={() => {
           if (!hasUserInteracted) {
@@ -92,7 +136,9 @@ export function Disclosure({ children, ...props }: DisclosureProps) {
           }
         }}
       >
-        {children}
+        <DisclosureScrollContext.Provider value={{ scrollTo, handleScrollTo }}>
+          {children}
+        </DisclosureScrollContext.Provider>
       </AriaDisclosure>
     </DisclosureInteractionContext.Provider>
   );
@@ -186,33 +232,39 @@ export function DisclosureHeader({
 
 export interface DisclosurePanelProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
-  scrollIntoView?: boolean;
 }
 
-export function DisclosurePanel({
-  children,
-  scrollIntoView = false,
-  ...props
-}: DisclosurePanelProps) {
+const panelVariants: Variants = {
+  expanded: {
+    height: "fit-content",
+    opacity: 1,
+    transition: {
+      height: { duration: 0.35, ease: "easeInOut" },
+      opacity: { duration: 0.45, ease: "easeInOut", delay: 0.1 },
+    },
+  },
+  collapsed: {
+    height: 0,
+    opacity: 0,
+    transition: {
+      height: { duration: 0.3, ease: "easeInOut", delay: 0.1 },
+      opacity: { duration: 0.3, ease: "easeInOut" },
+    },
+  },
+};
+
+export function DisclosurePanel({ children, ...props }: DisclosurePanelProps) {
   const { isExpanded } = useContext(DisclosureStateContext)!;
   const isInGroup = useContext(DisclosureGroupStateContext) !== null;
   const panelRef = useRef<HTMLDivElement>(null);
 
   const groupHasInteracted = useContext(DisclosureGroupInteractionContext);
   const standaloneHasInteracted = useContext(DisclosureInteractionContext);
+  const { scrollTo, handleScrollTo } = useContext(DisclosureScrollContext);
 
   const hasBeenInteractedWith = isInGroup
     ? groupHasInteracted
     : standaloneHasInteracted;
-
-  const handleAnimationComplete = () => {
-    if (panelRef.current) {
-      panelRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
 
   // Due to the overflow hidden styling on the div, the focus ring is being cutoff.
   // The workaround is to increase the width of the div beyond the width of its container and
@@ -224,28 +276,19 @@ export function DisclosurePanel({
       {isExpanded ? (
         <motion.div
           style={{ "--x-offset": `${X_OFFSET_PX}px` } as CSSProperties}
-          initial={{ height: 0, opacity: 0 }}
-          animate={{
-            height: "fit-content",
-            opacity: 1,
-            transition: {
-              height: { duration: 0.35, ease: "easeInOut" },
-              opacity: { duration: 0.45, ease: "easeInOut", delay: 0.1 },
-            },
+          variants={panelVariants}
+          initial="collapsed"
+          animate="expanded"
+          exit="collapsed"
+          onAnimationComplete={(definition) => {
+            if (
+              definition === "expanded" &&
+              scrollTo &&
+              hasBeenInteractedWith
+            ) {
+              handleScrollTo();
+            }
           }}
-          exit={{
-            height: 0,
-            opacity: 0,
-            transition: {
-              height: { duration: 0.3, ease: "easeInOut", delay: 0.1 },
-              opacity: { duration: 0.3, ease: "easeInOut" },
-            },
-          }}
-          onAnimationComplete={
-            scrollIntoView && hasBeenInteractedWith
-              ? handleAnimationComplete
-              : undefined
-          }
           className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)]`}
         >
           <div

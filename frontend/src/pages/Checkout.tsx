@@ -5,6 +5,9 @@ import { CheckoutSession } from "../components/checkout/CheckoutSession";
 import { Button } from "../components/ui/aria/Button";
 import { ChevronBack } from "../components/ui/icons/ChevronBack";
 import { motion } from "motion/react";
+import { useEffect } from "react";
+import { STICKY_HEADER_HEIGHT } from "../constants/layout";
+import { CSSProperties } from "react";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,13 +15,24 @@ const CheckoutPage: React.FC = () => {
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
 
+  useEffect(() => {
+    document.documentElement.style.scrollPaddingTop = STICKY_HEADER_HEIGHT;
+
+    return () => {
+      document.documentElement.style.scrollPaddingTop = "";
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen flex justify-center">
+    <div className="min-h-screen flex justify-center mb-500">
       <div className="w-[80%] max-w-5xl">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-default-bg">
           <div className="mx-auto">
-            <div className="flex items-center justify-between h-[4.5rem] relative">
+            <div
+              className="flex items-center justify-between relative"
+              style={{ height: STICKY_HEADER_HEIGHT } as CSSProperties}
+            >
               <Button
                 variant="icon"
                 onClick={() => navigate("/basket")}
