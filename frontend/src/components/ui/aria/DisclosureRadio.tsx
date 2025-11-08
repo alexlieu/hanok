@@ -27,18 +27,43 @@ const DisclosureRadioContext = createContext<RadioRenderProps | null>(null);
 const DisclosureRadioGroupInteractionContext = createContext<boolean>(false);
 
 interface DisclosureRadioProps extends Omit<AriaRadioProps, "className"> {
+  className?: string;
   children: ReactNode;
   panelContent?: ReactNode;
-  className?: string;
   panelTransition?: Transition;
+  disableScrollTo?: boolean;
+  scrollOffset?: number | string;
 }
 
 export const DisclosureRadio = (props: DisclosureRadioProps) => {
   const { selectedValue } = useContext(RadioGroupStateContext) ?? {};
   const isSelected = selectedValue === props.value;
+
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollTo = () => {
+    if (headerRef.current) {
+      headerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
+  const scrollMarginTopValue =
+    props.scrollOffset && props.scrollOffset !== 0
+      ? typeof props.scrollOffset === "string"
+        ? props.scrollOffset
+        : `${props.scrollOffset}px`
+      : undefined;
+
   return (
     <>
-      <div className={props.className}>
+      <div
+        className={props.className}
+        ref={headerRef}
+        style={{ scrollMarginTop: scrollMarginTopValue }}
+      >
         <div className="w-full">
           <AriaRadio {...props} className={"group"}>
             {(renderProps) => (
@@ -53,6 +78,7 @@ export const DisclosureRadio = (props: DisclosureRadioProps) => {
         <DisclosureRadioPanel
           isExpanded={isSelected}
           transition={props.panelTransition}
+          onOpenComplete={props.disableScrollTo ? undefined : handleScrollTo}
         >
           {props.panelContent}
         </DisclosureRadioPanel>
@@ -127,6 +153,7 @@ interface DisclosureRadioPanelProps extends HTMLAttributes<HTMLDivElement> {
   scrollIntoView?: boolean;
   isExpanded: boolean;
   transition?: Transition;
+  onOpenComplete?: () => void;
 }
 
 const DisclosureRadioPanel = ({
@@ -137,10 +164,10 @@ const DisclosureRadioPanel = ({
     ease: "easeOut",
     duration: 0.3,
   },
+  onOpenComplete,
   ...props
 }: DisclosureRadioPanelProps) => {
   const hasUserInteracted = useContext(DisclosureRadioGroupInteractionContext);
-  const panelRef = useRef<HTMLDivElement>(null);
   const isInitialRender = useRef(true);
   const X_OFFSET_PX = 5;
   // Display state is used to prevent the panel from affecting the render flow when it is hidden.
@@ -149,11 +176,8 @@ const DisclosureRadioPanel = ({
   );
 
   const handleAnimationComplete = () => {
-    if (isExpanded && panelRef.current) {
-      panelRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (isExpanded && onOpenComplete && hasUserInteracted) {
+      onOpenComplete();
     }
     if (!isExpanded) {
       setDisplay("hidden");
@@ -185,7 +209,6 @@ const DisclosureRadioPanel = ({
 
   return (
     <motion.div
-      ref={panelRef}
       style={{ "--x-offset": `${X_OFFSET_PX}px` } as CSSProperties}
       className={`overflow-hidden w-[calc(100%+var(--x-offset)*2)] -mx-[var(--x-offset)] ${display}`}
       onPointerDown={(e) => e.stopPropagation()}
