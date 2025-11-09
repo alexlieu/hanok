@@ -1,48 +1,62 @@
-import { Navigate, useLoaderData } from "react-router-dom";
-import { BasketResponse } from "../types/BasketTypes";
-import OrderSummary from "../components/checkout/OrderSummary";
-import PickupMap from "../components/checkout/PickupMap";
-import CheckoutForm from "../components/checkout/CheckoutForm";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "../utils/hooks/useWindowDimensions";
-import { AccordianItem } from "../components/ui/AccordianItem";
-import { useState } from "react";
+import { CheckoutRequiredData } from "../types/CheckoutType";
+import { CheckoutSession } from "../components/checkout/CheckoutSession";
+import { Button } from "../components/ui/aria/Button";
+import { ChevronBack } from "../components/ui/icons/ChevronBack";
+import { motion } from "motion/react";
+import { useEffect } from "react";
+import { STICKY_HEADER_HEIGHT } from "../constants/layout";
+import { CSSProperties } from "react";
 
 const CheckoutPage: React.FC = () => {
-  const { items, total }: BasketResponse = useLoaderData();
-  const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
-  const isSmallScreen = useMediaQuery("(max-width: 767px)");
-  if (items.length <= 0 && total <= 0) {
-    return <Navigate to="/basket" />;
-  }
+  const navigate = useNavigate();
+  const checkoutRequiredData = useLoaderData() as CheckoutRequiredData;
 
-  const openOrderSummary = () => {
-    setOrderSummaryExpanded((prevVal) => !prevVal);
-  };
+  const isSmallScreen = useMediaQuery("(max-width: 767px)");
+
+  useEffect(() => {
+    document.documentElement.style.scrollPaddingTop = STICKY_HEADER_HEIGHT;
+
+    return () => {
+      document.documentElement.style.scrollPaddingTop = "";
+    };
+  }, []);
 
   return (
-    <div className="flex flex-col md:flex-row max-w-[70em] m-auto justify-center items-center md:items-start">
-      <div className="w-full order-2 md:order-1 md:w-4/7 py-7 self-start">
-        <CheckoutForm />
-      </div>
-      {isSmallScreen ? (
-        <AccordianItem
-          title="Order Summary"
-          isExpanded={orderSummaryExpanded}
-          onToggle={() => openOrderSummary()}
-          containerStyle="w-full px-10 font-medium pt-7"
-          buttonStyle="tracking-wide text-xl"
-        >
-          <div className="flex flex-col sm:flex-row sm:gap-3 md:flex-col">
-            <PickupMap />
-            <OrderSummary items={items} total={total} />
+    <div className="min-h-screen flex justify-center mb-500">
+      <div className="w-[80%] max-w-5xl">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-default-bg">
+          <div className="mx-auto">
+            <div
+              className="flex items-center justify-between relative"
+              style={{ height: STICKY_HEADER_HEIGHT } as CSSProperties}
+            >
+              <Button
+                variant="icon"
+                onClick={() => navigate("/basket")}
+                className="p-0"
+              >
+                <motion.div
+                  whileHover="hover"
+                  className="flex gap-1 text-[0.8rem] items-center p-1"
+                >
+                  <ChevronBack size="0.8rem" strokeWidth={"1.8px"} />
+                  <span>back to basket</span>
+                </motion.div>
+              </Button>
+              <h1 className="text-3xl absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
+                checkout
+              </h1>
+            </div>
           </div>
-        </AccordianItem>
-      ) : (
-        <div className="w-[85%] order-1 md:order-2 md:w-3/7 p-7 flex flex-col items-center min-w-[270px] md:sticky md:top-0">
-          <PickupMap />
-          <OrderSummary items={items} total={total} />
         </div>
-      )}
+        {/* Main Content */}
+        <div className={`${isSmallScreen ? "space-y-6" : "flex gap-[4rem]"}`}>
+          <CheckoutSession checkoutData={checkoutRequiredData} />
+        </div>
+      </div>
     </div>
   );
 };

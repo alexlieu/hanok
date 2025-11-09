@@ -44,19 +44,6 @@ public class PaymentDetailsValidator implements ConstraintValidator<ValidPayment
             default:
                 addConstraintViolation(context, "Unsupported payment method: " + method, "paymentMethod");
         }
-//        PaymentMethod paymentMethod = payment.getPaymentMethod();
-//        boolean hasCardDetails = (payment.getCardDetails() != null);
-//        if (paymentMethod == PaymentMethod.CARD) {
-//            if (! hasCardDetails) {
-//                addConstraintViolation(context, "Card details are required for 'CARD' payment method", "cardDetails");
-//                return false;
-//            }
-//        } else {
-//            if (hasCardDetails) {
-//                addConstraintViolation(context, "Card details should not be provided for " + paymentMethod.getDisplayName() + " payment method", "cardDetails");
-//                return false;
-//            }
-//        }
         return true;
     }
 

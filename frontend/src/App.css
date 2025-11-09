@@ -2,10 +2,25 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dongle:wght@300;400;700&family=Outfit:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&display=swap');
 @import "tailwindcss";
+@plugin "tailwindcss-react-aria-components";
+@plugin "tailwindcss-animate";
+@plugin "tailwind-scrollbar";
 
 :root {
     --focus-border-color: rgba(72, 142, 254, 0.763);
     --focus-glow-color: #bbdafa;
+}
+
+@keyframes point-left-hover {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-0.15rem); }
+    100% { transform: translateX(-0.1rem); }
+}
+
+@keyframes point-right-hover {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(0.15rem); }
+    100% { transform: translateX(0.1rem); }
 }
 
 @theme {
@@ -37,6 +52,11 @@
     --color-icon-disabled-bg: #E7E9EC;
     --color-icon-hover: #ADADAD;
     --color-icon-pressed: #636172;
+    --color-default-scrollbar-thumb: #C1BDC0;
+    --color-checkbox-hover-bg: #dadada;
+
+    --animate-point-left-hover: point-left-hover 0.5s cubic-bezier(0.35, 0.91, 0.33, 0.97) forwards;
+    --animate-point-right-hover: point-right-hover 0.5s cubic-bezier(0.35, 0.91, 0.33, 0.97) forwards;
 }
 
 .form-error {

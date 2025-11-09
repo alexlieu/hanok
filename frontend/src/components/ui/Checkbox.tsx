@@ -1,27 +1,26 @@
-import { UseFormRegister, Path } from "react-hook-form";
-import { FormData } from "../../schemas/CheckoutFormSchema";
+import { UseFormRegister, FieldValues } from "react-hook-form";
 
-type CheckboxProps = {
-  name: Path<FormData>;
-  register: UseFormRegister<FormData>;
+interface CheckboxProps<T extends FieldValues> {
+  name: keyof T;
+  register: UseFormRegister<T>;
   displayLabel: string;
   onChange: () => void;
-};
+}
 
-const Checkbox: React.FC<CheckboxProps> = ({
+const Checkbox = <T extends FieldValues>({
   name,
   register,
   displayLabel,
   onChange,
-}) => {
+}: CheckboxProps<T>) => {
   return (
     <div className="flex flex-row gap-2 items-center">
       <div className="relative size-[1em]">
         <input
           className="opacity-0 absolute z-10 appearance-none size-full peer"
           type="checkbox"
-          id={name}
-          {...register(name, { onChange: () => onChange() })}
+          id={name as string}
+          {...register(name as any, { onChange: () => onChange() })}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
@@ -70,7 +69,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
              "
         ></div>
       </div>
-      <label htmlFor={name} className={""}>
+      <label htmlFor={name as string} className={""}>
         {displayLabel}
       </label>
     </div>

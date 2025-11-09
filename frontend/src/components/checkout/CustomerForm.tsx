@@ -1,160 +1,213 @@
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckoutSchema, FormData } from "../../schemas/CheckoutFormSchema";
-import DateInput from "./DateInput";
-import Checkbox from "../ui/Checkbox";
-import FormError from "./ErrorMessage";
-import { useEffect } from "react";
-import PhoneInput from "./PhoneInput";
-import { PhoneData } from "../../schemas/PhoneSchema";
-import ToolTip from "../ui/ToolTip";
+import { Controller, useFormContext } from "react-hook-form";
+import { DatePicker } from "../ui/aria/DatePicker";
+import { DateValue, I18nProvider } from "react-aria-components";
+import { useLoaderData } from "react-router-dom";
+import { CheckoutRequiredData } from "../../types/CheckoutType";
+import { TextField } from "../ui/aria/TextField";
+import { Checkbox, CheckboxGroup } from "../ui/aria/Checkbox";
+import Tooltip from "../ui/Tooltip";
+import { isDateInRanges } from "../../utils/dateUtils";
+import { ControlledPhoneField } from "../ui/form/ControlledPhoneField";
+import { useCallback } from "react";
+import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
+import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 
-const DEFAULT_VALUES = {
-  fullName: "",
-  email: "",
-  phoneNumber: { countryCode: "GB", phoneNumber: undefined },
-  emailUpdate: false,
-  smsUpdate: false,
-  specialInstructions: "",
-};
-
-const CustomerForm: React.FC = () => {
-  const methods = useForm<FormData>({
-    resolver: zodResolver(CheckoutSchema),
-    defaultValues: DEFAULT_VALUES,
-    mode: "onTouched",
-    reValidateMode: "onChange",
-    criteriaMode: "all",
-  });
-
+const CustomerForm = () => {
   const {
-    register,
-    handleSubmit,
-    watch,
-    control,
-    trigger,
-    reset,
-    formState: { errors, isSubmitSuccessful },
-  } = methods;
+    pickupRules: { firstValidDate, lastValidDate, unavailableDates },
+  } = useLoaderData() as CheckoutRequiredData;
 
-  console.log(errors);
+  const { control, trigger, formState } = useFormContext<CheckoutFormValues>();
 
-  const onSubmit: SubmitHandler<FormData> = (data: FormData) => {
-    console.log(data);
-  };
+  const { errors, touchedFields, dirtyFields, submitCount } = formState;
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-  }, [isSubmitSuccessful, reset]);
+  const serverErrors = useServerErrors();
 
-  const legendStyling = "text-xl font-medium tracking-wide";
+  const isDateUnavailable = useCallback(
+    (date: DateValue) => isDateInRanges(date, unavailableDates),
+    [unavailableDates]
+  );
 
   return (
-    <div className="mx-auto">
-      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-        <fieldset className="">
-          <legend className={`${legendStyling}`}>Contact details</legend>
-          <div className="flex flex-col">
-            <label htmlFor="fullName">Full name</label>
-            <input
-              id="fullName"
-              {...register("fullName")}
-              className={`form-input-base ${
-                errors.fullName ? "border-error-red" : "border-gray-300"
-              }`}
-            />
-            <FormError name="fullName" errors={errors} />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex justify-between">
-              <label htmlFor="email">Email</label>
-              <ToolTip message="We need either your email or phone number so we can send you updates on your order." />
-            </div>
-            <input
-              id="email"
-              {...register("email", { onChange: () => trigger("contact") })}
-              className={`form-input-base ${
-                errors.contact || errors.email
-                  ? "border-error-red"
-                  : "border-gray-300"
-              }`}
-              placeholder="email@example.com"
-            />
-            <FormError name="email" errors={errors} />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="">Phone number</label>
-            <Controller
-              name="phoneNumber"
-              control={control}
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <PhoneInput
-                  phoneData={value}
-                  onPhoneDataChange={(data: PhoneData) => {
-                    onChange(data);
-                    trigger("contact");
-                  }}
-                  onBlur={onBlur}
-                  inputRef={ref}
-                  watch={watch}
-                  errors={!!(errors.contact || errors.phoneNumber)}
-                />
-              )}
-            />
-            <FormError name="phoneNumber" errors={errors} />
-          </div>
-          <FormError name="contact" errors={errors} />
-        </fieldset>
-        <fieldset className="flex flex-col">
-          <legend className={`${legendStyling}`}>Order preferences</legend>
-          <DateInput
-            name="pickup"
-            register={register}
-            displayLabel="What is your preferred pickup date?"
-            errors={errors}
-          />
-          <div>
-            <p>How would you like to receive updates?</p>
-            <FormError name="update" errors={errors} />
-            <Checkbox
-              register={register}
-              name="emailUpdate"
-              displayLabel="Email Update"
-              onChange={() => trigger("update")}
-            />
-            <FormError name="emailUpdate" errors={errors} />
-            <Checkbox
-              register={register}
-              name="smsUpdate"
-              displayLabel="SMS Update"
-              onChange={() => trigger("update")}
-            />
-          </div>
-          <FormError name="smsUpdate" errors={errors} />
-          <div className="flex flex-col">
-            <label htmlFor="special-instructions">
-              Special instructions (optional)
-            </label>
-            <input
-              type="text"
-              name="special-instructions"
-              className="form-input-base border-gray-300"
-            />
-          </div>
-        </fieldset>
-        <button type="submit">Place Order</button>
-        <button
-          type="reset"
-          onClick={() => {
-            reset();
+    <>
+      <fieldset className="grid grid-cols-1 lg:grid-cols-2 gap-[0.7rem]">
+        <legend className="lowercase tracking-wide text-lg font-medium mb-2">
+          contact details
+        </legend>
+        <Controller
+          name="fullName"
+          control={control}
+          render={({
+            field: { onChange, onBlur, value, ref },
+            fieldState: { invalid, error },
+          }) => {
+            const zodError = error?.message;
+            const serverError =
+              serverErrors.validationErrors.fullName?.[0]?.message;
+            const errorMessage = zodError || serverError;
+            return (
+              <TextField
+                inputRef={ref}
+                value={value}
+                onChange={onChange}
+                onBlur={() => {
+                  onChange(value.trim().replace(/\s+/g, " "));
+                  onBlur();
+                }}
+                label="Full name"
+                maxLength={50}
+                isRequired
+                isInvalid={invalid || !!serverError}
+                errorMessage={errorMessage}
+                className="lg:col-span-2"
+              />
+            );
           }}
-        >
-          Clear form
-        </button>
-      </form>
-    </div>
+        />
+        <Controller
+          name="email"
+          control={control}
+          render={({
+            field: { onChange, onBlur, value, ref },
+            fieldState: { invalid, error },
+          }) => {
+            const zodError = error?.message;
+            const serverError =
+              serverErrors.validationErrors.email?.[0]?.message;
+            const contactError = errors.contact?.message;
+            const errorMessage = zodError || serverError || contactError;
+            const invalidState = !!(invalid || serverError || contactError);
+            return (
+              <TextField
+                inputRef={ref}
+                value={value}
+                onChange={(e) => {
+                  onChange(e);
+                  if (
+                    (touchedFields.email || dirtyFields.email) &&
+                    (submitCount > 0 || dirtyFields.updatePreference)
+                  )
+                    trigger("updatePreference");
+                  trigger("contact");
+                }}
+                onBlur={onBlur}
+                label="Email"
+                tooltip={
+                  <Tooltip
+                    className="absolute top-0 right-0 focus:ring-offset-0"
+                    buttonAriaLabel="More information on why we need your contact details"
+                  >
+                    <p>
+                      We need either your email or phone number so we can keep
+                      you up to date on your order.
+                    </p>
+                  </Tooltip>
+                }
+                placeholder="name@email.com"
+                maxLength={50}
+                isInvalid={invalidState}
+                errorMessage={errorMessage}
+                className="lg:col-start-1"
+              />
+            );
+          }}
+        />
+        <Controller
+          name="phoneNumber"
+          control={control}
+          render={({ field, fieldState }) => (
+            <ControlledPhoneField
+              formState={formState}
+              field={field}
+              fieldState={fieldState}
+              trigger={trigger}
+              hasContactError={!!errors.contact}
+            />
+          )}
+        />
+      </fieldset>
+      <fieldset className="space-y-[0.7rem]">
+        <legend className="lowercase tracking-wide text-lg font-medium mb-2">
+          pickup and updates
+        </legend>
+        <I18nProvider locale="en-GB">
+          <Controller
+            name="pickupDate"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => {
+              const zodError = error?.message;
+              const serverError =
+                serverErrors.validationErrors.pickupDate?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
+              return (
+                <DatePicker
+                  isInvalid={invalidState}
+                  value={value}
+                  inputRef={ref}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  errorMessage={errorMessage}
+                  minValue={firstValidDate}
+                  maxValue={lastValidDate}
+                  isDateUnavailable={isDateUnavailable}
+                  unavailableDates={unavailableDates}
+                  isRequired
+                  label="What is your preferred pickup date?"
+                />
+              );
+            }}
+          />
+        </I18nProvider>
+        <Controller
+          name="updatePreference"
+          control={control}
+          render={({
+            field: { onChange, onBlur, value, ref },
+            fieldState: { invalid, error },
+          }) => {
+            const zodError = error?.message;
+            const serverError =
+              serverErrors.validationErrors.updatePreference?.[0]?.message;
+            const errorMessage = zodError || serverError;
+            const invalidState = !!(invalid || serverError);
+            return (
+              <CheckboxGroup
+                isInvalid={invalidState}
+                value={value}
+                onChange={(pref) => {
+                  onChange(pref);
+                  trigger("updatePreference");
+                }}
+                inputRef={ref}
+                onBlur={onBlur}
+                errorMessage={errorMessage}
+                isRequired
+                label="How should we update you on your order?"
+              >
+                <Checkbox
+                  value="email"
+                  className="w-fit"
+                  name="update-preference-email"
+                >
+                  Email
+                </Checkbox>
+                <Checkbox
+                  value="sms"
+                  className="w-fit"
+                  name="update-preference-sms"
+                >
+                  SMS
+                </Checkbox>
+              </CheckboxGroup>
+            );
+          }}
+        />
+      </fieldset>
+    </>
   );
 };
 

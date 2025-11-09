@@ -1,6 +1,8 @@
 package com.alex_lieu.hanok.service;
 
 import com.alex_lieu.hanok.dto.config.PickupRulesDto;
+import com.alex_lieu.hanok.dto.holiday.PickupDateDetails;
+import com.alex_lieu.hanok.entity.Holiday;
 import com.alex_lieu.hanok.utils.orders.DateRange;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class PickupService {
@@ -42,26 +43,50 @@ public class PickupService {
     }
 
     public DateRange getValidPickupDateRange() {
-        LocalDateTime now = LocalDateTime.now(timezoneId);
-        LocalDate effectiveBaseDate = now.toLocalDate();
+        return getValidPickupDateRange(LocalDateTime.now(ZoneId.of(timezone)));
+    }
+
+    public DateRange getValidPickupDateRange(LocalDateTime now) {
+        LocalDate candidateDate = now.toLocalDate();
+
         if (now.toLocalTime().isAfter(cutoffTime)) {
-            effectiveBaseDate = effectiveBaseDate.plusDays(1);
+            candidateDate = candidateDate.plusDays(1);
         }
-        LocalDate earliestPickupDate = effectiveBaseDate.plusDays(requiredLeadDays);
-        LocalDate latestPickupDate = effectiveBaseDate.plusMonths(maxMonths);
-        return new DateRange(earliestPickupDate, latestPickupDate);
+
+        LocalDate earliestPickup = holidayService.findNextAvailableDate(candidateDate.plusDays(requiredLeadDays));
+
+        LocalDate latestPickup = earliestPickup.plusMonths(maxMonths);
+        latestPickup = holidayService.findPreviousAvailableDate(latestPickup);
+
+        return new DateRange(earliestPickup, latestPickup);
+    }
+
+    public PickupDateDetails getPickupDateDetails(LocalDate baseDate) {
+        DateRange validPickupDateRange = getValidPickupDateRange();
+        List<Holiday> holidaysInRange = holidayService.findHolidaysInRange(
+                baseDate,
+                validPickupDateRange.end()
+        );
+        return new PickupDateDetails(validPickupDateRange, holidaysInRange);
     }
 
     public PickupRulesDto getPickupRules() {
-        DateRange validPickupDateRange = getValidPickupDateRange();
-        Set<DateRange> holidayRanges = holidayService.getHolidaysForDateRange(validPickupDateRange.start(), validPickupDateRange.end());
+        LocalDate today = LocalDate.now(timezoneId);
+        return getPickupRules(today);
+    }
+
+    public PickupRulesDto getPickupRules(LocalDate baseDate) {
+        PickupDateDetails pickupDateDetails = getPickupDateDetails(baseDate);
+        List<DateRange> overlappingHolidayDateRanges = holidayService.convertHolidaysToDateRanges(pickupDateDetails.holidaysInRange());
         return new PickupRulesDto(
                 requiredLeadDays,
                 cutoffHour,
                 cutoffMin,
                 maxMonths,
                 timezone,
-                List.copyOf(holidayRanges)
+                overlappingHolidayDateRanges,
+                pickupDateDetails.validRange().start(),
+                pickupDateDetails.validRange().end()
         );
     }
 }

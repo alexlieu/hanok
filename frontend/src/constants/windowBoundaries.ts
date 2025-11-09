@@ -1,0 +1,17 @@
+export const WINDOW_BOUNDARIES = {
+  SMALL: 640,
+  MEDIUM: 768,
+  LARGE: 1024,
+  XLARGE: 1280,
+  XXLARGE: 1536,
+};
+
+export const PAYMENT_STACK_BOUNDARIES = {
+  upper: 815,
+  lower: WINDOW_BOUNDARIES.MEDIUM,
+};
+
+export const CARD_SVG_BOUNDARIES = {
+  upper: 900, // 860
+  lower: WINDOW_BOUNDARIES.MEDIUM,
+};

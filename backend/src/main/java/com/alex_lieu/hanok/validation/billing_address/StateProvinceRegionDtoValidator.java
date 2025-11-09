@@ -15,7 +15,7 @@ public class StateProvinceRegionDtoValidator implements ConstraintValidator<Vali
         if (address == null) {
             return true;
         }
-        ValidationResult result = StateProvinceRegionLogic.validate(address.countryCode(), address.stateProvinceRegion());
+        ValidationResult result = StateProvinceRegionLogic.validate(address.country(), address.stateProvinceRegion());
         if (! result.isValid()) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(result.getMessage()).addPropertyNode("stateProvinceRegion")

@@ -39,7 +39,7 @@ public class OrderProcessingService {
     }
 
     public OrderItem convertToOrderItem(OrderItemRequestDto dto) {
-        ProductVariant product = productService.getActiveProductVariantById(dto.produceVariantId());
+        ProductVariant product = productService.getActiveProductVariantById(dto.productVariantId());
         return OrderItem.builder()
                 .variant(product)
                 .unitPrice(product.getPrice())
@@ -63,13 +63,13 @@ public class OrderProcessingService {
                 canonicalPhoneNumber = phoneUtil.format(parsedNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
             } catch (NumberParseException e) {
                 throw new OrderPlacementFailedException(
-                        0, dto.customerName(), "The provided phone number is invalid", "INVALID_PHONE_NUMBER_FORMAT", dto.payment()
+                        0, dto.fullName(), "The provided phone number is invalid", "INVALID_PHONE_NUMBER_FORMAT", dto.payment()
                         .total(), "GBP", e
                 );
             }
         }
         CustomerOrder order = CustomerOrder.builder()
-                .customerName(dto.customerName())
+                .customerName(dto.fullName())
                 .customer(customer)
                 .phoneNumber(canonicalPhoneNumber)
                 .email(dto.email())

@@ -43,7 +43,7 @@ const MainNav: React.FC = () => {
   return (
     <header>
       {width < 768 ? (
-        <nav className="w-screen border-b-1 flex flex-row justify-center min-[360px]:justify-end h-[100px]">
+        <nav className="w-full border-b-1 flex flex-row justify-center min-[360px]:justify-end h-[100px]">
           <button
             onClick={() => setIsMenuOpen((prevState) => !prevState)}
             className="w-fit h-fit min-[360px]:mr-[20px] mt-[15px] cursor-pointer"

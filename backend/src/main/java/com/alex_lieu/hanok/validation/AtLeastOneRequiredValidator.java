@@ -2,13 +2,10 @@ package com.alex_lieu.hanok.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 public class AtLeastOneRequiredValidator implements ConstraintValidator<AtLeastOneRequired, Object> {
-    private static final Logger logger = LoggerFactory.getLogger(AtLeastOneRequiredValidator.class);
 
     private String[] fieldNames;
 
@@ -30,7 +27,7 @@ public class AtLeastOneRequiredValidator implements ConstraintValidator<AtLeastO
             Object fieldValue = beanWrapper.getPropertyValue(fieldName);
             if (fieldValue != null) {
                 if (fieldValue instanceof String) {
-                    if (! ((String) fieldValue).trim().isEmpty()) {
+                    if (!((String) fieldValue).trim().isEmpty()) {
                         atLeastOneFieldHasValue = true;
                         break;
                     }

@@ -77,88 +77,62 @@ export const countries = [
 ] as const;
 // sort((a, b) => a.name.localeCompare(b.name));
 
+export const groupedCountries = countries.reduce((acc, country) => {
+  const firstLetter = country.name.charAt(0).toUpperCase();
+  if (!acc[firstLetter]) {
+    acc[firstLetter] = [];
+  }
+  acc[firstLetter].push(country);
+  return acc;
+}, {} as Record<string, Country[]>);
+
 type CountriesArrayType = typeof countries;
-type SingleCountryType = CountriesArrayType[number];
+export type SingleCountryType = CountriesArrayType[number];
 export type CountryCodeUnion = SingleCountryType["code"];
 
-const CountryCodeSchema = z.enum(
-  countries.map((c) => c.code) as [string, ...string[]]
-);
+const countryCodes = countries.map((country) => country.code);
+
+const CountryCodeSchema = z.enum(countryCodes as [string, ...string[]]);
 
 export const PhoneSchema = z
   .object({
-    countryCode: z.union([CountryCodeSchema, z.literal(undefined)]),
+    countryCode: CountryCodeSchema,
     phoneNumber: z.union([z.string(), z.literal(undefined)]),
   })
-  .refine(
-    (data) => {
-      const cleanedPhoneNumber = data.phoneNumber?.trim() || undefined;
-      const cleanedCountryCode = data.countryCode?.trim() || undefined;
-      return !(cleanedPhoneNumber && !cleanedCountryCode);
-    },
-    {
-      message: "Country must be provided if a phone number is entered.",
-      path: ["countryCode"],
-    }
-  )
-  .refine(
-    (data) => {
-      const cleanedPhoneNumber = data.phoneNumber?.trim() || undefined;
-      const cleanedCountryCode = data.countryCode?.trim() || undefined;
-      if (cleanedPhoneNumber && cleanedCountryCode) {
-        return CountryCodeSchema.safeParse(cleanedCountryCode).success;
+  .superRefine(({ countryCode, phoneNumber }, ctx) => {
+    if (phoneNumber) {
+      const isValid = validatePhoneNumber(
+        phoneNumber,
+        countryCode as CountryCode
+      );
+      if (!isValid) {
+        ctx.addIssue({
+          code: "custom",
+          message: `Please provide a valid ${countryCode} phone number.`,
+          path: ["phoneNumber"],
+        });
       }
-      return true;
-    },
-    {
-      message: "Invalid country code selected.",
-      path: ["countryCode"],
     }
-  )
-  .refine(
-    (data) => {
-      const cleanedPhoneNumber = data.phoneNumber?.trim() || undefined;
-      const cleanedCountryCode = data.countryCode?.trim() || undefined;
-      if (
-        cleanedPhoneNumber &&
-        cleanedCountryCode &&
-        CountryCodeSchema.safeParse(cleanedCountryCode).success
-      ) {
-        return validatePhoneNumber(
-          cleanedPhoneNumber,
-          cleanedCountryCode as CountryCode
-        );
-      }
-      return true;
-    },
-    {
-      message: "Invalid phone number for selected country.",
-      path: ["phoneNumber"],
-    }
-  )
+  })
   .transform((data) => {
-    const cleanedCountryCode = data.countryCode?.trim() || undefined;
-    const cleanedPhoneNumber = data.phoneNumber?.trim() || undefined;
-    if (!cleanedCountryCode && !cleanedPhoneNumber) {
+    const cleanedPhoneNumber = data.phoneNumber?.trim();
+    if (!cleanedPhoneNumber) {
       return {
-        countryCode: undefined,
-        phoneNumber: undefined,
+        countryCode: data.countryCode as CountryCodeUnion,
+        phoneNumber: data.phoneNumber,
       };
     }
-    const countryCodeForParsing: CountryCode | undefined =
-      cleanedCountryCode &&
-      CountryCodeSchema.safeParse(cleanedCountryCode).success
-        ? (cleanedCountryCode as CountryCode)
-        : undefined;
-    const parsedPhoneNumberObject =
-      cleanedPhoneNumber && countryCodeForParsing
-        ? parsePhoneNumberFromString(cleanedPhoneNumber, countryCodeForParsing)
-        : undefined;
+    const parsedPhoneNumberObject = parsePhoneNumberFromString(
+      cleanedPhoneNumber,
+      data.countryCode as CountryCode
+    );
+
     const formattedPhoneNumber = parsedPhoneNumberObject?.isValid()
       ? parsedPhoneNumberObject.format("E.164")
       : cleanedPhoneNumber;
+
     return {
-      countryCode: cleanedCountryCode,
+      countryCode: data.countryCode as CountryCodeUnion,
       phoneNumber: formattedPhoneNumber,
     };
   });

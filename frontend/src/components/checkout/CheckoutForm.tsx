@@ -1,48 +1,42 @@
-// import { useState } from "react";
 import PaymentForm from "./PaymentForm";
 import CustomerForm from "./CustomerForm";
-// import { AccordianItem } from "../ui/AccordianItem";
+import { Controller } from "react-hook-form";
+import { TextArea } from "../ui/aria/TextArea";
+import { useFormContext } from "react-hook-form";
+import { Disclosure, DisclosureHeader } from "../ui/aria/Disclosure";
+import { DisclosurePanel } from "../ui/aria/Disclosure";
 
 const CheckoutForm: React.FC = () => {
-  // const [customerFormOpen, setCustomerFormOpen] = useState(true);
-  // const [paymentFormOpen, setPaymentFormOpen] = useState(false);
-
-  // const openPaymentForm = () => {
-  //   setPaymentFormOpen((prevVal) => !prevVal);
-  // };
-
-  // const openCustomerForm = () => {
-  //   setCustomerFormOpen((prevVal) => !prevVal);
-  // };
-
-  // useEffect(() => {
-  //   const subscription = watch((data) => {
-  //     console.log(data);
-  //   });
-  //   return () => subscription.unsubscribe();
-  // }, [watch]);
-  // console.log("Touched fields: ", touchedFields);
-  // console.log("Dirty fields: ", dirtyFields);
-  // console.log("Errors:", errors);
-
+  const { control } = useFormContext();
   return (
-    <div className="mx-auto px-10">
-      {/* <AccordianItem
-        title="Contact details"
-        isExpanded={customerFormOpen}
-        onToggle={() => openCustomerForm()}
-      >
-        <CustomerForm />
-      </AccordianItem>
-      <AccordianItem
-        title="Payment form"
-        isExpanded={paymentFormOpen}
-        onToggle={() => openPaymentForm()}
-      >
-        <PaymentForm />
-      </AccordianItem> */}
+    <div className="flex flex-col w-full space-y-[1.3rem]">
       <CustomerForm />
       <PaymentForm />
+      <Disclosure scrollMarginBottom={"1.5rem"} scrollTo>
+        <DisclosureHeader>Add Special Instructions</DisclosureHeader>
+        <DisclosurePanel>
+          <Controller
+            name="specialInstructions"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => (
+              <TextArea
+                inputRef={ref}
+                value={value || ""}
+                onChange={onChange}
+                onBlur={onBlur}
+                aria-label="Special instructions"
+                className={`w-full`}
+                description="Please feel free to add any additional requests or requirements you may need for your order and we'll do our best to accommodate."
+                errorMessage={error?.message}
+                isInvalid={invalid}
+              />
+            )}
+          />
+        </DisclosurePanel>
+      </Disclosure>
     </div>
   );
 };

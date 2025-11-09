@@ -43,8 +43,9 @@ public class HolidayDataLoader implements CommandLineRunner {
             logger.info("Holiday table is empty. Populating with initial data.");
             createHoliday(holidays, "augBank", LocalDate.of(2025, 8, 25), LocalDate.of(2025, 8, 25));
             createHoliday(holidays, "personal", LocalDate.of(2025, 9, 5), LocalDate.of(2025, 9, 8));
-            createHoliday(holidays, "personal", LocalDate.of(2025, 10, 1), LocalDate.of(2025, 10, 10));
-            createHoliday(holidays, "christmas", LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 26));
+            createHoliday(holidays, "personal", LocalDate.of(2025, 10, 1), LocalDate.of(2025, 10, 13));
+            createHoliday(holidays, "personal", LocalDate.of(2025, 11, 8), LocalDate.of(2025, 11, 13));
+            createHoliday(holidays, "christmas", LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 28));
             holidayRepository.saveAll(holidays);
             logger.info("Successfully populated holiday table with {} entries.", holidayRepository.count());
             holidayService.refreshHolidayCache();

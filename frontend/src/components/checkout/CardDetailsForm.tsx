@@ -1,120 +1,315 @@
-import { useFormContext } from "react-hook-form";
-import { PaymentFormFields } from "../../schemas/PaymentFormSchema";
-import VisaSymbol from "../../assets/checkout_logos/visa_symbol.svg?react";
-import MasterCardSymbol from "../../assets/checkout_logos/mastercard_symbol.svg?react";
-import AmexSymbol from "../../assets/checkout_logos/amex_symbol.svg?react";
+import { Controller, useFormContext } from "react-hook-form";
+import { TextField } from "../ui/aria/TextField";
+import { tv } from "tailwind-variants";
+import { getIssuingBank, issuingBank } from "../../schemas/CardSchema";
+import Visa from "../../assets/checkout_logos/visa.svg?react";
+import Mastercard from "../../assets/checkout_logos/mastercard.svg?react";
+import Amex from "../../assets/checkout_logos/amex.svg?react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { FaRegCreditCard } from "react-icons/fa6";
+import { LuCircleX } from "react-icons/lu";
+import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
+import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
+import { BACKEND_ERROR_CODES } from "../../constants/errorCodes";
+import ServerErrorMessage from "../ui/ServerErrorMessage";
+import { useWindowDimensions } from "../../utils/hooks/useWindowDimensions";
+import {
+  CARD_SVG_BOUNDARIES,
+  PAYMENT_STACK_BOUNDARIES,
+} from "../../constants/windowBoundaries";
 
-const CardDetailsForm: React.FC = () => {
-  const {
-    register,
-    setValue,
-    formState: { errors },
-  } = useFormContext<PaymentFormFields>();
+interface CardDetailsFormProps {
+  issuingBank: issuingBank;
+  activeCards: string[];
+}
 
-  console.log(errors);
+const CardDetailsForm: React.FC<CardDetailsFormProps> = ({
+  issuingBank,
+  activeCards,
+}) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const singleColumn =
+    windowWidth <= PAYMENT_STACK_BOUNDARIES.upper &&
+    windowWidth >= PAYMENT_STACK_BOUNDARIES.lower;
+  const hideCardSvg =
+    windowWidth <= CARD_SVG_BOUNDARIES.upper &&
+    windowWidth >= CARD_SVG_BOUNDARIES.lower;
+  const { control } = useFormContext<CheckoutFormValues>();
+  const serverErrors = useServerErrors();
 
-  const cardNumberChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const input = event.target.value;
-    const filteredInput = input.replace(/\D/g, "");
-    const formattedInput = filteredInput.match(/.{1,4}/g)?.join(" ") || "";
-    const finalValue =
-      formattedInput.length <= 19
-        ? formattedInput
-        : formattedInput.substring(0, 19);
-    setValue("cardNumber", finalValue);
-  };
+  const logoStyles = tv({
+    base: "h-[1.1rem] w-auto",
+  });
 
-  const expirationChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const input = event.target.value;
-    const filteredInput = input.replace(/\D/g, "");
-    const finalValue =
-      filteredInput.length === 0
-        ? ""
-        : filteredInput.length <= 2
-        ? filteredInput
-        : `${filteredInput.substring(0, 2)}/${filteredInput.substring(2, 4)}`;
-    setValue("expiration", finalValue);
-  };
+  const [isInitialMount, setIsInitialMount] = useState(true);
 
-  const cvvChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const input = event.target.value;
-    const filteredInput = input.replace(/\D/g, "");
-    const finalValue =
-      filteredInput.length <= 3 ? filteredInput : filteredInput.substring(0, 3);
-    setValue("cvv", finalValue);
-  };
+  useEffect(() => {
+    setIsInitialMount(false);
+  }, []);
 
-  const logoStyling =
-    "h-5 sm:h-6 w-auto border border-stone-200 rounded p-[1px]";
+  const showCardError =
+    serverErrors.codedError?.code === BACKEND_ERROR_CODES.INSUFFICIENT_FUNDS ||
+    serverErrors.codedError?.code ===
+      BACKEND_ERROR_CODES.TOKEN_PROCESSING_FAILED ||
+    serverErrors.codedError?.code ===
+      BACKEND_ERROR_CODES.PAYMENT_METHOD_NOT_SUPPORTED;
 
   return (
     <>
       <fieldset>
-        <legend>Card information</legend>
-        <div className="relative flex items-center w-full">
-          <input
-            type="text"
-            placeholder="1234 1234 1234 1234"
-            inputMode="numeric"
-            autoCorrect="false"
-            spellCheck="false"
-            autoComplete="false"
-            aria-label="Card Number"
-            {...register("cardNumber", {})}
-            onChange={cardNumberChangeHandler}
-            className={`
-              w-full form-input-base
-              ${errors.cardNumber ? "border-error-red" : "border-gray-300"}
-            `}
-          />
-          <div
-            className={`
-              absolute right-2 top-1/2 -translate-y-1/2
-              flex flex-row gap-[0.5em] sm:gap-[0.75em]
-            `}
-          >
-            <MasterCardSymbol id="mastercard" className={logoStyling} />
-            <VisaSymbol id="visa" className={logoStyling} />
-            <AmexSymbol id="amex" className={logoStyling} />
-          </div>
-        </div>
-        <div className="flex flex-row w-full">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="MM/YY"
-              inputMode="numeric"
-              aria-label="Expiration"
-              {...register("expiration")}
-              onChange={expirationChangeHandler}
-              className="w-full mt-[-2px] form-input-base border-gray-300"
-            />
-          </div>
-          <div className="flex-1 ml-[-2px]">
-            <input
-              type="text"
-              placeholder="CVV"
-              inputMode="numeric"
-              aria-label="CVV"
-              {...register("cvv")}
-              onChange={cvvChangeHandler}
-              className="w-full mt-[-2px] form-input-base border-gray-300"
-            />
-          </div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Cardholder name</legend>
-        <input
-          type="text"
-          placeholder="Full name on card"
-          {...register("holderName")}
-          className="w-full focus:z-10 form-input-base border-gray-300"
+        <legend title="Card details" className="sr-only">
+          Card details
+        </legend>
+        <ServerErrorMessage
+          show={showCardError}
+          message={serverErrors.codedError?.message}
         />
+        <div className="grid grid-cols-2 gap-3">
+          <Controller
+            name="holderName"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref, ...field },
+              fieldState: { invalid, error },
+            }) => {
+              const zodError = error?.message;
+              const serverError =
+                serverErrors.validationErrors.holderName?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
+              return (
+                <TextField
+                  label="Holder Name"
+                  isRequired
+                  inputRef={ref}
+                  maxLength={50}
+                  className={"col-span-2"}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
+                  value={value}
+                  onChange={onChange}
+                  onBlur={() => {
+                    onChange(value?.trim().replace(/\s+/g, " "));
+                    onBlur();
+                  }}
+                  {...field}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="cardNumber"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => {
+              const handleCleanCardNumber = (rawInput: string) => {
+                const filteredInput = rawInput.replace(/\D/g, "");
+                const len = filteredInput.length;
+                const localIssuingBank = getIssuingBank(filteredInput);
+                let formattedInput;
+                if (localIssuingBank === "Amex") {
+                  formattedInput = "";
+                  if (len > 0) {
+                    formattedInput += filteredInput.substring(0, 4);
+                    if (len > 4) {
+                      formattedInput += " " + filteredInput.substring(4, 10);
+                    }
+                    if (len > 10) {
+                      formattedInput += " " + filteredInput.substring(10, 15);
+                    }
+                  }
+                } else {
+                  formattedInput =
+                    filteredInput.match(/.{1,4}/g)?.join(" ") || "";
+                }
+                onChange(formattedInput);
+              };
+              const zodError = error?.message;
+              const serverError =
+                serverErrors.validationErrors.cardNumber?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
+              return (
+                <TextField
+                  placeholder="1234 1234 1234 1234"
+                  label="Card number"
+                  inputRef={ref}
+                  value={value}
+                  onChange={handleCleanCardNumber}
+                  onBlur={onBlur}
+                  isRequired
+                  aria-label="Card number field"
+                  maxLength={issuingBank === "Amex" ? 17 : 19}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
+                  className={"col-span-2"}
+                  contentInField={(() => {
+                    const duration = 0.08;
+                    const logoVariants = {
+                      hidden: {
+                        opacity: 0,
+                        translateY: 5,
+                        transition: { duration: duration },
+                      },
+                      visible: {
+                        opacity: 1,
+                        translateY: 0,
+                        transition: { duration: duration },
+                      },
+                      exit: {
+                        opacity: 0,
+                        translateY: 5,
+                        transition: { duration: duration },
+                      },
+                    };
+                    const invalidCardSvg = (
+                      <motion.span
+                        className="absolute flex justify-center items-center right-3 top-0 h-full"
+                        key="invalid"
+                        variants={logoVariants}
+                        initial={isInitialMount ? false : "hidden"}
+                        animate="visible"
+                        exit="exit"
+                      >
+                        <FaRegCreditCard
+                          fill="var(--color-error-red)"
+                          className="scale-150 relative"
+                        />
+                        <LuCircleX
+                          stroke="var(--color-error-red)"
+                          strokeWidth={3}
+                          className="absolute scale-70 bg-default-bg rounded-full -right-2 bottom-1"
+                        />
+                      </motion.span>
+                    );
+                    const showInvalidSvg = invalid && value === "";
+                    return (
+                      <AnimatePresence mode="wait">
+                        // The card SVGs are hidden when the window width is
+                        less than 900px so that it doesn't overlap with the text
+                        in the input field.
+                        {hideCardSvg ? (
+                          showInvalidSvg ? (
+                            invalidCardSvg
+                          ) : undefined
+                        ) : showInvalidSvg ? (
+                          invalidCardSvg
+                        ) : (
+                          <motion.ul
+                            className="flex flex-row justify-center items-center h-full gap-3 absolute top-0 right-2"
+                            key={issuingBank || "all"}
+                            initial="none"
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            {activeCards.map((logo) => (
+                              <motion.li
+                                key={logo}
+                                variants={logoVariants}
+                                initial={isInitialMount ? false : "hidden"}
+                                animate="visible"
+                                exit="exit"
+                              >
+                                {logo === "Visa" && (
+                                  <Visa className={logoStyles()} />
+                                )}
+                                {logo === "Mastercard" && (
+                                  <Mastercard className={logoStyles()} />
+                                )}
+                                {logo === "Amex" && (
+                                  <Amex className={logoStyles()} />
+                                )}
+                              </motion.li>
+                            ))}
+                          </motion.ul>
+                        )}
+                      </AnimatePresence>
+                    );
+                  })()}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="expiration"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => {
+              const handleFormatExpiration = (rawInput: string) => {
+                const filteredInput = rawInput.replace(/\D/g, "");
+                const finalValue =
+                  filteredInput.length === 0
+                    ? ""
+                    : filteredInput.length <= 2
+                    ? filteredInput
+                    : `${filteredInput.substring(
+                        0,
+                        2
+                      )}/${filteredInput.substring(2, 4)}`;
+                onChange(finalValue);
+              };
+              const zodError = error?.message;
+              const serverError =
+                serverErrors.validationErrors.expiration?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
+              return (
+                <TextField
+                  label="Expiration date"
+                  placeholder="MM/YY"
+                  inputRef={ref}
+                  value={value}
+                  onChange={handleFormatExpiration}
+                  onBlur={onBlur}
+                  isRequired
+                  aria-label="Card expiration date field"
+                  maxLength={5}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
+                  className={singleColumn ? "col-span-2" : "col-span-1"}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="cvv"
+            control={control}
+            render={({
+              field: { onChange, onBlur, value, ref },
+              fieldState: { invalid, error },
+            }) => {
+              const handleFormatCVV = (rawInput: string) => {
+                onChange(rawInput.replace(/\D/g, ""));
+              };
+              const zodError = error?.message;
+              const serverError =
+                serverErrors.validationErrors.cvv?.[0]?.message;
+              const errorMessage = zodError || serverError;
+              const invalidState = !!(invalid || serverError);
+              return (
+                <TextField
+                  label="CVV"
+                  placeholder="CVV"
+                  inputRef={ref}
+                  value={value}
+                  onChange={handleFormatCVV}
+                  onBlur={onBlur}
+                  isRequired
+                  aria-label="Card CVV field"
+                  maxLength={4}
+                  isInvalid={invalidState}
+                  errorMessage={errorMessage}
+                  className={singleColumn ? "col-span-2" : "col-span-1"}
+                />
+              );
+            }}
+          />
+        </div>
       </fieldset>
     </>
   );

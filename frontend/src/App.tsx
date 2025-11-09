@@ -10,10 +10,15 @@ import {
   productsByCategoryLoader,
   productLoader,
   basketLoader,
+  checkoutLoader,
 } from "./utils/loader";
 import "./App.css";
 import BasketPage from "./pages/Basket";
 import CheckoutPage from "./pages/Checkout";
+import ProductsSkeleton from "./components/ui/skeletons/ProductsSkeleton";
+import ProductDetailSkeleton from "./components/ui/skeletons/ProductDetailSkeleton";
+import BasketSkeleton from "./components/ui/skeletons/BasketSkeleton";
+import CheckoutSkeleton from "./components/ui/skeletons/CheckoutSkeleton";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +31,7 @@ const router = createBrowserRouter([
         path: "products",
         id: "all-products",
         loader: productsLoader,
+        HydrateFallback: ProductsSkeleton,
         children: [
           {
             index: true,
@@ -35,11 +41,13 @@ const router = createBrowserRouter([
             path: ":categorySlug",
             element: <ProductsPage />,
             loader: productsByCategoryLoader,
+            HydrateFallback: ProductsSkeleton,
           },
           {
             path: ":categorySlug/:productSlug",
             element: <ProductPage />,
             loader: productLoader,
+            HydrateFallback: ProductDetailSkeleton,
           },
         ],
       },
@@ -47,11 +55,13 @@ const router = createBrowserRouter([
         path: "basket",
         element: <BasketPage />,
         loader: basketLoader,
+        HydrateFallback: BasketSkeleton,
       },
       {
         path: "checkout",
         element: <CheckoutPage />,
-        loader: basketLoader,
+        loader: checkoutLoader,
+        HydrateFallback: CheckoutSkeleton,
       },
     ],
   },

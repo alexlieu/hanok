@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.controller;
 
+import com.alex_lieu.hanok.dto.validation.ValidationError;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -23,7 +25,7 @@ public class ErrorReply {
     private String message;
     private String path;
     private String code;
-    private Map<String, String> validationErrors;
+    private Map<String, List<ValidationError>> validationErrors;
 
     public ErrorReply(HttpStatus status, String error, String message, String path, String code) {
         this.timestamp = LocalDateTime.now();
