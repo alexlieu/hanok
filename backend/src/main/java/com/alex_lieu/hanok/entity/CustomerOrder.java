@@ -13,7 +13,8 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -49,7 +50,7 @@ public class CustomerOrder {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    private LocalDateTime orderDateTime;
+    private ZonedDateTime orderDateTime;
 
     //  @ValidPickupDate only works at the controller level, but fails during data persistence of the entity
     //  There are 2 different validation contexts in the application - Spring MVC Validations VS JPA/Hibernate Validation
@@ -64,12 +65,13 @@ public class CustomerOrder {
     @NotNull(message = "order.pickup-date.not-null")
     private LocalDate pickupDate;
 
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     // Called before the entity is persisted (inserted into the database)
     @PrePersist
     public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("Europe/London");
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
         this.orderDateTime = now;
         this.updatedAt = now;
         this.orderStatus = OrderStatus.PENDING;
@@ -85,7 +87,8 @@ public class CustomerOrder {
     // Called before the entity is updated
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("Europe/London");
+        this.updatedAt = ZonedDateTime.now(zoneId);
     }
 
     @Enumerated(EnumType.STRING)

@@ -9,7 +9,7 @@ import com.alex_lieu.hanok.enums.PaymentMethod;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ public record OrderSuccessDto(
         String email,
         String phoneNumber,
         LocalDate pickupDateTime,
-        LocalDateTime orderDateTime
+        ZonedDateTime orderDateTime
 ) implements Serializable {
     private record OrderItemDetails(
             String productName,

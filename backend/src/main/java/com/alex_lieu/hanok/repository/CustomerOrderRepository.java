@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Repository
@@ -24,8 +24,8 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
     List<CustomerOrder> filterAll(
             @Param("customerId") Long customerId,
             @Param("orderStatus") CustomerOrder.OrderStatus orderStatus,
-            @Param("orderDateTimeStart") LocalDateTime orderDateTimeStart,
-            @Param("orderDateTimeEnd") LocalDateTime orderDateTimeEnd,
+            @Param("orderDateTimeStart") ZonedDateTime orderDateTimeStart,
+            @Param("orderDateTimeEnd") ZonedDateTime orderDateTimeEnd,
             @Param("pickupDateStart") LocalDate pickupDateStart,
             @Param("pickupDateEnd") LocalDate pickupDateEnd
     );
