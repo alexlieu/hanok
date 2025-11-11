@@ -15,6 +15,7 @@ public record PickupRulesDto(
         List<DateRange> holidayRanges,
         LocalDate firstValidDate,
         LocalDate lastValidDate,
-        List<PickupSlotDto> pickupSlots
+        List<PickupSlotDto> pickupSlots,
+        List<OpeningHours> openingHours
 ) implements Serializable {
 }

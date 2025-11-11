@@ -1,5 +1,7 @@
 package com.alex_lieu.hanok.service;
 
+import com.alex_lieu.hanok.config.StoreConfig;
+import com.alex_lieu.hanok.dto.config.OpeningHours;
 import com.alex_lieu.hanok.dto.config.PickupRulesDto;
 import com.alex_lieu.hanok.dto.config.PickupSlotDto;
 import com.alex_lieu.hanok.dto.holiday.PickupDateDetails;
@@ -27,6 +29,7 @@ public class PickupService {
     private final ZoneId timezoneId;
     private final String timezone;
     private final HolidayService holidayService;
+    private final StoreConfig storeConfig;
 
     public PickupService(
             @Value("${app.order.pickup.min-lead-days}") int requiredLeadDays,
@@ -34,7 +37,8 @@ public class PickupService {
             @Value("${app.order.pickup.cutoff.hour}") int cutoffHour,
             @Value("${app.order.pickup.cutoff.minute}") int cutoffMin,
             @Value("${app.order.pickup.timezone}") String timezone,
-            HolidayService holidayService
+            HolidayService holidayService,
+            StoreConfig storeConfig
     ) {
         this.requiredLeadDays = requiredLeadDays;
         this.maxMonths = maxMonths;
@@ -44,6 +48,7 @@ public class PickupService {
         this.timezoneId = ZoneId.of(timezone);
         this.timezone = timezone;
         this.holidayService = holidayService;
+        this.storeConfig = storeConfig;
     }
 
     public DateRange getValidPickupDateRange() {
@@ -85,6 +90,9 @@ public class PickupService {
         List<PickupSlotDto> pickupSlots = Arrays.stream(PickupSlot.values())
                 .map(slot -> new PickupSlotDto(slot.name(), slot.getLabel(), slot.getStartTime(), slot.getEndTime()))
                 .collect(Collectors.toList());
+        List<OpeningHours> openingHours = storeConfig.getOpeningHours().entrySet().stream()
+                .map(entry -> new OpeningHours(entry.getKey(), entry.getValue())).toList();
+        System.out.println("Opening hours: " + openingHours);
         return new PickupRulesDto(
                 requiredLeadDays,
                 cutoffHour,
@@ -94,7 +102,8 @@ public class PickupService {
                 overlappingHolidayDateRanges,
                 pickupDateDetails.validRange().start(),
                 pickupDateDetails.validRange().end(),
-                pickupSlots
+                pickupSlots,
+                openingHours
         );
     }
 }
