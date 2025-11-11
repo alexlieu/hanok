@@ -25,6 +25,14 @@ public enum PickupSlot {
         return timeRange.start();
     }
 
+    public LocalTime getEndTime() {
+        return timeRange.end();
+    }
+
+    public String getLabel() {
+        return timeRange.label();
+    }
+
     @JsonCreator
     public static PickupSlot fromString(String value) {
         if (value == null) return null;

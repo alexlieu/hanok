@@ -14,6 +14,7 @@ public record PickupRulesDto(
         String timezone,
         List<DateRange> holidayRanges,
         LocalDate firstValidDate,
-        LocalDate lastValidDate
+        LocalDate lastValidDate,
+        List<PickupSlotDto> pickupSlots
 ) implements Serializable {
 }
