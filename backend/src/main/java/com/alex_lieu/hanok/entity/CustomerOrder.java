@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.entity;
 
+import com.alex_lieu.hanok.enums.PickupSlot;
 import com.alex_lieu.hanok.validation.AtLeastOneRequired;
 import com.alex_lieu.hanok.validation.ValidPhoneNumber;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -64,6 +65,9 @@ public class CustomerOrder {
     //          NoSuchMethodException.
     @NotNull(message = "order.pickup-date.not-null")
     private LocalDate pickupDate;
+
+    @NotNull(message = "order.pickup-slot.not-null")
+    private PickupSlot pickupSlot;
 
     private ZonedDateTime updatedAt;
 

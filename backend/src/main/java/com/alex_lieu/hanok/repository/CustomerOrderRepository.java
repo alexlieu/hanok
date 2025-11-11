@@ -1,6 +1,7 @@
 package com.alex_lieu.hanok.repository;
 
 import com.alex_lieu.hanok.entity.CustomerOrder;
+import com.alex_lieu.hanok.enums.PickupSlot;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,13 +21,15 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
             "AND (:orderDateTimeStart IS NULL OR o.orderDateTime >= :orderDateTimeStart) " +
             "AND (:orderDateTimeEnd IS NULL OR o.orderDateTime <= :orderDateTimeEnd) " +
             "AND (:pickupDateTimeStart IS NULL OR o.pickupDate >= :pickupDateTimeStart) " +
-            "AND (:pickupDateTimeEnd IS NULL OR o.pickupDate <= :pickupDateTimeEnd)")
+            "AND (:pickupDateTimeEnd IS NULL OR o.pickupDate <= :pickupDateTimeEnd)" +
+            "AND (:pickupSlot IS NULL OR o.pickupSlot = :pickupSlot)")
     List<CustomerOrder> filterAll(
             @Param("customerId") Long customerId,
             @Param("orderStatus") CustomerOrder.OrderStatus orderStatus,
             @Param("orderDateTimeStart") ZonedDateTime orderDateTimeStart,
             @Param("orderDateTimeEnd") ZonedDateTime orderDateTimeEnd,
             @Param("pickupDateStart") LocalDate pickupDateStart,
-            @Param("pickupDateEnd") LocalDate pickupDateEnd
+            @Param("pickupDateEnd") LocalDate pickupDateEnd,
+            @Param("pickupSlot") PickupSlot pickupSlot
     );
 }

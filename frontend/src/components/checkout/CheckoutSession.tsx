@@ -36,7 +36,7 @@ import {
 import { ServerErrorProvider } from "../../contexts/ServerErrorProvider";
 import { ServerErrorState } from "../../contexts/ServerErrorContext";
 import { useNavigate } from "react-router-dom";
-// import { TEST_CHECKOUT_FORM_VALUES } from "../../constants/testData";
+import { TEST_CHECKOUT_FORM_VALUES } from "../../constants/testData";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -101,8 +101,8 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
     mode: "onTouched",
     reValidateMode: "onChange",
     criteriaMode: "all",
-    defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
-    // defaultValues: TEST_CHECKOUT_FORM_VALUES,
+    // defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
+    defaultValues: TEST_CHECKOUT_FORM_VALUES,
   });
 
   const { handleSubmit } = methods;
@@ -134,6 +134,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       phoneNumber: data.phoneNumber?.phoneNumber || undefined,
       specialInstructions: data.specialInstructions || undefined,
       pickupDate: data.pickupDate!.toString(),
+      pickupSlot: "SLOT_1", // TODO: Add pickup slot to the order request
       orderItems: items.map((item) => ({
         productVariantId: item.variantId,
         quantity: item.quantity,

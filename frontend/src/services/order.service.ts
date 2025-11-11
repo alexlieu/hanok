@@ -37,6 +37,7 @@ export const transformOrderResponse = (
     email: rawResponse.email,
     phoneNumber: rawResponse.phoneNumber,
     pickupDateTime: parseDate(rawResponse.pickupDateTime),
+    pickupSlot: rawResponse.pickupSlot,
     orderDateTime: parseAbsoluteToLocal(rawResponse.orderDateTime),
   };
 };

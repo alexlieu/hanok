@@ -27,6 +27,7 @@ const OrderConfirmation = () => {
       <p>Order Status: {orderData.orderStatus}</p>
       <p>Payment Method: {orderData.paymentMethod}</p>
       <p>Masked Card No: {orderData.maskedCardNo}</p>
+      <p>Pickup Slot: {orderData.pickupSlot}</p>
       <p>
         Order Items:{" "}
         {orderData.orderItems.map((item) => item.productName).join(", ")}
