@@ -1,8 +1,12 @@
 package com.alex_lieu.hanok.service;
 
+import com.alex_lieu.hanok.config.StoreConfig;
+import com.alex_lieu.hanok.dto.config.OpeningHours;
 import com.alex_lieu.hanok.dto.config.PickupRulesDto;
+import com.alex_lieu.hanok.dto.config.PickupSlotDto;
 import com.alex_lieu.hanok.dto.holiday.PickupDateDetails;
 import com.alex_lieu.hanok.entity.Holiday;
+import com.alex_lieu.hanok.enums.PickupSlot;
 import com.alex_lieu.hanok.utils.orders.DateRange;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,7 +15,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PickupService {
@@ -23,6 +29,7 @@ public class PickupService {
     private final ZoneId timezoneId;
     private final String timezone;
     private final HolidayService holidayService;
+    private final StoreConfig storeConfig;
 
     public PickupService(
             @Value("${app.order.pickup.min-lead-days}") int requiredLeadDays,
@@ -30,7 +37,8 @@ public class PickupService {
             @Value("${app.order.pickup.cutoff.hour}") int cutoffHour,
             @Value("${app.order.pickup.cutoff.minute}") int cutoffMin,
             @Value("${app.order.pickup.timezone}") String timezone,
-            HolidayService holidayService
+            HolidayService holidayService,
+            StoreConfig storeConfig
     ) {
         this.requiredLeadDays = requiredLeadDays;
         this.maxMonths = maxMonths;
@@ -40,6 +48,7 @@ public class PickupService {
         this.timezoneId = ZoneId.of(timezone);
         this.timezone = timezone;
         this.holidayService = holidayService;
+        this.storeConfig = storeConfig;
     }
 
     public DateRange getValidPickupDateRange() {
@@ -78,6 +87,11 @@ public class PickupService {
     public PickupRulesDto getPickupRules(LocalDate baseDate) {
         PickupDateDetails pickupDateDetails = getPickupDateDetails(baseDate);
         List<DateRange> overlappingHolidayDateRanges = holidayService.convertHolidaysToDateRanges(pickupDateDetails.holidaysInRange());
+        List<PickupSlotDto> pickupSlots = Arrays.stream(PickupSlot.values())
+                .map(slot -> new PickupSlotDto(slot.name(), slot.getLabel(), slot.getStartTime(), slot.getEndTime()))
+                .collect(Collectors.toList());
+        List<OpeningHours> openingHours = storeConfig.getOpeningHours().entrySet().stream()
+                .map(entry -> new OpeningHours(entry.getKey(), entry.getValue())).toList();
         return new PickupRulesDto(
                 requiredLeadDays,
                 cutoffHour,
@@ -86,7 +100,9 @@ public class PickupService {
                 timezone,
                 overlappingHolidayDateRanges,
                 pickupDateDetails.validRange().start(),
-                pickupDateDetails.validRange().end()
+                pickupDateDetails.validRange().end(),
+                pickupSlots,
+                openingHours
         );
     }
 }

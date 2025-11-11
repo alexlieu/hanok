@@ -5,11 +5,12 @@ import com.alex_lieu.hanok.entity.OrderItem;
 import com.alex_lieu.hanok.entity.Payment;
 import com.alex_lieu.hanok.entity.ProductVariant;
 import com.alex_lieu.hanok.enums.PaymentMethod;
+import com.alex_lieu.hanok.enums.PickupSlot;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,8 @@ public record OrderSuccessDto(
         String email,
         String phoneNumber,
         LocalDate pickupDateTime,
-        LocalDateTime orderDateTime
+        PickupSlot pickupSlot,
+        ZonedDateTime orderDateTime
 ) implements Serializable {
     private record OrderItemDetails(
             String productName,
@@ -74,6 +76,7 @@ public record OrderSuccessDto(
                 order.getEmail(),
                 order.getPhoneNumber(),
                 order.getPickupDate(),
+                order.getPickupSlot(),
                 order.getOrderDateTime()
         );
     }

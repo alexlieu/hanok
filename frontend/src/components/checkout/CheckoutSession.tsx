@@ -23,7 +23,10 @@ import CheckoutForm from "./CheckoutForm";
 import { twMerge } from "tailwind-merge";
 import { CodedError, OrderRequest } from "../../types/order.types";
 import { PaymentMethod as ApiPaymentMethod } from "../../types/order.types";
-import { createOrder } from "../../services/order.service";
+import {
+  createOrder,
+  transformOrderResponse,
+} from "../../services/order.service";
 import {
   ApiError,
   isCodedBackendError,
@@ -32,7 +35,8 @@ import {
 } from "../../utils/api/apiClient";
 import { ServerErrorProvider } from "../../contexts/ServerErrorProvider";
 import { ServerErrorState } from "../../contexts/ServerErrorContext";
-// import { TEST_CHECKOUT_FORM_VALUES } from "../../constants/testData";
+import { useNavigate } from "react-router-dom";
+import { TEST_CHECKOUT_FORM_VALUES } from "../../constants/testData";
 
 const DEFAULT_CUSTOMER_DETAILS = {
   fullName: "",
@@ -72,6 +76,7 @@ interface CheckoutSessionProps {
 }
 
 export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
+  const navigate = useNavigate();
   const {
     basketContent: { items, total },
     pickupRules: { firstValidDate, lastValidDate, unavailableDates },
@@ -96,8 +101,8 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
     mode: "onTouched",
     reValidateMode: "onChange",
     criteriaMode: "all",
-    defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
-    // defaultValues: TEST_CHECKOUT_FORM_VALUES,
+    // defaultValues: DEFAULT_CHECKOUT_FORM_VALUES,
+    defaultValues: TEST_CHECKOUT_FORM_VALUES,
   });
 
   const { handleSubmit } = methods;
@@ -129,6 +134,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       phoneNumber: data.phoneNumber?.phoneNumber || undefined,
       specialInstructions: data.specialInstructions || undefined,
       pickupDate: data.pickupDate!.toString(),
+      pickupSlot: "SLOT_1", // TODO: Add pickup slot to the order request
       orderItems: items.map((item) => ({
         productVariantId: item.variantId,
         quantity: item.quantity,
@@ -164,11 +170,18 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       ) {
         payload.payment.paymentToken = `tok_test_${payload.payment.paymentMethod.toLowerCase()}_pay_success`;
       }
-      const response = await createOrder(
+      const rawResponse = await createOrder(
         payload,
         payload.payment.paymentMethod
       );
-      console.log("Order created successfully: ", response);
+      console.log("Raw response: ", rawResponse);
+      const orderData = transformOrderResponse(rawResponse);
+      console.log("Order created successfully: ", orderData);
+      navigate("/order-confirmation", {
+        state: {
+          orderData: orderData,
+        },
+      });
       clearServerErrors();
     } catch (error) {
       if (error instanceof ApiError) {

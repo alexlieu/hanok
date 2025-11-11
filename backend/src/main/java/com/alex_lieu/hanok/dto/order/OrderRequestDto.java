@@ -1,5 +1,6 @@
 package com.alex_lieu.hanok.dto.order;
 
+import com.alex_lieu.hanok.enums.PickupSlot;
 import com.alex_lieu.hanok.validation.AtLeastOneRequired;
 import com.alex_lieu.hanok.validation.ValidPhoneNumber;
 import com.alex_lieu.hanok.validation.ValidPickupDate;
@@ -45,12 +46,15 @@ public record OrderRequestDto(
         PaymentRequestDto payment,
 
         @NotNull(message = "{order.pickup-date.not-null}", groups = {ValidationGroups.OrderChecks.class}) @ValidPickupDate(groups = {ValidationGroups.OrderChecks.class, ValidationGroups.FormatAndLogicChecks.class})
-        LocalDate pickupDate
+        LocalDate pickupDate,
+
+        @NotNull(message = "order.pickup-slot.not-null", groups = {ValidationGroups.OrderChecks.class})
+        PickupSlot pickupSlot
 
 ) implements Serializable {
     // The JSON deserializer will call this canonical constructor, so that the data is normalised before the validation annotations are checked.
     // This prevents "dirty" data from "dirty" requests.
-    public OrderRequestDto(String fullName, String customerId, String phoneNumber, String email, List<OrderItemRequestDto> orderItems, String specialInstructions, PaymentRequestDto payment, LocalDate pickupDate) {
+    public OrderRequestDto(String fullName, String customerId, String phoneNumber, String email, List<OrderItemRequestDto> orderItems, String specialInstructions, PaymentRequestDto payment, LocalDate pickupDate, PickupSlot pickupSlot) {
         this.fullName = Optional.ofNullable(fullName).map(s -> s.trim().replaceAll("\\s+", " ")).orElse(null);
         this.customerId = Optional.ofNullable(customerId).map(String::trim).orElse(null);
         this.phoneNumber = Optional.ofNullable(phoneNumber).map(s -> s.trim().replaceAll("[\\s\\-().]", ""))
@@ -60,5 +64,6 @@ public record OrderRequestDto(
         this.pickupDate = pickupDate;
         this.orderItems = orderItems;
         this.payment = payment;
+        this.pickupSlot = pickupSlot;
     }
 }
