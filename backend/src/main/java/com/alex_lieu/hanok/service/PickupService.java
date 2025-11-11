@@ -92,7 +92,6 @@ public class PickupService {
                 .collect(Collectors.toList());
         List<OpeningHours> openingHours = storeConfig.getOpeningHours().entrySet().stream()
                 .map(entry -> new OpeningHours(entry.getKey(), entry.getValue())).toList();
-        System.out.println("Opening hours: " + openingHours);
         return new PickupRulesDto(
                 requiredLeadDays,
                 cutoffHour,
