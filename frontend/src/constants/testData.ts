@@ -28,7 +28,7 @@ export const TEST_BILLING_ADDRESS: BillingAddressData = {
 };
 
 export const TEST_CARD_DETAILS: CardInformation = {
-  cardNumber: "4242 4242 4242 4242",
+  cardNumber: "4000 0566 5566 5556",
   expiration: "12/27",
   cvv: "1234",
   holderName: "John Doe",

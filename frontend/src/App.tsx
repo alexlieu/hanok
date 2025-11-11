@@ -19,6 +19,7 @@ import ProductsSkeleton from "./components/ui/skeletons/ProductsSkeleton";
 import ProductDetailSkeleton from "./components/ui/skeletons/ProductDetailSkeleton";
 import BasketSkeleton from "./components/ui/skeletons/BasketSkeleton";
 import CheckoutSkeleton from "./components/ui/skeletons/CheckoutSkeleton";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
         element: <CheckoutPage />,
         loader: checkoutLoader,
         HydrateFallback: CheckoutSkeleton,
+      },
+      {
+        path: "order-confirmation",
+        element: <OrderConfirmation />,
       },
     ],
   },

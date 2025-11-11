@@ -23,7 +23,10 @@ import CheckoutForm from "./CheckoutForm";
 import { twMerge } from "tailwind-merge";
 import { CodedError, OrderRequest } from "../../types/order.types";
 import { PaymentMethod as ApiPaymentMethod } from "../../types/order.types";
-import { createOrder } from "../../services/order.service";
+import {
+  createOrder,
+  transformOrderResponse,
+} from "../../services/order.service";
 import {
   ApiError,
   isCodedBackendError,
@@ -32,6 +35,7 @@ import {
 } from "../../utils/api/apiClient";
 import { ServerErrorProvider } from "../../contexts/ServerErrorProvider";
 import { ServerErrorState } from "../../contexts/ServerErrorContext";
+import { useNavigate } from "react-router-dom";
 // import { TEST_CHECKOUT_FORM_VALUES } from "../../constants/testData";
 
 const DEFAULT_CUSTOMER_DETAILS = {
@@ -72,6 +76,7 @@ interface CheckoutSessionProps {
 }
 
 export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
+  const navigate = useNavigate();
   const {
     basketContent: { items, total },
     pickupRules: { firstValidDate, lastValidDate, unavailableDates },
@@ -164,11 +169,18 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       ) {
         payload.payment.paymentToken = `tok_test_${payload.payment.paymentMethod.toLowerCase()}_pay_success`;
       }
-      const response = await createOrder(
+      const rawResponse = await createOrder(
         payload,
         payload.payment.paymentMethod
       );
-      console.log("Order created successfully: ", response);
+      console.log("Raw response: ", rawResponse);
+      const orderData = transformOrderResponse(rawResponse);
+      console.log("Order created successfully: ", orderData);
+      navigate("/order-confirmation", {
+        state: {
+          orderData: orderData,
+        },
+      });
       clearServerErrors();
     } catch (error) {
       if (error instanceof ApiError) {

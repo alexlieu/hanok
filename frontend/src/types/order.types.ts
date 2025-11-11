@@ -1,3 +1,4 @@
+import { CalendarDate, ZonedDateTime } from "@internationalized/date";
 import { PAYMENT_METHODS } from "../schemas/CustomerFormSchema";
 
 export type PaymentMethod = Uppercase<
@@ -74,6 +75,28 @@ export interface OrderItemRawResponse {
   unitPrice: number;
   quantity: number;
   itemTotal: number;
+}
+
+export interface OrderResponse {
+  orderStatus: OrderStatus;
+  paymentMethod: PaymentMethod;
+  maskedCardNo: string;
+  orderItems: OrderItemResponse[];
+  total: string;
+  specialInstructions: string;
+  customerName: string;
+  email?: string;
+  phoneNumber?: string;
+  pickupDateTime: CalendarDate;
+  orderDateTime: ZonedDateTime;
+}
+
+export interface OrderItemResponse {
+  productName: string;
+  variantConfig: ProductVariantConfig;
+  unitPrice: string;
+  quantity: number;
+  itemTotal: string;
 }
 
 export interface ProductVariantConfig {
