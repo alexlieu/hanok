@@ -32,7 +32,7 @@ type CountryFieldSpecificConfig = {
 const countryFieldConfigs: Record<string, CountryFieldSpecificConfig> = {
   GB: {
     postalCode: { label: "Postcode" },
-    county: { label: "County (Optional)" },
+    county: { label: "County" },
   },
   US: {
     postalCode: { label: "ZIP Code" },
@@ -280,8 +280,8 @@ const BillingAddressForm = () => {
           const invalidState = !!(invalid || serverError);
           return (
             <TextField
-              label="Apartment, suite, etc. (optional)"
-              placeholder="Apartment, suite, etc. (optional)"
+              label="Apartment, suite, etc."
+              placeholder="Apartment, suite, etc."
               maxLength={30}
               inputRef={ref}
               isInvalid={invalidState}
