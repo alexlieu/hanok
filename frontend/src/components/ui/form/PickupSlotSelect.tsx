@@ -55,7 +55,7 @@ const PickupSlotSelect = () => {
           const invalidState = !!(invalid || serverError);
           return (
             <Select
-              label="And your preferred pickup time?"
+              label="Pickup Time"
               buttonClassNames={borderedSelectButtonStyles}
               isRequired
               isInvalid={invalidState}
