@@ -10,9 +10,9 @@ import java.util.Arrays;
 @Getter
 public enum PickupSlot {
     SLOT_1(new TimeRange("2:00PM - 3:00PM", LocalTime.of(14,0), LocalTime.of(15, 0))),
-    SLOT_2(new TimeRange("2:00PM - 3:00PM", LocalTime.of(15,0), LocalTime.of(16, 0))),
-    SLOT_3(new TimeRange("2:00PM - 3:00PM", LocalTime.of(16,0), LocalTime.of(17, 0))),
-    SLOT_4(new TimeRange("2:00PM - 3:00PM", LocalTime.of(17, 0), LocalTime.of(18, 0))),
+    SLOT_2(new TimeRange("3:00PM - 4:00PM", LocalTime.of(15, 0), LocalTime.of(16, 0))),
+    SLOT_3(new TimeRange("4:00PM - 5:00PM", LocalTime.of(16, 0), LocalTime.of(17, 0))),
+    SLOT_4(new TimeRange("5:00PM - 6:00PM", LocalTime.of(17, 0), LocalTime.of(18, 0))),
     ;
 
     private final TimeRange timeRange;
