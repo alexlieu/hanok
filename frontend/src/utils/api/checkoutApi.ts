@@ -7,17 +7,17 @@ import { ValidStatesProvincesRegions } from "../../types/ValidStatesProvincesReg
 
 /**
  * Converts Java's DayOfWeek enum string (e.g., "MONDAY", "TUESDAY") to
- * @internationalized/date DayOfWeek numeric value (0-6, where 0=Sunday, 1=Monday, etc.)
+ * @internationalized/date DayOfWeek numeric value with locale "en-GB" (0-6, where 6=Sunday, 0=Monday, etc.)
  */
 function parseDayOfWeek(javaDayOfWeek: string): DayOfWeek {
   const dayMap: Record<string, number> = {
-    MONDAY: 1,
-    TUESDAY: 2,
-    WEDNESDAY: 3,
-    THURSDAY: 4,
-    FRIDAY: 5,
-    SATURDAY: 6,
-    SUNDAY: 0, // Java uses 7, but @internationalized/date uses 0 for Sunday
+    MONDAY: 0,
+    TUESDAY: 1,
+    WEDNESDAY: 2,
+    THURSDAY: 3,
+    FRIDAY: 4,
+    SATURDAY: 5,
+    SUNDAY: 6,
   };
 
   const normalizedDay = javaDayOfWeek.trim().toUpperCase();
@@ -63,11 +63,9 @@ export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
 
     const openingHours = rawOpeningHours.map((hour) => ({
       dayOfWeek: parseDayOfWeek(hour.dayOfWeek),
-      timeRange: {
-        label: hour.timeRange.label,
-        start: parseTime(hour.timeRange.start),
-        end: parseTime(hour.timeRange.end),
-      },
+      label: hour.timeRange.label,
+      start: parseTime(hour.timeRange.start),
+      end: parseTime(hour.timeRange.end),
     }));
 
     const unavailableDates = holidayRanges.map((range) => ({
