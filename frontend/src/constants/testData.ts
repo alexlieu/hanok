@@ -13,6 +13,7 @@ export const TEST_CUSTOMER_DETAILS = {
   phoneNumber: { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: "" },
   updatePreference: ["email"],
   pickupDate: new CalendarDate(2025, 12, 10),
+  pickupSlot: "SLOT_1",
   specialInstructions: "",
   paymentMethod: "card" as PaymentMethod,
 };

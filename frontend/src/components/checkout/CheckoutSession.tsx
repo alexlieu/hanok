@@ -145,7 +145,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       phoneNumber: data.phoneNumber?.phoneNumber || undefined,
       specialInstructions: data.specialInstructions || undefined,
       pickupDate: data.pickupDate!.toString(),
-      pickupSlot: "SLOT_1", // TODO: Add pickup slot to the order request
+      pickupSlot: data.pickupSlot!,
       orderItems: items.map((item) => ({
         productVariantId: item.variantId,
         quantity: item.quantity,
