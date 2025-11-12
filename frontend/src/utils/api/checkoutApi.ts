@@ -1,9 +1,38 @@
-import { now, parseDate } from "@internationalized/date";
+import { DayOfWeek, now, parseDate, parseTime } from "@internationalized/date";
 import {
   ConfiguredPickupRules,
   PickupRulesResponse,
 } from "../../types/ConfigTypes";
 import { ValidStatesProvincesRegions } from "../../types/ValidStatesProvincesRegions";
+
+/**
+ * Converts Java's DayOfWeek enum string (e.g., "MONDAY", "TUESDAY") to
+ * @internationalized/date DayOfWeek numeric value (0-6, where 0=Sunday, 1=Monday, etc.)
+ */
+function parseDayOfWeek(javaDayOfWeek: string): DayOfWeek {
+  const dayMap: Record<string, number> = {
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
+    SUNDAY: 0, // Java uses 7, but @internationalized/date uses 0 for Sunday
+  };
+
+  const normalizedDay = javaDayOfWeek.trim().toUpperCase();
+  const dayOfWeek = dayMap[normalizedDay];
+
+  if (dayOfWeek === undefined) {
+    throw new Error(
+      `Invalid day of week: ${javaDayOfWeek}. Expected one of: ${Object.keys(
+        dayMap
+      ).join(", ")}`
+    );
+  }
+
+  return dayOfWeek as unknown as DayOfWeek;
+}
 
 export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
   try {
@@ -16,7 +45,30 @@ export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
       );
     }
     const data = (await response.json()) as PickupRulesResponse;
-    const { timezone, holidayRanges, firstValidDate, lastValidDate } = data;
+    const {
+      timezone,
+      holidayRanges,
+      firstValidDate,
+      lastValidDate,
+      pickupSlots: rawPickupSlots,
+      openingHours: rawOpeningHours,
+    } = data;
+
+    const pickupSlots = rawPickupSlots.map((slot) => ({
+      value: slot.value,
+      label: slot.label,
+      start: parseTime(slot.start),
+      end: parseTime(slot.end),
+    }));
+
+    const openingHours = rawOpeningHours.map((hour) => ({
+      dayOfWeek: parseDayOfWeek(hour.dayOfWeek),
+      timeRange: {
+        label: hour.timeRange.label,
+        start: parseTime(hour.timeRange.start),
+        end: parseTime(hour.timeRange.end),
+      },
+    }));
 
     const unavailableDates = holidayRanges.map((range) => ({
       start: parseDate(range.start),
@@ -28,6 +80,8 @@ export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
       lastValidDate: parseDate(lastValidDate),
       unavailableDates,
       receivedAt: now(timezone),
+      pickupSlots,
+      openingHours,
     } as ConfiguredPickupRules;
   } catch (error) {
     console.log("Failed to fetch pickup rules: ", error);
