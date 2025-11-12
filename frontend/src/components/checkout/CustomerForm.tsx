@@ -11,6 +11,7 @@ import { ControlledPhoneField } from "../ui/form/ControlledPhoneField";
 import { useCallback } from "react";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
+import PickupSlotSelect from "../ui/form/PickupSlotSelect";
 
 const CustomerForm = () => {
   const {
@@ -162,6 +163,7 @@ const CustomerForm = () => {
             }}
           />
         </I18nProvider>
+        <PickupSlotSelect />
         <Controller
           name="updatePreference"
           control={control}

@@ -1,8 +1,9 @@
 import { z } from "zod/v4";
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, DayOfWeek, getDayOfWeek } from "@internationalized/date";
 import { PhoneSchema } from "./PhoneSchema";
 import { isDateInRanges } from "../utils/dateUtils";
 import { DateRange } from "../types/DateTypes";
+import { OpeningHour, PickupSlot } from "../types/ConfigTypes";
 
 export const PAYMENT_METHODS = [
   {
@@ -48,6 +49,7 @@ const CustomerFormSchema = z
     pickupDate: z
       .instanceof(CalendarDate, { message: "Please enter a valid date." })
       .nullish(),
+    pickupSlot: z.string().nullish(),
     updatePreference: z.optional(
       z
         .array(z.enum(["sms", "email"]))
@@ -117,9 +119,17 @@ const CustomerFormSchema = z
 
 const createCustomerFormSchema = (
   unavailableDates: DateRange[],
-  validDateRange: DateRange
+  validDateRange: DateRange,
+  pickupSlots: PickupSlot[],
+  openingHours: OpeningHour[]
 ) => {
-  return CustomerFormSchema.superRefine(({ pickupDate }, ctx) => {
+  const openingHoursMap = new Map(
+    openingHours.map((hour) => [
+      hour.dayOfWeek,
+      { start: hour.start, end: hour.end },
+    ])
+  );
+  return CustomerFormSchema.superRefine(({ pickupDate, pickupSlot }, ctx) => {
     if (pickupDate) {
       if (isDateInRanges(pickupDate, unavailableDates)) {
         ctx.addIssue({
@@ -138,6 +148,39 @@ const createCustomerFormSchema = (
           path: ["pickupDate"],
         });
       }
+    }
+    if (!pickupSlot) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please select a pickup slot.",
+        path: ["pickupSlot"],
+      });
+    }
+    if (!pickupSlots.some((slot) => slot.value === pickupSlot)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please select a valid pickup slot.",
+        path: ["pickupSlot"],
+      });
+    }
+    const selectedDayOpeningHours = pickupDate
+      ? openingHoursMap.get(
+          getDayOfWeek(pickupDate, "en-GB") as unknown as DayOfWeek
+        )
+      : undefined;
+    const unavailablePickupSlots = selectedDayOpeningHours
+      ? pickupSlots.filter(
+          (slot) =>
+            slot.end.compare(selectedDayOpeningHours.end) >= 0 ||
+            slot.start.compare(selectedDayOpeningHours.start) <= 0
+        )
+      : [];
+    if (unavailablePickupSlots.some((slot) => slot.value === pickupSlot)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Please select a valid pickup slot.",
+        path: ["pickupSlot"],
+      });
     }
   });
 };

@@ -65,6 +65,7 @@ const DEFAULT_CARD_DETAILS: CardInformation = {
   holderName: "",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_CHECKOUT_FORM_VALUES: CheckoutFormValues = {
   ...DEFAULT_CUSTOMER_DETAILS,
   ...DEFAULT_BILLING_ADDRESS,
@@ -79,7 +80,13 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
   const navigate = useNavigate();
   const {
     basketContent: { items, total },
-    pickupRules: { firstValidDate, lastValidDate, unavailableDates },
+    pickupRules: {
+      firstValidDate,
+      lastValidDate,
+      unavailableDates,
+      pickupSlots,
+      openingHours,
+    },
     validStatesProvincesRegions,
   } = checkoutData;
 
@@ -87,13 +94,17 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
     return createCheckoutSchema(
       unavailableDates,
       { start: firstValidDate, end: lastValidDate },
-      validStatesProvincesRegions
+      validStatesProvincesRegions,
+      pickupSlots,
+      openingHours
     );
   }, [
     firstValidDate,
     lastValidDate,
     unavailableDates,
     validStatesProvincesRegions,
+    pickupSlots,
+    openingHours,
   ]);
 
   const methods = useForm<CheckoutFormValues>({
