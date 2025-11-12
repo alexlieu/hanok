@@ -6,10 +6,7 @@ import {
 } from "../../schemas/BillingAddressSchema";
 import { useEffect } from "react";
 import { Select, SelectItem } from "../ui/aria/Select";
-import { selectButtonStyles as defaultSelectButtonStyles } from "../ui/aria/styles/selectButtonStyles";
-import { inputStyles } from "../ui/aria/styles/inputStyles";
-import { tv } from "tailwind-variants";
-import { twMerge } from "tailwind-merge";
+import { borderedSelectButtonStyles } from "../ui/aria/styles/borderedSelectButtonStyles";
 import { TextField } from "../ui/aria/TextField";
 import { COUNTRY_CODES } from "../../schemas/BillingAddressSchema";
 import { useLoaderData } from "react-router-dom";
@@ -20,14 +17,6 @@ import {
 } from "../../utils/postalCodeUtils";
 import { checkIsCountry } from "../../utils/countryUtils";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
-
-const selectButtonStyles = tv({
-  extend: defaultSelectButtonStyles,
-  base: twMerge(
-    inputStyles.base,
-    "h-full focus:border-brand-colour-4 focus-visible:ring-[2px] focus-visible:ring-offset-default-bg focus-visible:ring-offset-[2px] focus-visible:transition-shadow focus-visible:ring-brand-focus"
-  ),
-});
 
 type FieldLabelConfig = {
   label: string;
@@ -103,7 +92,7 @@ const BillingAddressForm = () => {
             inputRef={ref}
             value={value}
             onChange={onChange}
-            buttonClassNames={selectButtonStyles}
+            buttonClassNames={borderedSelectButtonStyles}
             {...field}
           >
             {countryList.map(({ value, label }) => (
@@ -183,7 +172,7 @@ const BillingAddressForm = () => {
               inputRef={ref}
               value={value}
               onChange={onChange}
-              buttonClassNames={selectButtonStyles}
+              buttonClassNames={borderedSelectButtonStyles}
               {...field}
             >
               {config.options instanceof Set

@@ -7,6 +7,7 @@ import { CheckoutRequiredData } from "../../../types/CheckoutType";
 import { useServerErrors } from "../../../utils/hooks/features/checkout/useServerErrors";
 import { useMemo } from "react";
 import { DayOfWeek, getDayOfWeek } from "@internationalized/date";
+import { borderedSelectButtonStyles } from "../aria/styles/borderedSelectButtonStyles";
 
 const PickupSlotSelect = () => {
   const {
@@ -55,6 +56,7 @@ const PickupSlotSelect = () => {
           return (
             <Select
               label="And your preferred pickup time?"
+              buttonClassNames={borderedSelectButtonStyles}
               isRequired
               isInvalid={invalidState}
               errorMessage={errorMessage}
