@@ -110,6 +110,8 @@ export const checkoutLoader = async (): Promise<CheckoutRequiredData> => {
         isHoliday: () => false,
         receivedAt: now(getLocalTimeZone()),
         unavailableDates: [],
+        pickupSlots: [],
+        openingHours: [],
       } as ConfiguredPickupRules,
       basketContent: { items: [], total: 0 } as BasketResponse,
       validStatesProvincesRegions: {

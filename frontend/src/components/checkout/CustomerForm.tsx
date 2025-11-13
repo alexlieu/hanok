@@ -11,6 +11,7 @@ import { ControlledPhoneField } from "../ui/form/ControlledPhoneField";
 import { useCallback } from "react";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
+import PickupSlotSelect from "../ui/form/PickupSlotSelect";
 
 const CustomerForm = () => {
   const {
@@ -130,38 +131,41 @@ const CustomerForm = () => {
         <legend className="lowercase tracking-wide text-lg font-medium mb-2">
           pickup and updates
         </legend>
-        <I18nProvider locale="en-GB">
-          <Controller
-            name="pickupDate"
-            control={control}
-            render={({
-              field: { onChange, onBlur, value, ref },
-              fieldState: { invalid, error },
-            }) => {
-              const zodError = error?.message;
-              const serverError =
-                serverErrors.validationErrors.pickupDate?.[0]?.message;
-              const errorMessage = zodError || serverError;
-              const invalidState = !!(invalid || serverError);
-              return (
-                <DatePicker
-                  isInvalid={invalidState}
-                  value={value}
-                  inputRef={ref}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  errorMessage={errorMessage}
-                  minValue={firstValidDate}
-                  maxValue={lastValidDate}
-                  isDateUnavailable={isDateUnavailable}
-                  unavailableDates={unavailableDates}
-                  isRequired
-                  label="What is your preferred pickup date?"
-                />
-              );
-            }}
-          />
-        </I18nProvider>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-[0.7rem]">
+          <I18nProvider locale="en-GB">
+            <Controller
+              name="pickupDate"
+              control={control}
+              render={({
+                field: { onChange, onBlur, value, ref },
+                fieldState: { invalid, error },
+              }) => {
+                const zodError = error?.message;
+                const serverError =
+                  serverErrors.validationErrors.pickupDate?.[0]?.message;
+                const errorMessage = zodError || serverError;
+                const invalidState = !!(invalid || serverError);
+                return (
+                  <DatePicker
+                    isInvalid={invalidState}
+                    value={value}
+                    inputRef={ref}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    errorMessage={errorMessage}
+                    minValue={firstValidDate}
+                    maxValue={lastValidDate}
+                    isDateUnavailable={isDateUnavailable}
+                    unavailableDates={unavailableDates}
+                    isRequired
+                    label="Pickup Date"
+                  />
+                );
+              }}
+            />
+          </I18nProvider>
+          <PickupSlotSelect />
+        </div>
         <Controller
           name="updatePreference"
           control={control}
