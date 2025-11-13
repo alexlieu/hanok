@@ -47,25 +47,28 @@ const PickupSlotSelect = () => {
         render={({
           field: { onChange, onBlur, value, ref },
           fieldState: { invalid, error },
+          formState: { errors },
         }) => {
           const zodError = error?.message;
           const serverError =
             serverErrors.validationErrors.pickupSlot?.[0]?.message;
           const errorMessage = zodError || serverError;
           const invalidState = !!(invalid || serverError);
+          const slotOptions = errors.pickupDate ? [] : availablePickupSlots;
           return (
             <Select
               label="Pickup Time"
               buttonClassNames={borderedSelectButtonStyles}
               isRequired
               isInvalid={invalidState}
+              isDisabled={!!errors.pickupDate}
               errorMessage={errorMessage}
               inputRef={ref}
               onChange={onChange}
               onBlur={onBlur}
               value={value}
             >
-              {availablePickupSlots.map(({ value, label }) => {
+              {slotOptions.map(({ value, label }) => {
                 return (
                   <SelectItem key={value} id={value}>
                     {label}
