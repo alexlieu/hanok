@@ -138,7 +138,7 @@ export function Select<T extends object>({
       <Button
         className={buttonClassNames ? buttonClassNames : selectButtonStyles}
       >
-        {({ isHovered, isFocused }) => (
+        {({ isHovered, isFocused, isDisabled }) => (
           <>
             <SelectValue className="flex-1 text-sm placeholder-shown:italic truncate">
               {({ defaultChildren, isPlaceholder }) => {
@@ -175,9 +175,13 @@ export function Select<T extends object>({
             </SelectValue>
             {defaultChevron ? (
               <LuChevronDown
-                stroke="var(--color-brand-colour-5)"
+                stroke={
+                  isDisabled
+                    ? "var(--color-unavailable)"
+                    : "var(--color-brand-colour-5)"
+                }
                 strokeWidth={3}
-                className="scale-115 group-disabled:text-gray-200"
+                className="scale-115"
               />
             ) : undefined}
           </>

@@ -5,7 +5,7 @@ export const selectButtonStyles = tv({
   variants: {
     isDisabled: {
       false: "text-gray-800 hover:bg-gray-100 group-invalid:border-error-red",
-      true: "text-gray-200",
+      true: "text-disabled-text",
     },
     isFocused: {
       true: "", // "ring-[2px] ring-brand-focus outline-none transition-shadow",
