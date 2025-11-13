@@ -65,57 +65,68 @@ const CustomerFormSchema = z
       .enum(PAYMENT_METHODS.map((method) => method.value))
       .default("card"),
   })
-  .superRefine(({ pickupDate, email, phoneNumber, updatePreference }, ctx) => {
-    if (!pickupDate) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Please enter a valid date.",
-        path: ["pickupDate"],
-      });
-    }
+  .superRefine(
+    ({ pickupDate, pickupSlot, email, phoneNumber, updatePreference }, ctx) => {
+      if (!pickupDate) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please enter a valid date.",
+          path: ["pickupDate"],
+        });
+      }
 
-    const hasEmail = email && email.trim().length !== 0;
-    const hasPhoneNumber =
-      phoneNumber?.phoneNumber && phoneNumber?.phoneNumber.trim().length !== 0;
+      if (!pickupSlot) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please select a pickup slot.",
+          path: ["pickupSlot"],
+        });
+      }
 
-    if (!hasEmail && !hasPhoneNumber) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Please provide either your email or phone number.",
-        path: ["contact"],
-      });
-    }
+      const hasEmail = email && email.trim().length !== 0;
+      const hasPhoneNumber =
+        phoneNumber?.phoneNumber &&
+        phoneNumber?.phoneNumber.trim().length !== 0;
 
-    if (
-      updatePreference?.includes("email") &&
-      !hasEmail &&
-      updatePreference?.includes("sms") &&
-      !hasPhoneNumber
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        message:
-          "Please provide an email and a phone number to receive both email and SMS updates.",
-        path: ["updatePreference"],
-      });
-    }
+      if (!hasEmail && !hasPhoneNumber) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please provide either your email or phone number.",
+          path: ["contact"],
+        });
+      }
 
-    if (updatePreference?.includes("email") && !hasEmail) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Please provide an email to receive email updates.",
-        path: ["updatePreference"],
-      });
-    }
+      if (
+        updatePreference?.includes("email") &&
+        !hasEmail &&
+        updatePreference?.includes("sms") &&
+        !hasPhoneNumber
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Please provide an email and a phone number to receive both email and SMS updates.",
+          path: ["updatePreference"],
+        });
+      }
 
-    if (updatePreference?.includes("sms") && !hasPhoneNumber) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Please provide a phone number to receive SMS updates.",
-        path: ["updatePreference"],
-      });
+      if (updatePreference?.includes("email") && !hasEmail) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please provide an email to receive email updates.",
+          path: ["updatePreference"],
+        });
+      }
+
+      if (updatePreference?.includes("sms") && !hasPhoneNumber) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please provide a phone number to receive SMS updates.",
+          path: ["updatePreference"],
+        });
+      }
     }
-  });
+  );
 
 const createCustomerFormSchema = (
   unavailableDates: DateRange[],
@@ -149,14 +160,7 @@ const createCustomerFormSchema = (
         });
       }
     }
-    if (!pickupSlot) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Please select a pickup slot.",
-        path: ["pickupSlot"],
-      });
-    }
-    if (!pickupSlots.some((slot) => slot.value === pickupSlot)) {
+    if (pickupSlot && !pickupSlots.some((slot) => slot.value === pickupSlot)) {
       ctx.addIssue({
         code: "custom",
         message: "Please select a valid pickup slot.",
@@ -175,6 +179,15 @@ const createCustomerFormSchema = (
             slot.start.compare(selectedDayOpeningHours.start) <= 0
         )
       : [];
+    if (pickupDate && pickupSlot && !selectedDayOpeningHours) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Sorry, we don't have opening hours for that day. Please choose another date.",
+        path: ["pickupSlot"],
+      });
+      return;
+    }
     if (unavailablePickupSlots.some((slot) => slot.value === pickupSlot)) {
       ctx.addIssue({
         code: "custom",
