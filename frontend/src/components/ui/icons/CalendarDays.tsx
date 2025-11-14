@@ -6,6 +6,7 @@ export interface CalendarDaysIconProps extends HTMLAttributes<HTMLDivElement> {
   size?: string | number;
   strokeWidth?: number;
   playAnimation?: boolean | null;
+  isDisabled?: boolean;
 }
 
 const DOTS = [
@@ -23,6 +24,7 @@ const dotVariants: Variants = {
     opacity: [1, 0.3, 1],
     transition: { delay: i * 0.1, duration: 0.4, times: [0, 0.5, 1] },
   }),
+  disabled: { opacity: 1, transition: { duration: 0.2 } },
 };
 
 const svgVariants: Variants = {
@@ -37,6 +39,12 @@ const svgVariants: Variants = {
     color: "var(--color-brand-colour-2)",
     transition: { duration: 0.4, times: [0, 0.5, 1] },
   },
+  disabled: {
+    rotateZ: 0,
+    y: 0,
+    color: "var(--color-disabled-text)",
+    opacity: 0.6,
+  },
 };
 
 export const CalendarDaysIcon = ({
@@ -46,6 +54,7 @@ export const CalendarDaysIcon = ({
   playAnimation = null,
   onMouseEnter,
   onMouseLeave,
+  isDisabled = false,
   ...props
 }: CalendarDaysIconProps) => {
   const [isAnimationConditionMet, setIsAnimationConditionMet] = useState(false);
@@ -55,18 +64,22 @@ export const CalendarDaysIcon = ({
 
   const handleMouseEnter = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
-      setIsAnimationConditionMet(true);
-      onMouseEnter?.(e);
+      if (!isDisabled) {
+        setIsAnimationConditionMet(true);
+        onMouseEnter?.(e);
+      }
     },
-    [onMouseEnter]
+    [onMouseEnter, isDisabled]
   );
 
   const handleMouseLeave = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
-      setIsAnimationConditionMet(false);
-      onMouseLeave?.(e);
+      if (!isDisabled) {
+        setIsAnimationConditionMet(false);
+        onMouseLeave?.(e);
+      }
     },
-    [onMouseLeave]
+    [onMouseLeave, isDisabled]
   );
 
   return (
@@ -88,7 +101,7 @@ export const CalendarDaysIcon = ({
         strokeLinejoin="round"
         initial="normal"
         variants={svgVariants}
-        animate={shouldAnimate ? "animate" : "normal"}
+        animate={isDisabled ? "disabled" : shouldAnimate ? "animate" : "normal"}
       >
         <path d="M8 2v4" />
         <path d="M16 2v4" />
@@ -105,7 +118,9 @@ export const CalendarDaysIcon = ({
               stroke="none"
               initial="normal"
               variants={dotVariants}
-              animate={shouldAnimate ? "animate" : "normal"}
+              animate={
+                isDisabled ? "disabled" : shouldAnimate ? "animate" : "normal"
+              }
               custom={index}
             />
           ))}
