@@ -14,6 +14,7 @@ import { composeTailwindRenderProps } from "./utils";
 import { RefCallBack } from "react-hook-form";
 import { createLabel } from "./utils/createLabel";
 import { CircleChevronDownIcon } from "../icons/CircleChevronDown";
+import { twMerge } from "tailwind-merge";
 
 function getCountryFromCode(code: CountryCodeUnion) {
   return countries.find((c) => c.code === code) || countries[0];
@@ -51,7 +52,7 @@ const buttonStyles = tv({
   base: "flex items-center text-start w-full cursor-default px-1 my-auto ml-1 py-1 focus:outline-none inset-ring-brand-focus",
   variants: {
     isDisabled: {
-      true: "bg-stone-300",
+      true: "opacity-30",
     },
     isFocusVisible: {
       false: "inset-ring-0",
@@ -78,6 +79,7 @@ export const PhoneField = memo(function PhoneField({
   errorMessage,
   inputRef,
   isInvalid,
+  isDisabled,
   phoneNumber,
   countryCode,
   onPhoneNumberChange,
@@ -101,7 +103,11 @@ export const PhoneField = memo(function PhoneField({
           size="0.9rem"
           fill="var(--color-default-bg)"
           strokeWidth={3}
-          stroke="var(--color-brand-colour-5)"
+          stroke={
+            isDisabled
+              ? "var(--color-disabled-text)"
+              : "var(--color-brand-colour-5)"
+          }
           playAnimation={playAnimation}
         />
       </div>
@@ -115,6 +121,7 @@ export const PhoneField = memo(function PhoneField({
 
   return (
     <TextField
+      isDisabled={isDisabled}
       {...props}
       className={composeTailwindRenderProps(
         props.className,
@@ -143,6 +150,7 @@ export const PhoneField = memo(function PhoneField({
           customSelectValue={({ isHovered, isFocused }) =>
             getCountryFlag(isHovered || isFocused)
           }
+          isDisabled={isDisabled}
           defaultChevron={false}
           onFocusChange={setIsFocused}
           widePopover={true}
@@ -170,7 +178,10 @@ export const PhoneField = memo(function PhoneField({
           id={inputId}
           value={phoneNumber}
           inputRef={inputRef}
-          className="focus:outline-0 flex-1 text-sm"
+          className={twMerge(
+            "focus:outline-0 flex-1 text-sm",
+            isDisabled && "text-disabled-text"
+          )}
           placeholder={getCountryFromCode(countryCode).example}
           onChange={(e) =>
             onPhoneNumberChange(
