@@ -77,7 +77,10 @@ export const DateInput = (props: DateInputProps) => {
       {...dateInputProps}
     >
       {(segment) => (
-        <DateSegment segment={segment} className={segmentStyles()} />
+        <DateSegment
+          segment={segment}
+          className={(renderProps) => segmentStyles({ ...renderProps })}
+        />
       )}
     </AriaDateInput>
   );
