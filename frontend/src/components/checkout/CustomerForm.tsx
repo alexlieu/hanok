@@ -136,19 +136,7 @@ const CustomerForm = () => {
             );
           }}
         />
-        <Controller
-          name="phoneNumber"
-          control={control}
-          render={({ field, fieldState }) => (
-            <ControlledPhoneField
-              formState={formState}
-              field={field}
-              fieldState={fieldState}
-              trigger={trigger}
-              hasContactError={!!errors.contact}
-            />
-          )}
-        />
+        <ControlledPhoneField />
       </fieldset>
       <fieldset className="space-y-[0.7rem]">
         <legend className="lowercase tracking-wide text-lg font-medium mb-2">

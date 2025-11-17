@@ -3,7 +3,7 @@ import { CheckoutFormValues } from "../../../../schemas/CheckoutSchema";
 import { debounce } from "../../../debounce";
 import { useMemo } from "react";
 
-const DEBOUNCE_DELAY = 500;
+const DEBOUNCE_DELAY = 300;
 
 /**
  * Creates a debounced function that will trigger validation for the given field names after a delay.
