@@ -43,17 +43,22 @@ export const ControlledPhoneField = memo(() => {
             {
               shouldValidate: false,
               shouldDirty: true,
-              shouldTouch: true,
             }
           );
-          const fieldsToValidate: (keyof CheckoutFormValues)[] = [
-            "phoneNumber",
-            "contact",
-          ];
-          if (triggerUpdatePreferenceValidation) {
-            fieldsToValidate.push("updatePreference");
+          if (
+            submitCount > 0 ||
+            touchedFields.phoneNumber ||
+            touchedFields.email
+          ) {
+            const fieldsToValidate: (keyof CheckoutFormValues)[] = [
+              "phoneNumber",
+              "contact",
+            ];
+            if (triggerUpdatePreferenceValidation) {
+              fieldsToValidate.push("updatePreference");
+            }
+            debouncedTrigger(fieldsToValidate);
           }
-          debouncedTrigger(fieldsToValidate);
         };
         const invalidState = !!(invalid || contactError || serverError);
         return (

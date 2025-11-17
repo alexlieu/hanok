@@ -98,16 +98,21 @@ const CustomerForm = () => {
                   setValue("email", val, {
                     shouldValidate: false,
                     shouldDirty: true,
-                    shouldTouch: true,
                   });
-                  const fieldsToValidate: (keyof CheckoutFormValues)[] = [
-                    "email",
-                    "contact",
-                  ];
-                  if (triggerUpdatePreferenceValidation) {
-                    fieldsToValidate.push("updatePreference");
+                  if (
+                    submitCount > 0 ||
+                    touchedFields.email ||
+                    touchedFields.phoneNumber
+                  ) {
+                    const fieldsToValidate: (keyof CheckoutFormValues)[] = [
+                      "email",
+                      "contact",
+                    ];
+                    if (triggerUpdatePreferenceValidation) {
+                      fieldsToValidate.push("updatePreference");
+                    }
+                    debouncedTrigger(fieldsToValidate);
                   }
-                  debouncedTrigger(fieldsToValidate);
                 }}
                 onBlur={() => {
                   onBlur();
