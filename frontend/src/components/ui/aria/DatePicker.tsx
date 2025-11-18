@@ -64,13 +64,14 @@ export const DatePicker = memo(function DatePicker({
           className="flex-1 min-w-[150px] px-2 py-1.5 text-sm"
         />
         <Button variant="iconNoInteraction" className="mr-1 p-0">
-          {({ isHovered, isFocused }) => {
+          {({ isHovered, isFocused, isDisabled }) => {
             return (
               <CalendarDaysIcon
                 aria-hidden
                 size={"1.2rem"}
                 strokeWidth={2.3}
-                playAnimation={isHovered || isFocused}
+                isDisabled={isDisabled}
+                playAnimation={isDisabled ? false : isHovered || isFocused}
               />
             );
           }}

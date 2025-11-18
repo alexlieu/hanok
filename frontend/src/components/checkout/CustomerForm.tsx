@@ -12,17 +12,21 @@ import { useCallback } from "react";
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { useServerErrors } from "../../utils/hooks/features/checkout/useServerErrors";
 import PickupSlotSelect from "../ui/form/PickupSlotSelect";
+import { useDebouncedFormTrigger } from "../../utils/hooks/features/checkout/useDebouncedFormTrigger";
 
 const CustomerForm = () => {
   const {
     pickupRules: { firstValidDate, lastValidDate, unavailableDates },
   } = useLoaderData() as CheckoutRequiredData;
 
-  const { control, trigger, formState } = useFormContext<CheckoutFormValues>();
+  const { control, trigger, formState, setValue } =
+    useFormContext<CheckoutFormValues>();
 
   const { errors, touchedFields, dirtyFields, submitCount } = formState;
 
   const serverErrors = useServerErrors();
+
+  const debouncedTrigger = useDebouncedFormTrigger();
 
   const isDateUnavailable = useCallback(
     (date: DateValue) => isDateInRanges(date, unavailableDates),
@@ -69,7 +73,7 @@ const CustomerForm = () => {
           name="email"
           control={control}
           render={({
-            field: { onChange, onBlur, value, ref },
+            field: { onBlur, value, ref },
             fieldState: { invalid, error },
           }) => {
             const zodError = error?.message;
@@ -78,20 +82,44 @@ const CustomerForm = () => {
             const contactError = errors.contact?.message;
             const errorMessage = zodError || serverError || contactError;
             const invalidState = !!(invalid || serverError || contactError);
+
+            const triggerUpdatePreferenceValidation: boolean = !!(
+              (touchedFields.email || dirtyFields.email) &&
+              (submitCount > 0 || dirtyFields.updatePreference)
+            );
+
             return (
               <TextField
                 inputRef={ref}
                 value={value}
-                onChange={(e) => {
-                  onChange(e);
+                onChange={(val) => {
+                  // This is the key to bypass the validation mode enforced by RHF.
+                  // We set the value immediately, without validation, and then trigger the debounced validation.
+                  setValue("email", val, {
+                    shouldValidate: false,
+                    shouldDirty: true,
+                  });
                   if (
-                    (touchedFields.email || dirtyFields.email) &&
-                    (submitCount > 0 || dirtyFields.updatePreference)
-                  )
-                    trigger("updatePreference");
-                  trigger("contact");
+                    submitCount > 0 ||
+                    touchedFields.email ||
+                    touchedFields.phoneNumber
+                  ) {
+                    const fieldsToValidate: (keyof CheckoutFormValues)[] = [
+                      "email",
+                      "contact",
+                    ];
+                    if (triggerUpdatePreferenceValidation) {
+                      fieldsToValidate.push("updatePreference");
+                    }
+                    debouncedTrigger(fieldsToValidate);
+                  }
                 }}
-                onBlur={onBlur}
+                onBlur={() => {
+                  onBlur();
+                  if (triggerUpdatePreferenceValidation)
+                    trigger(["updatePreference"]);
+                  trigger(["email", "contact"]);
+                }}
                 label="Email"
                 tooltip={
                   <Tooltip
@@ -113,19 +141,7 @@ const CustomerForm = () => {
             );
           }}
         />
-        <Controller
-          name="phoneNumber"
-          control={control}
-          render={({ field, fieldState }) => (
-            <ControlledPhoneField
-              formState={formState}
-              field={field}
-              fieldState={fieldState}
-              trigger={trigger}
-              hasContactError={!!errors.contact}
-            />
-          )}
-        />
+        <ControlledPhoneField />
       </fieldset>
       <fieldset className="space-y-[0.7rem]">
         <legend className="lowercase tracking-wide text-lg font-medium mb-2">

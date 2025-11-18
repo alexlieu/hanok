@@ -10,7 +10,7 @@ export const fieldBorderStyles = tv({
       true: "border-error-red",
     },
     isDisabled: {
-      true: "bg-unavailable",
+      true: "border-unavailable text-disabled-text",
     },
   },
   compoundVariants: [

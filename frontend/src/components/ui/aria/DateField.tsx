@@ -49,7 +49,7 @@ const segmentStyles = tv({
       true: "text-gray-600 italic",
     },
     isDisabled: {
-      true: "text-gray-200",
+      true: "text-disabled-text",
     },
     isFocused: {
       true: "bg-brand-colour-2 text-default-bg outline-none",
@@ -76,7 +76,12 @@ export const DateInput = (props: DateInputProps) => {
       }
       {...dateInputProps}
     >
-      {(segment) => <DateSegment segment={segment} className={segmentStyles} />}
+      {(segment) => (
+        <DateSegment
+          segment={segment}
+          className={(renderProps) => segmentStyles({ ...renderProps })}
+        />
+      )}
     </AriaDateInput>
   );
 };
