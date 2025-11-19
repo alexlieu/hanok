@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public record OrderSuccessDto(
         CustomerOrder.OrderStatus orderStatus,
+        String orderNumber,
         PaymentMethod paymentMethod,
         String maskedCardNo,
         List<OrderItemDetails> orderItems,
@@ -66,6 +67,7 @@ public record OrderSuccessDto(
 
         return new OrderSuccessDto(
                 order.getOrderStatus(),
+                order.getOrderNumber(),
                 payment.getPaymentMethod(),
                 maskedCardNo,
                 order.getOrderItems().stream().map(OrderItemDetails::fromOrderItemEntity)
