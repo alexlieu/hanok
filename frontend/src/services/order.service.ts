@@ -22,6 +22,7 @@ export const transformOrderResponse = (
 ): OrderResponse => {
   return {
     orderStatus: rawResponse.orderStatus,
+    orderNumber: rawResponse.orderNumber,
     paymentMethod: rawResponse.paymentMethod,
     maskedCardNo: rawResponse.maskedCardNo,
     orderItems: rawResponse.orderItems.map((item) => ({

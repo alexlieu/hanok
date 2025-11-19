@@ -58,6 +58,7 @@ export type OrderStatus =
 
 export interface OrderSuccessRawResponse {
   orderStatus: OrderStatus;
+  orderNumber: string;
   paymentMethod: PaymentMethod;
   pickupSlot: string;
   maskedCardNo: string;
@@ -81,6 +82,7 @@ export interface OrderItemRawResponse {
 
 export interface OrderResponse {
   orderStatus: OrderStatus;
+  orderNumber: string;
   paymentMethod: PaymentMethod;
   pickupSlot: string;
   maskedCardNo: string;
