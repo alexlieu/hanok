@@ -7,7 +7,7 @@ interface LocationState {
   orderData: OrderResponse;
 }
 
-const OrderConfirmation = () => {
+const OrderConfirmationPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
@@ -37,4 +37,4 @@ const OrderConfirmation = () => {
   );
 };
 
-export default OrderConfirmation;
+export default OrderConfirmationPage;
