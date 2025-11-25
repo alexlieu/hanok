@@ -17,18 +17,6 @@ const headerCellStyles = tv({
   },
 });
 
-const cellStyles = tv({
-  base: "text-left align-middle",
-  variants: {
-    productName: {
-      true: "flex flex-row text-left items-center gap-2 align-top mt-[0.7rem]",
-    },
-    price: {
-      true: "text-right",
-    },
-  },
-});
-
 interface LocationState {
   orderData: OrderResponse;
 }
@@ -75,7 +63,7 @@ const OrderConfirmationPage = () => {
         </div>
       </div>
 
-      <table className="border-collapse w-2/5">
+      <table className="border-collapse w-[25rem]">
         <thead className="border-b border-gray-300">
           <tr>
             <th className={headerCellStyles()}>Product</th>
@@ -90,15 +78,19 @@ const OrderConfirmationPage = () => {
                 item.variantConfig.flavour +
                 item.variantConfig.size
               }
+              // Margins do not exist on tables cells <td> in the standard CSS box model.
+              // Some browsers may ignore any margin applied to <td> elements so it is
+              // necessary to use padding instead to create space between the cells.
+              className="first:[&>td]:pt-1 *:pb-1"
             >
-              <td className={cellStyles({ productName: true })}>
+              <td className="text-left align-middle flex flex-row items-center gap-2">
                 <img
                   src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23d1fae5' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2310b981' font-size='12' font-family='sans-serif'%3ENo Image%3C/text%3E%3C/svg%3E"
                   alt={item.productName}
                   className="w-16 h-16 object-cover"
                 />
                 <span className="flex flex-row items-center gap-2">
-                  <span className="inline-block">
+                  <span className="inline-block text-nowrap">
                     {item.quantity}
                     {" x"}
                   </span>
@@ -111,16 +103,14 @@ const OrderConfirmationPage = () => {
                   </span>
                 </span>
               </td>
-              <td className={cellStyles({ price: true })}>
-                {offsetItemTotal(item.itemTotal)}
-              </td>
+              <td className="text-right">{offsetItemTotal(item.itemTotal)}</td>
             </tr>
           ))}
           <tr className="border-t border-gray-300">
             <td className="text-right align-middle py-3 pr-2 font-medium">
-              Total:
+              total:
             </td>
-            <td className={cellStyles({ price: true })}>
+            <td className="text-right">
               {formatPrice(parseFloat(orderData.total))}
             </td>
           </tr>
