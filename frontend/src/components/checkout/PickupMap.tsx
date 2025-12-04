@@ -5,10 +5,11 @@ import L, { LatLng } from "leaflet";
 import { Button } from "../ui/aria/Button";
 import { LuPlus, LuMinus, LuCakeSlice } from "react-icons/lu";
 import { tv } from "tailwind-variants";
-import { IoMdExpand } from "react-icons/io";
 import { Modal } from "../ui/aria/Modal";
 import { Dialog } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
+import { ExpandIcon } from "../ui/icons/Expand";
+import { ShrinkIcon } from "../ui/icons/Shrink";
 
 const position: LatLng = new LatLng(51.40313097396538, -0.2730678337183401);
 const maxZoom = 18;
@@ -144,8 +145,13 @@ const MapControls = ({
         </Button>
       </div>
       <Button variant="icon" className={buttonStyling()} onClick={onToggle}>
-        <IoMdExpand className="size-full" strokeWidth={2} />
-        {isExpanded ? "close" : "open"}
+        {({ isHovered, isFocusVisible }) =>
+          isExpanded ? (
+            <ShrinkIcon isHovered={isHovered} isFocusVisible={isFocusVisible} />
+          ) : (
+            <ExpandIcon playAnimation={isHovered} />
+          )
+        }
       </Button>
     </div>
   );
