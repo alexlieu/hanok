@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
+import { RefObject, useEffect, useRef, useState } from "react";
+import L, { LatLng } from "leaflet";
 import { Button } from "../ui/aria/Button";
 import { LuPlus, LuMinus, LuCakeSlice } from "react-icons/lu";
 import { tv } from "tailwind-variants";
@@ -10,7 +10,7 @@ import { Modal } from "../ui/aria/Modal";
 import { Dialog } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 
-const position: [number, number] = [51.40313097396538, -0.2730678337183401];
+const position: LatLng = new LatLng(51.40313097396538, -0.2730678337183401);
 const maxZoom = 18;
 const minZoom = 10;
 
@@ -18,21 +18,27 @@ const MapContent = ({
   isInteractive,
   onToggle,
   isExpanded,
+  initialCenter,
+  initialZoom,
+  ref: mapRef,
 }: {
   isInteractive: boolean;
   onToggle?: () => void;
   isExpanded: boolean;
+  initialCenter?: LatLng;
+  initialZoom?: number;
+  ref: RefObject<L.Map | null>;
 }) => {
-  const mapRef = useRef<L.Map | null>(null);
   useEffect(() => {
     mapRef.current?.invalidateSize();
     // if (isInteractive) mapRef.current?.panTo(position, { animate: false });
-  }, [isExpanded]);
+  }, [isExpanded, mapRef]);
   return (
     <MapContainer
       ref={mapRef}
-      center={position}
-      zoom={maxZoom}
+      center={initialCenter ? initialCenter : position}
+      zoom={initialZoom ? initialZoom : maxZoom}
+      maxZoom={maxZoom}
       minZoom={minZoom}
       scrollWheelZoom={true}
       zoomControl={false}
@@ -147,6 +153,43 @@ const MapControls = ({
 
 const PickupMap: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [syncedView, setSyncedView] = useState({
+    center: position,
+    zoom: maxZoom,
+  });
+  const inlineMapRef = useRef<L.Map | null>(null);
+  const expandedMapRef = useRef<L.Map | null>(null);
+  const handleExpand = () => {
+    if (inlineMapRef.current) {
+      setSyncedView({
+        center: inlineMapRef.current.getCenter(),
+        zoom: inlineMapRef.current.getZoom(),
+      });
+    }
+    setIsOpen(true);
+  };
+
+  // There is a Render vs State race condition.
+  // When setIsOpen(false) is called the flyTo() call is made immediately in the next line,
+  // which can happen when the map has not yet re-rendered and the inline map has the
+  // invisible class. This means that Leaflet tries to animate the map that is styled as
+  // hidden. The useEffect hook runs after the render is committed to the DOM.
+  useEffect(() => {
+    const mapRef = inlineMapRef.current;
+    if (!isOpen && mapRef) {
+      const distanceMeters = position.distanceTo(syncedView.center);
+      const calculatedDuration = Math.min(
+        Math.max(distanceMeters / 2500, 0.5),
+        1.5
+      );
+      mapRef.invalidateSize();
+      mapRef.setView(position, maxZoom, {
+        animate: true,
+        duration: calculatedDuration,
+        easeLinearity: 0.25,
+      });
+    }
+  }, [isOpen, syncedView]);
 
   return (
     <>
@@ -158,8 +201,11 @@ const PickupMap: React.FC = () => {
       >
         <MapContent
           isInteractive={true}
-          onToggle={() => setIsOpen((prevVal) => !prevVal)}
+          onToggle={handleExpand}
           isExpanded={false}
+          initialCenter={position}
+          initialZoom={maxZoom}
+          ref={inlineMapRef}
         />
         <Modal
           isOpen={isOpen}
@@ -174,11 +220,13 @@ const PickupMap: React.FC = () => {
           >
             {({ close }) => (
               <div className="h-[80vh] w-[90vw] md:w-[80vh] md:h-[80vh] bg-white rounded-xl overflow-hidden relative">
-                {/* Render the fully interactive map */}
                 <MapContent
+                  ref={expandedMapRef}
                   isInteractive={true}
                   isExpanded={true}
                   onToggle={close}
+                  initialCenter={syncedView.center}
+                  initialZoom={syncedView.zoom}
                 />
               </div>
             )}
