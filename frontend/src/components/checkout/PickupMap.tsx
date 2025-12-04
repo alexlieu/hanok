@@ -98,25 +98,25 @@ const PickupMap: React.FC = () => {
         <div className="w-full h-30 flex flex-col justify-evenly items-center">
           <Button
             variant="icon"
-            className={buttonStyling()}
+            className={buttonStyling({ isDisabled: atOrigin })}
             onClick={() => map.setView(position, maxZoom, { animate: true })}
-            isDisabled={atOrigin}
+            aria-disabled={atOrigin}
           >
             <LuCakeSlice className="size-full" strokeWidth={2} />
           </Button>
           <Button
             variant="icon"
-            className={buttonStyling()}
+            className={buttonStyling({ isDisabled: !canZoomIn })}
             onClick={() => map.setZoom(map.getZoom() + 1)}
-            isDisabled={!canZoomIn}
+            aria-disabled={!canZoomIn}
           >
             <LuPlus className="size-full" strokeWidth={2} />
           </Button>
           <Button
             variant="icon"
-            className={buttonStyling()}
+            className={buttonStyling({ isDisabled: !canZoomOut })}
             onClick={() => map.setZoom(map.getZoom() - 1)}
-            isDisabled={!canZoomOut}
+            aria-disabled={!canZoomOut}
           >
             <LuMinus className="size-full" strokeWidth={2} />
           </Button>
