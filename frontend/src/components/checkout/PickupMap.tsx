@@ -149,7 +149,7 @@ const MapControls = ({
           isExpanded ? (
             <ShrinkIcon isHovered={isHovered} isFocusVisible={isFocusVisible} />
           ) : (
-            <ExpandIcon playAnimation={isHovered} />
+            <ExpandIcon isHovered={isHovered} isFocusVisible={isFocusVisible} />
           )
         }
       </Button>

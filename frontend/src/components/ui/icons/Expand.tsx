@@ -1,45 +1,89 @@
-import type { Transition } from "motion/react";
+import type { Transition, Variants } from "motion/react";
 import type { HTMLAttributes } from "react";
-import { useState } from "react";
-import { motion } from "motion/react";
-
-export interface ExpandIconHandle {
-  startAnimation: () => void;
-  stopAnimation: () => void;
-}
+import { useEffect, useState } from "react";
+import { motion, useAnimation } from "motion/react";
 
 interface ExpandIconProps extends HTMLAttributes<HTMLDivElement> {
   size?: number;
-  playAnimation?: boolean;
+  isHovered?: boolean;
+  isFocusVisible?: boolean;
 }
 
-const defaultTransition: Transition = {
+const SPRING_TRANSITION: Transition = {
   type: "spring",
   stiffness: 250,
   damping: 25,
 };
+
+const PEEK_TRANSITION: Transition = {
+  type: "tween",
+  duration: 0.5,
+  ease: "easeInOut",
+};
+
+const getVariants = (xDir: number, yDir: number): Variants => ({
+  closed: { translateX: "0px", translateY: "0px" },
+  open: { translateX: `${xDir}px`, translateY: `${yDir}px` },
+  peek: {
+    translateX: ["0px", `${xDir}px`, "0px"],
+    translateY: ["0px", `${yDir}px`, "0px"],
+    transition: PEEK_TRANSITION,
+  },
+});
 
 const ExpandIcon = ({
   onMouseEnter,
   onMouseLeave,
   className,
   size = 28,
-  playAnimation,
+  isHovered,
+  isFocusVisible,
   ...props
 }: ExpandIconProps) => {
   const [isInternalHover, setIsInternalHover] = useState(false);
-  const isControlled = playAnimation !== undefined;
-  const shouldAnimate = isControlled ? playAnimation : isInternalHover;
+  const controls = useAnimation();
 
-  const currentVariant = shouldAnimate ? "open" : "closed";
+  const activeHover = isHovered !== undefined ? isHovered : isInternalHover;
+
+  useEffect(() => {
+    if (activeHover) {
+      controls.start("open");
+      return;
+    }
+
+    if (isFocusVisible) {
+      controls.start("peek");
+    } else {
+      controls.start("closed");
+    }
+
+    if (!activeHover && !isFocusVisible) {
+      controls.start("closed");
+    }
+  }, [activeHover, isFocusVisible, controls]);
+
+  useEffect(() => {
+    if (activeHover) {
+      controls.start("open");
+    } else {
+      controls.start("closed");
+    }
+  });
+
+  useEffect(() => {
+    if (isFocusVisible && !activeHover) {
+      controls.start("peek");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocusVisible, controls]);
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isControlled) setIsInternalHover(true);
+    if (isHovered === undefined) setIsInternalHover(true);
     onMouseEnter?.(e);
   };
 
   const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isControlled) setIsInternalHover(false);
+    if (isHovered === undefined) setIsInternalHover(false);
     onMouseLeave?.(e);
   };
 
@@ -63,42 +107,30 @@ const ExpandIcon = ({
       >
         <motion.path
           d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8"
-          transition={defaultTransition}
-          variants={{
-            closed: { translateX: "0%", translateY: "0%" },
-            open: { translateX: "2px", translateY: "2px" },
-          }}
-          animate={currentVariant}
+          transition={SPRING_TRANSITION}
+          variants={getVariants(2, 2)}
+          animate={controls}
           initial={false}
         />
         <motion.path
           d="M3 16.2V21m0 0h4.8M3 21l6-6"
-          transition={defaultTransition}
-          variants={{
-            closed: { translateX: "0%", translateY: "0%" },
-            open: { translateX: "-2px", translateY: "2px" },
-          }}
-          animate={currentVariant}
+          transition={SPRING_TRANSITION}
+          variants={getVariants(-2, 2)}
+          animate={controls}
           initial={false}
         />
         <motion.path
           d="M21 7.8V3m0 0h-4.8M21 3l-6 6"
-          transition={defaultTransition}
-          variants={{
-            closed: { translateX: "0%", translateY: "0%" },
-            open: { translateX: "2px", translateY: "-2px" },
-          }}
-          animate={currentVariant}
+          transition={SPRING_TRANSITION}
+          variants={getVariants(2, -2)}
+          animate={controls}
           initial={false}
         />
         <motion.path
           d="M3 7.8V3m0 0h4.8M3 3l6 6"
-          transition={defaultTransition}
-          variants={{
-            closed: { translateX: "0%", translateY: "0%" },
-            open: { translateX: "-2px", translateY: "-2px" },
-          }}
-          animate={currentVariant}
+          transition={SPRING_TRANSITION}
+          variants={getVariants(-2, -2)}
+          animate={controls}
           initial={false}
         />
       </svg>
