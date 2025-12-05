@@ -21,7 +21,8 @@ const SPRING_TRANSITION: Transition = {
 const PEEK_TRANSITION: Transition = {
   type: "tween",
   duration: 0.5,
-  ease: "easeInOut",
+  times: [0, 0.3, 1],
+  ease: ["easeIn", "easeOut"],
 };
 
 const getVariants = (xDir: number, yDir: number): Variants => ({
