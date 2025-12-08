@@ -5,11 +5,12 @@ import L, { LatLng } from "leaflet";
 import { Button } from "../ui/aria/Button";
 import { LuPlus, LuMinus, LuCakeSlice } from "react-icons/lu";
 import { tv } from "tailwind-variants";
-import { Modal } from "../ui/aria/Modal";
 import { Dialog } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 import { ExpandIcon } from "../ui/icons/Expand";
 import { ShrinkIcon } from "../ui/icons/Shrink";
+import { MotionModal } from "../ui/aria/MotionModal";
+import { motion } from "motion/react";
 
 const position: LatLng = new LatLng(51.40313097396538, -0.2730678337183401);
 const maxZoom = 18;
@@ -159,6 +160,7 @@ const MapControls = ({
 
 const PickupMap: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [syncedView, setSyncedView] = useState({
     center: position,
     zoom: maxZoom,
@@ -173,6 +175,15 @@ const PickupMap: React.FC = () => {
       });
     }
     setIsOpen(true);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      setIsClosing(false);
+    } else {
+      setIsClosing(true);
+    }
+    setIsOpen(open);
   };
 
   // There is a Render vs State race condition.
@@ -199,11 +210,17 @@ const PickupMap: React.FC = () => {
 
   return (
     <>
-      <div
+      <motion.div
         className={twMerge(
           "relative w-full aspect-3/2 sm:aspect-square mx-auto",
-          `${isOpen ? "invisible" : ""}`
+          `${isOpen || isClosing ? "invisible" : ""}`
         )}
+        variants={{
+          visible: { opacity: 1, filter: "blur(0px)" },
+          hidden: { opacity: 0, filter: "blur(2px)" },
+        }}
+        animate={isOpen || isClosing ? "hidden" : "visible"}
+        transition={{ ease: "easeOut", duration: 0.5 }}
       >
         <MapContent
           isInteractive={true}
@@ -213,12 +230,13 @@ const PickupMap: React.FC = () => {
           initialZoom={maxZoom}
           ref={inlineMapRef}
         />
-        <Modal
+        <MotionModal
           isOpen={isOpen}
-          onOpenChange={setIsOpen}
+          onOpenChange={handleOpenChange}
           isDismissable
           size="full"
           className="bg-transparent shadow-none border-none p-0"
+          onExitComplete={() => setIsClosing(false)}
         >
           <Dialog
             className="outline-none h-full w-full"
@@ -237,8 +255,8 @@ const PickupMap: React.FC = () => {
               </div>
             )}
           </Dialog>
-        </Modal>
-      </div>
+        </MotionModal>
+      </motion.div>
     </>
   );
 };
