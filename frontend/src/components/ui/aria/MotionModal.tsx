@@ -1,17 +1,19 @@
-import { AnimatePresence, easeOut, motion } from "motion/react";
+import { animate, AnimatePresence, motion } from "motion/react";
 import {
   Modal as RACModal,
   ModalOverlay,
   ModalOverlayProps,
 } from "react-aria-components";
 import { tv, VariantProps } from "tailwind-variants";
+import { twMerge } from "tailwind-merge";
+import { useEffect } from "react";
 
 const overlayStyles = tv({
-  base: "fixed top-0 left-0 w-full h-(--visual-viewport-height) isolate z-20 bg-default-bg/10 flex items-center justify-center p-4 text-center backdrop-blur-lg",
+  base: "fixed top-0 left-0 w-full h-(--visual-viewport-height) isolate z-20 bg-default-bg/10 flex items-center justify-center p-4 text-center",
 });
 
 const modalStyles = tv({
-  base: "w-full max-h-full bg-white dark:bg-zinc-800/70 dark:backdrop-blur-2xl dark:backdrop-saturate-200 forced-colors:bg-[Canvas] text-left align-middle text-slate-700 dark:text-zinc-300 shadow-2xl bg-clip-padding border border-black/10 dark:border-white/10",
+  base: "w-full max-h-full bg-white forced-colors:bg-[Canvas] text-left align-middle text-slate-700 shadow-2xl bg-clip-padding border border-black/10",
   variants: {
     size: {
       xs: "max-w-xs",
@@ -27,8 +29,10 @@ const modalStyles = tv({
 
 type ModalVariants = VariantProps<typeof modalStyles>;
 
-const AnimatedModal = motion(RACModal);
-const AnimatedModalOverlay = motion(ModalOverlay);
+const AnimatedModal = motion.create(RACModal);
+const AnimatedModalOverlay = motion.create(ModalOverlay);
+
+const root = document.body.firstElementChild as HTMLElement;
 
 // Motion and react-aria-components have namespace collisions on specific event prop names.
 type ConflictingProps =
@@ -55,6 +59,22 @@ const MotionModal = ({
   onExitComplete,
   ...props
 }: MotionModalProps) => {
+  useEffect(() => {
+    if (!root) return;
+    if (isOpen) {
+      animate(
+        root,
+        { scale: 0.95, overflow: "hidden" },
+        { type: "spring", stiffness: 400, damping: 30 }
+      );
+    } else {
+      animate(
+        root,
+        { scale: 1 },
+        { type: "spring", stiffness: 400, damping: 30 }
+      );
+    }
+  }, [isOpen]);
   return (
     <AnimatePresence onExitComplete={onExitComplete}>
       {isOpen && (
@@ -63,14 +83,13 @@ const MotionModal = ({
           onOpenChange={onOpenChange}
           isDismissable={isDismissable}
           className={overlayStyles}
+          initial={{ backdropFilter: "blur(8px)" }}
+          animate={{ backdropFilter: "blur(8px)" }}
+          exit={{ backdropFilter: "blur(0px)" }}
         >
           <AnimatedModal
             {...props}
-            className={modalStyles({ size, className })}
-            initial={{ filter: "blur(2px)", y: 10 }}
-            animate={{ filter: "blur(0px)", y: 0 }}
-            exit={{ filter: "blur(2px)", y: 10 }}
-            transition={{ ease: easeOut, duration: 0.1 }}
+            className={twMerge(modalStyles({ size }), className)}
           />
         </AnimatedModalOverlay>
       )}

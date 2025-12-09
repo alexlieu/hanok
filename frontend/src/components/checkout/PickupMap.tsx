@@ -1,16 +1,21 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import L, { LatLng } from "leaflet";
 import { Button } from "../ui/aria/Button";
 import { LuPlus, LuMinus, LuCakeSlice } from "react-icons/lu";
 import { tv } from "tailwind-variants";
 import { Dialog } from "react-aria-components";
-import { twMerge } from "tailwind-merge";
 import { ExpandIcon } from "../ui/icons/Expand";
 import { ShrinkIcon } from "../ui/icons/Shrink";
 import { MotionModal } from "../ui/aria/MotionModal";
-import { motion } from "motion/react";
+import { motion, Transition } from "motion/react";
+
+const expandTransition: Transition = {
+  type: "spring",
+  stiffness: 450,
+  damping: 30,
+};
 
 const position: LatLng = new LatLng(51.40313097396538, -0.2730678337183401);
 const maxZoom = 18;
@@ -160,103 +165,116 @@ const MapControls = ({
 
 const PickupMap: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [syncedView, setSyncedView] = useState({
     center: position,
     zoom: maxZoom,
   });
   const inlineMapRef = useRef<L.Map | null>(null);
   const expandedMapRef = useRef<L.Map | null>(null);
-  const handleExpand = () => {
-    if (inlineMapRef.current) {
+
+  const syncMapState = useCallback((fromMap: L.Map | null) => {
+    if (fromMap) {
       setSyncedView({
-        center: inlineMapRef.current.getCenter(),
-        zoom: inlineMapRef.current.getZoom(),
+        center: fromMap.getCenter(),
+        zoom: fromMap.getZoom(),
       });
     }
+  }, []);
+
+  const handleExpand = () => {
+    syncMapState(inlineMapRef.current);
     setIsOpen(true);
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setIsClosing(false);
-    } else {
-      setIsClosing(true);
+  const handleClose = (open: boolean) => {
+    if (!open) {
+      syncMapState(expandedMapRef.current);
     }
     setIsOpen(open);
   };
 
-  // There is a Render vs State race condition.
-  // When setIsOpen(false) is called the flyTo() call is made immediately in the next line,
-  // which can happen when the map has not yet re-rendered and the inline map has the
-  // invisible class. This means that Leaflet tries to animate the map that is styled as
-  // hidden. The useEffect hook runs after the render is committed to the DOM.
   useEffect(() => {
-    const mapRef = inlineMapRef.current;
-    if (!isOpen && mapRef) {
-      const distanceMeters = position.distanceTo(syncedView.center);
-      const calculatedDuration = Math.min(
-        Math.max(distanceMeters / 2500, 0.5),
-        1.5
-      );
-      mapRef.invalidateSize();
-      mapRef.setView(position, maxZoom, {
-        animate: true,
-        duration: calculatedDuration,
-        easeLinearity: 0.25,
+    if (!isOpen && inlineMapRef.current) {
+      const mapRef = inlineMapRef.current;
+      // The nested call of requestAnimationFrame() is the ensure that the
+      // inline map is painted before we begin animating it
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const distanceMeters = position.distanceTo(syncedView.center);
+          const calculatedDuration = Math.min(
+            Math.max(distanceMeters / 5000, 0.3),
+            1
+          );
+          mapRef.invalidateSize();
+          mapRef.setView(position, maxZoom, {
+            animate: true,
+            duration: calculatedDuration,
+            easeLinearity: 0.25,
+          });
+        });
       });
     }
-  }, [isOpen, syncedView]);
+  }, [isOpen, syncedView.center]);
 
   return (
     <>
-      <motion.div
-        className={twMerge(
-          "relative w-full aspect-3/2 sm:aspect-square mx-auto",
-          `${isOpen || isClosing ? "invisible" : ""}`
+      <div className="relative w-full aspect-3/2 sm:aspect-square mx-auto">
+        {!isOpen && (
+          <motion.div
+            layoutId="pickup-map-card"
+            className="w-full h-full overflow-hidden"
+            transition={expandTransition}
+          >
+            <MapContent
+              isInteractive={true}
+              onToggle={handleExpand}
+              isExpanded={false}
+              initialCenter={syncedView.center}
+              initialZoom={syncedView.zoom}
+              ref={inlineMapRef}
+            />
+          </motion.div>
         )}
-        variants={{
-          visible: { opacity: 1, filter: "blur(0px)" },
-          hidden: { opacity: 0, filter: "blur(2px)" },
-        }}
-        animate={isOpen || isClosing ? "hidden" : "visible"}
-        transition={{ ease: "easeOut", duration: 0.5 }}
-      >
-        <MapContent
-          isInteractive={true}
-          onToggle={handleExpand}
-          isExpanded={false}
-          initialCenter={position}
-          initialZoom={maxZoom}
-          ref={inlineMapRef}
-        />
+
         <MotionModal
           isOpen={isOpen}
-          onOpenChange={handleOpenChange}
+          onOpenChange={handleClose}
           isDismissable
           size="full"
-          className="bg-transparent shadow-none border-none p-0"
-          onExitComplete={() => setIsClosing(false)}
+          className="bg-transparent shadow-none border-none p-0 flex items-center justify-center pointer-events-none"
+          onExitComplete={() => {
+            syncMapState(expandedMapRef.current);
+          }}
         >
           <Dialog
-            className="outline-none h-full w-full"
+            className="outline-none pointer-events-auto"
             aria-label="Pickup location map"
           >
-            {({ close }) => (
-              <div className="h-[80vh] w-[90vw] md:w-[80vh] md:h-[80vh] bg-white rounded-xl overflow-hidden relative">
-                <MapContent
-                  ref={expandedMapRef}
-                  isInteractive={true}
-                  isExpanded={true}
-                  onToggle={close}
-                  initialCenter={syncedView.center}
-                  initialZoom={syncedView.zoom}
-                />
-              </div>
-            )}
+            {({ close }) => {
+              const handleCloseClick = () => {
+                syncMapState(expandedMapRef.current);
+                close();
+              };
+              return (
+                <motion.div
+                  layoutId="pickup-map-card"
+                  className="h-[80vh] w-[90vw] md:w-[80vh] md:h-[80vh] bg-white overflow-hidden relative"
+                  transition={expandTransition}
+                >
+                  <MapContent
+                    ref={expandedMapRef}
+                    isInteractive={true}
+                    isExpanded={true}
+                    onToggle={handleCloseClick}
+                    initialCenter={syncedView.center}
+                    initialZoom={syncedView.zoom}
+                  />
+                </motion.div>
+              );
+            }}
           </Dialog>
         </MotionModal>
-      </motion.div>
+      </div>
     </>
   );
 };
