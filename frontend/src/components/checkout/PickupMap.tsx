@@ -186,7 +186,7 @@ const PickupMap: React.FC = () => {
     setIsOpen(true);
   };
 
-  const handleClose = (open: boolean) => {
+  const handleOpenChange = (open: boolean) => {
     if (!open) {
       syncMapState(expandedMapRef.current);
     }
@@ -238,7 +238,7 @@ const PickupMap: React.FC = () => {
 
         <MotionModal
           isOpen={isOpen}
-          onOpenChange={handleClose}
+          onOpenChange={handleOpenChange}
           isDismissable
           size="full"
           className="bg-transparent shadow-none border-none p-0 flex items-center justify-center pointer-events-none"
@@ -250,28 +250,22 @@ const PickupMap: React.FC = () => {
             className="outline-none pointer-events-auto"
             aria-label="Pickup location map"
           >
-            {({ close }) => {
-              const handleCloseClick = () => {
-                syncMapState(expandedMapRef.current);
-                close();
-              };
-              return (
-                <motion.div
-                  layoutId="pickup-map-card"
-                  className="h-[80vh] w-[90vw] md:w-[80vh] md:h-[80vh] bg-white overflow-hidden relative"
-                  transition={expandTransition}
-                >
-                  <MapContent
-                    ref={expandedMapRef}
-                    isInteractive={true}
-                    isExpanded={true}
-                    onToggle={handleCloseClick}
-                    initialCenter={syncedView.center}
-                    initialZoom={syncedView.zoom}
-                  />
-                </motion.div>
-              );
-            }}
+            {({ close }) => (
+              <motion.div
+                layoutId="pickup-map-card"
+                className="h-[80vh] w-[90vw] md:w-[80vh] md:h-[80vh] bg-white overflow-hidden relative"
+                transition={expandTransition}
+              >
+                <MapContent
+                  ref={expandedMapRef}
+                  isInteractive={true}
+                  isExpanded={true}
+                  onToggle={close}
+                  initialCenter={syncedView.center}
+                  initialZoom={syncedView.zoom}
+                />
+              </motion.div>
+            )}
           </Dialog>
         </MotionModal>
       </div>
