@@ -127,7 +127,7 @@ const MapControls = memo(
     return (
       <div
         ref={controlsRef}
-        className="absolute top-0 right-0 pt-2 pb-5 pr-2 w-12 h-full z-[1000] flex flex-col justify-between"
+        className="absolute top-0 right-0 pt-2 pb-7 pr-2 w-12 h-full z-[1000] flex flex-col justify-between items-center"
       >
         <div className="w-full h-30 flex flex-col justify-evenly items-center">
           <Button
