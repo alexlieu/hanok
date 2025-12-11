@@ -2,6 +2,7 @@ package com.alex_lieu.hanok.enums;
 
 import com.alex_lieu.hanok.utils.orders.TimeRange;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.time.LocalTime;
@@ -29,6 +30,7 @@ public enum PickupSlot {
         return timeRange.end();
     }
 
+    @JsonValue
     public String getLabel() {
         return timeRange.label();
     }
