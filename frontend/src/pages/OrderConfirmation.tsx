@@ -117,7 +117,7 @@ const OrderConfirmationPage = () => {
         </tbody>
       </table>
 
-      <div className="w-1/4">
+      <div className="w-full px-2">
         <h2>Collection Details</h2>
         <div className="w-full">
           <PickupMap />
