@@ -77,6 +77,297 @@ When reviewing or writing code, actively teach:
 - **Performance**: "I'm avoiding premature optimization here - readability first, optimize only if profiling shows a bottleneck"
 - **Error messages**: "This error message includes what went wrong AND how to fix it - helpful for debugging"
 
+## Git Commit Message Format
+
+This project follows the **Conventional Commits** specification with specific formatting conventions. All commit messages must follow this format to maintain a consistent, readable git history.
+
+### Basic Format Structure
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+**Simple Example**:
+```
+feat(frontend/PickupMap): Add expandable fullscreen map
+```
+
+**With Breaking Change**:
+```
+feat(frontend/checkout)!: Remove deprecated phone validation
+
+The old phone validation method has been replaced with the new
+libphonenumber-based validator. Components using the old validator
+need to update to the new API.
+
+BREAKING CHANGE: PhoneValidator.validate() now returns a different
+error object structure
+```
+
+### Commit Types
+
+Use these standard types (lowercase):
+
+- **feat**: New feature or enhancement to existing feature
+- **fix**: Bug fix
+- **refactor**: Code change that neither fixes a bug nor adds a feature (restructuring, optimization)
+- **docs**: Documentation-only changes
+
+### Scope Format
+
+The scope specifies the **layer** and **component/area** being modified.
+
+**Format**: `<layer>/<component-or-area>`
+
+**Examples**:
+- `frontend/PickupMap` - Frontend component (PascalCase for component names)
+- `backend/CustomerOrder` - Backend entity/feature (PascalCase for entities)
+- `frontend/checkout` - Frontend feature area (lowercase for areas)
+- `frontend/types` - Frontend type definitions (lowercase for utilities/types)
+- `frontend/utils` - Frontend utilities (lowercase)
+- Just `docs` - For documentation-only changes without code scope
+
+**Rules**:
+- Use **PascalCase** for component names: `PickupMap`, `OrderConfirmation`, `PhoneField`, `DatePicker`
+- Use **lowercase** for areas/utilities: `checkout`, `types`, `utils`
+- Always include the layer prefix (`frontend/` or `backend/`) unless it's a `docs` commit
+- The scope goes in parentheses with no spaces: `(frontend/PickupMap)` not `( frontend/PickupMap )`
+
+### Breaking Changes
+
+Use `!` after the scope (before the colon) to indicate a **breaking change**:
+
+```
+feat(frontend/checkout)!: Remove phone number field
+fix(backend/CustomerOrder)!: Change order status enum values
+```
+
+**When to use breaking change indicator**:
+- Removing props from components that other parts of the app use
+- Changing API endpoint request/response contracts
+- Renaming or removing exported functions, types, or interfaces
+- Changing component APIs in ways that require updates to calling code
+- Modifying database schema or business logic that affects existing functionality
+
+**Why this matters**:
+- Alerts other developers (or future you) that this change requires attention
+- Signals that dependent code may need updates
+- In semantic versioning, breaking changes trigger major version bumps
+- Makes it easy to find all breaking changes: `git log --grep="!:"`
+
+### Description Format
+
+**Rules**:
+1. **Start with a capital letter** - "Add feature" not "add feature"
+2. **Use imperative mood** - "Add" not "Added" or "Adds"
+3. **Be specific and descriptive** - Explain what changed
+4. **No period at the end** - "Add feature" not "Add feature."
+5. **Keep under 72 characters when possible** - For better readability in git logs and GitHub UI
+
+**Why 72 characters**:
+- Git shows the first line in `git log --oneline` and truncates longer lines
+- GitHub UI shows ~72 chars before cutting off with "..."
+- Makes commit history scannable without scrolling
+- Details can go in the commit body (explained below)
+
+**Common imperative verbs to start with**:
+- **Add** - New functionality or files
+- **Update** - Changes to existing functionality
+- **Remove** - Deletion of code or features
+- **Fix** - Bug fixes
+- **Refactor** - Code restructuring
+- **Optimize** - Performance improvements
+- **Format** - Styling/formatting changes
+- **Rename** - Renaming variables, files, or components
+- **Revert** - Undoing previous changes
+- **Sync** - Synchronizing state or behavior
+- **Isolate** - Restricting scope or focus
+- **Match** - Aligning behavior with something else
+
+### Commit Body (Optional but Recommended)
+
+For complex changes, add a blank line after the description, then add a body explaining:
+- **Why** the change was made (motivation)
+- **How** it works (if not obvious from code)
+- **Tradeoffs** or decisions made
+- **Context** that would help future developers
+
+**Example without body** (description does all the work):
+```
+fix(frontend/DatePicker): Correct focus styling on date segments
+```
+
+**Example with body** (complex change needs explanation):
+```
+feat(frontend/checkout): Add debounced validation to email field
+
+Implements a custom useDebounce hook to delay validation until the user
+stops typing. This improves UX by reducing error message flickering and
+prevents unnecessary API calls during typing.
+
+The validation triggers 300ms after the user stops typing, matching the
+pattern used in the phone number field for consistency.
+```
+
+**When to use a body**:
+- Complex features that need context about **why** they were built
+- Bug fixes where the cause isn't obvious from the description
+- Changes involving tradeoffs or alternative approaches considered
+- Refactoring that affects multiple files or patterns
+- Performance optimizations explaining what was slow and how it's fixed
+
+**Formatting the body**:
+- Leave one blank line between description and body
+- Wrap lines at 72 characters
+- Use paragraphs to separate different points
+- Use bullet points or lists if helpful
+
+**Why this helps**:
+- Keeps the first line short and scannable
+- Provides context that helps during code reviews
+- Helps future developers (including yourself in 6 months) understand decisions
+- Makes debugging easier when you need to understand why code changed
+
+### Choosing Between Prose and Bullets
+
+The commit body can use prose paragraphs, bullet points, or both. Choose the format based on what you're communicating, not a rigid rule. **Mixing formats in the same commit is perfectly fine** - use what makes the content clearest.
+
+**Use prose (paragraphs) for**:
+- Narrative explanations of why you made a decision
+- Describing tradeoffs you considered
+- Explaining context about the problem
+- Showing how different parts relate to each other
+
+**Example with prose**:
+```
+refactor(frontend/BasketProvider): Optimize basket sync with backend
+
+Changed from syncing on every state update to debounced syncing every
+500ms. This reduces API calls from ~10 per basket operation to 1.
+
+The optimistic UI update still happens immediately, so UX is unchanged.
+Backend remains source of truth with rollback on validation errors.
+```
+
+**Use bullet points for**:
+- Multiple independent changes in one commit
+- Lists of affected components or files
+- Step-by-step processes
+- Breaking changes that require specific updates
+
+**Example with bullets**:
+```
+feat(frontend/checkout): Add comprehensive form validation
+
+Implements client-side validation with backend sync:
+
+- Email field: debounced validation (300ms delay)
+- Phone field: libphonenumber validation with country detection
+- Address: conditional validation based on country (UK/US)
+- Payment: different validation groups for card vs token
+
+All fields show errors on blur or after first submit attempt.
+```
+
+**Mix prose and bullets when helpful**:
+```
+feat(frontend/checkout): Add comprehensive form validation
+
+Implements comprehensive client-side validation to reduce server load
+and provide immediate user feedback. This prevents invalid submissions
+and improves UX by catching errors before the payment step.
+
+Changes include:
+- Email field: debounced validation (300ms delay)
+- Phone field: libphonenumber with country detection
+- Address: conditional validation (UK postcode, US state/ZIP required)
+- Payment: validation groups for card vs tokenized payments
+
+The validation strategy matches backend rules to ensure consistency.
+Errors display on blur or after first submit to avoid interrupting
+users who are still typing.
+```
+
+**Key principle**: Focus on clarity, not format consistency. The reader cares about understanding what changed and why, not whether you used bullets or prose. Use whichever format (or combination) makes your explanation clearest.
+
+**Quick decision framework**:
+- Single concept/change → Prose explaining why
+- Multiple related changes → Brief prose intro + bullet list
+- Complex refactoring → Prose explaining problem/solution
+- Breaking changes → Prose explanation + bullets for what needs updating
+
+### Real Examples from This Project
+
+**Good examples following the format**:
+
+```
+feat(frontend/PickupMap): Add expandable fullscreen map to pickup map
+fix(frontend/PickupMap): Align expand/close button with map controls
+refactor(frontend/PickupMap): Optimize re-renders with React.memo
+feat(backend/CustomerOrder): Return pickup slot label in OrderSuccessDto
+feat(frontend/utils): Add debounce utility function
+docs: Add CLAUDE.md with codebase architecture guide
+```
+
+**Examples with bodies** (for complex changes):
+
+```
+feat(frontend/checkout): Add debounced validation to form fields
+
+Implements custom useDebounce hook to delay validation until user stops
+typing. This prevents error flickering and reduces unnecessary validation
+calls during active typing.
+
+Applied to both email and phone fields with 300ms delay for consistency.
+```
+
+```
+refactor(frontend/BasketProvider): Optimize basket sync with backend
+
+Changed from syncing on every state update to debounced syncing every
+500ms. This reduces API calls from ~10 per basket operation to 1.
+
+The optimistic UI update still happens immediately, so UX is unchanged.
+Backend remains source of truth with rollback on validation errors.
+```
+
+### Why This Format Matters
+
+Understanding the reasoning behind this convention helps you appreciate its value:
+
+**Consistency**:
+- Makes git history readable and easy to scan
+- You can quickly find all features, fixes, or refactors by type
+- `git log --oneline --grep="feat(frontend"` shows all frontend features
+- Team members (or future you) can understand the project evolution quickly
+
+**Context at a Glance**:
+- The scope tells you exactly where to look for changes without opening files
+- `feat(frontend/PickupMap)` immediately tells you it's a new feature in the PickupMap component
+- The `!` breaking change indicator prevents surprises during updates
+
+**Automation Potential**:
+- Tools can generate changelogs automatically from conventional commits
+- Can trigger different CI/CD pipelines based on commit type
+- Semantic versioning tools can determine version bumps (feat = minor, fix = patch, feat! = major)
+- GitHub Actions can label PRs automatically based on commit types
+
+**Better Code Reviews**:
+- Reviewers know what kind of change to expect from the type
+- The body provides context without needing to ask questions
+- Breaking changes are clearly marked and get extra scrutiny
+
+**Debugging Aid**:
+- `git log --grep="fix.*PickupMap"` finds all bug fixes in that component
+- `git blame` shows meaningful context for each line change
+- Bisecting bugs is easier when commits are clearly categorized
+
+When Claude Code creates commits, it will follow this exact format including breaking change indicators and bodies for complex changes to maintain consistency with your project's history.
+
 ## Common Commands
 
 ### Frontend (React + Vite)
