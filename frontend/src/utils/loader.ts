@@ -12,14 +12,15 @@ import {
 } from "./api/checkoutApi";
 import { getLocalTimeZone, now, today } from "@internationalized/date";
 import { ConfiguredPickupRules } from "../types/ConfigTypes";
+import { API_BASE_URL } from "./api/apiClient";
 
 export const productsLoader = async (): Promise<LoaderData> => {
   try {
     const [allProducts, categoryCounts] = await Promise.all([
-      fetch("http://localhost:8080/api/products")
+      fetch(`${API_BASE_URL}/products`)
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
-      fetch("http://localhost:8080/api/products/categories")
+      fetch(`${API_BASE_URL}/products/categories`)
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
     ]);
@@ -45,7 +46,7 @@ export const productsByCategoryLoader = async ({
 }: LoaderFunctionArgs<"categorySlug">): Promise<ProductView[]> => {
   const categorySlug = params.categorySlug;
   const response = await fetch(
-    `http://localhost:8080/api/products?category=${categorySlug}`
+    `${API_BASE_URL}/products?category=${categorySlug}`
   );
   if (!response.ok)
     throw new Response(
@@ -63,7 +64,7 @@ export const productLoader = async ({
   try {
     const slug = params.productSlug;
     const response = await fetch(
-      `http://localhost:8080/api/products/by-slug/${slug}`
+      `${API_BASE_URL}/products/by-slug/${slug}`
     );
     if (!response.ok) {
       throw new Response(JSON.stringify({ message: "Product not found." }), {

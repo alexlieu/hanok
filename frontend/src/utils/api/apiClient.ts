@@ -1,7 +1,7 @@
 import { CheckoutFormValues } from "../../schemas/CheckoutSchema";
 import { CodedError, ValidationError } from "../../types/order.types";
 
-const API_BASE_URL =
+export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 export class ApiError extends Error {

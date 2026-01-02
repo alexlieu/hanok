@@ -4,6 +4,7 @@ import {
   PickupRulesResponse,
 } from "../../types/ConfigTypes";
 import { ValidStatesProvincesRegions } from "../../types/ValidStatesProvincesRegions";
+import { API_BASE_URL } from "./apiClient";
 
 /**
  * Converts Java's DayOfWeek enum string (e.g., "MONDAY", "TUESDAY") to
@@ -36,9 +37,7 @@ function parseDayOfWeek(javaDayOfWeek: string): DayOfWeek {
 
 export const getPickupRules = async (): Promise<ConfiguredPickupRules> => {
   try {
-    const response = await fetch(
-      "http://localhost:8080/api/config/pickup-rules"
-    );
+    const response = await fetch(`${API_BASE_URL}/config/pickup-rules`);
     if (!response.ok) {
       throw new Error(
         `HTTP Error: ${response.status} - ${response.statusText}`
@@ -93,7 +92,7 @@ export const getValidStatesProvincesRegions =
   async (): Promise<ValidStatesProvincesRegions> => {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/config/addresses/statesProvincesRegions"
+        `${API_BASE_URL}/config/addresses/statesProvincesRegions`
       );
       if (!response.ok) {
         throw new Error(
