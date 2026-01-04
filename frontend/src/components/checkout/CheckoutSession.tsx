@@ -191,6 +191,7 @@ export const CheckoutSession = ({ checkoutData }: CheckoutSessionProps) => {
       navigate("/order-confirmation", {
         state: {
           orderData: orderData,
+          slots: pickupSlots,
         },
       });
       clearServerErrors();
