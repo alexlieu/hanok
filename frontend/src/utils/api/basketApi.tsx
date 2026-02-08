@@ -1,5 +1,6 @@
 import { BasketResponse } from "../../types/BasketTypes";
 import { APIResponseError } from "../../types/ErrorType";
+import { API_BASE_URL } from "./apiClient";
 
 const getBasketResponse = async (
   ids: number[],
@@ -13,7 +14,7 @@ const getBasketResponse = async (
     .filter(Boolean)
     .join("&");
   const response = await fetch(
-    `http://localhost:8080/api/orders/basket?${queryString}`
+    `${API_BASE_URL}/orders/basket?${queryString}`
   );
   if (!response.ok) {
     let errorMessage = `Request failed with status ${response.status}`;

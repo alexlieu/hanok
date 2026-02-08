@@ -236,7 +236,7 @@ const PickupMap: React.FC = () => {
 
   return (
     <>
-      <div className="relative w-full aspect-3/2 sm:aspect-square mx-auto">
+      <div className="relative w-full aspect-3/2 md:aspect-square mx-auto">
         {!isOpen && (
           <motion.div
             layoutId="pickup-map-card"
